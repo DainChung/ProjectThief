@@ -21,6 +21,7 @@ namespace Com.MyCompany.MyGame
 
         #region Private
 
+        bool isConnecting;
         string gameVersion = "1";
 
         #endregion
@@ -35,7 +36,8 @@ namespace Com.MyCompany.MyGame
 
         void Start()
         {
-            Connect();
+            progressLabel.SetActive(false);
+            controlPanel.SetActive(true);
         }
 
         #endregion
@@ -47,12 +49,18 @@ namespace Com.MyCompany.MyGame
         {
             Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
 
-            //임의의 방에 접속 시도
-            PhotonNetwork.JoinRandomRoom();
+            if (isConnecting)
+            {
+                //임의의 방에 접속 시도
+                PhotonNetwork.JoinRandomRoom();
+            }
         }
 
         public override void OnDisconnected(DisconnectCause cause)
         {
+            progressLabel.SetActive(false);
+            controlPanel.SetActive(true);
+
             Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
         }
 
@@ -65,16 +73,30 @@ namespace Com.MyCompany.MyGame
 
         public override void OnJoinedRoom()
         {
-            Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+            Debug.Log("We load the 'Room1 Demo'");
+
+            PhotonNetwork.LoadLevel("Room1 Demo");
         }
 
         #endregion
 
 
-        #region Public Methods
+        #region Public Fields
+
+        [Tooltip("The UI Panel to let the user enter name, connect and play")]
+        [SerializeField]
+        private GameObject controlPanel;
+        [Tooltip("The UI Label to inform the user that the connection is in progress")]
+        [SerializeField]
+        private GameObject progressLabel;
 
         public void Connect()
         {
+            isConnecting = true;
+
+            progressLabel.SetActive(true);
+            controlPanel.SetActive(false);
+
             if (PhotonNetwork.IsConnected)
             {
                 //임의의 방에 접속, 실패시 방 생성
@@ -86,6 +108,16 @@ namespace Com.MyCompany.MyGame
                 PhotonNetwork.GameVersion = gameVersion;
                 PhotonNetwork.ConnectUsingSettings();
             }
+        }
+
+        void OnApplicationQuit()
+        {
+            PhotonNetwork.Disconnect();
+        }
+
+        public void Quit()
+        {        
+            Application.Quit();
         }
 
         #endregion
