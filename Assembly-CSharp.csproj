@@ -61,6 +61,9 @@
      <Compile Include="Assets\Scripts\Demo\DemoPlayerManager.cs" />
      <Compile Include="Assets\Scripts\Server\DEMOPlayerNameInputField.cs" />
      <Compile Include="Assets\Scripts\Server\Launcher.cs" />
+     <Compile Include="Assets\Scripts\System\CameraWork.cs" />
+     <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\Unit\Unit.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
