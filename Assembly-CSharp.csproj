@@ -55,12 +55,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Demo\DemoCameraWork.cs" />
-     <Compile Include="Assets\Scripts\Demo\DemoGameManager.cs" />
-     <Compile Include="Assets\Scripts\Demo\DemoPlayerAnimatorManager.cs" />
-     <Compile Include="Assets\Scripts\Demo\DemoPlayerManager.cs" />
-     <Compile Include="Assets\Scripts\Server\DEMOPlayerNameInputField.cs" />
-     <Compile Include="Assets\Scripts\Server\Launcher.cs" />
      <Compile Include="Assets\Scripts\System\CameraWork.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Unit\Unit.cs" />
@@ -268,11 +262,8 @@
  <Reference Include="UnityEngine.XRModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
  </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="websocket-sharp">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
+ <Reference Include="System.Windows.Forms">
+ <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/System.Windows.Forms.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -625,36 +616,6 @@
  <Reference Include="System.Xml.Serialization">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.PhotonPlayer.Editor.csproj">
-      <Project>{268624A2-BFD6-401C-0B7D-671A2A10C016}</Project>
-      <Name>PhotonUnityNetworking.Utilities.PhotonPlayer.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.csproj">
-      <Project>{045E13F2-5346-7BE4-FDE9-37434B261BD6}</Project>
-      <Name>PhotonUnityNetworking.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonWebSocket.csproj">
-      <Project>{4AF0279A-E276-A7D8-29BB-306E484F14DF}</Project>
-      <Name>PhotonWebSocket</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonRealtime.csproj">
-      <Project>{3A3C3FDD-6681-3383-0885-3B812AFD19F2}</Project>
-      <Name>PhotonRealtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.csproj">
-      <Project>{6B351F4A-F722-186A-3224-F4BD35B8C044}</Project>
-      <Name>PhotonUnityNetworking</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.Culling.Editor.csproj">
-      <Project>{05CB955D-4861-3E3D-DEB9-B2E4A13AACD4}</Project>
-      <Name>PhotonUnityNetworking.Utilities.Culling.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Editor.csproj">
-      <Project>{5506EE59-E663-CFAC-B0DD-7D1AE4D53248}</Project>
-      <Name>PhotonUnityNetworking.Editor</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

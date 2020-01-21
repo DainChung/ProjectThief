@@ -73,6 +73,7 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
+        //카메라가 보고 있는 방향을 전방으로 정함
         void SetLookDir(float vertical, float horizontal)
         {
             lookDir = (vertical * mainCameraTransform.forward) + (horizontal * mainCameraTransform.right) + transform.position;
