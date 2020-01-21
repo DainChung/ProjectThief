@@ -8,7 +8,7 @@ namespace Com.MyCompany.MyGame
     {
         #region Public Var
 
-        public Vector3 dist;
+        public Vector3 cameraPos;
         public float smooth;
 
         #endregion
@@ -16,20 +16,20 @@ namespace Com.MyCompany.MyGame
         #region Private Var
 
         private Transform player;
-        private Vector3 playerPos;
+        private Vector3 destiPos;
+        private float dist;
 
         #endregion
 
         #region MonoBehaviour Callbacks
 
-        // Start is called before the first frame update
         void Start()
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
+            destiPos = cameraPos;
         }
 
-        // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
             FollowPlayer();
         }
@@ -40,7 +40,15 @@ namespace Com.MyCompany.MyGame
 
         private void FollowPlayer()
         {
-            transform.position = Vector3.Lerp(transform.position, player.position + dist, Time.deltaTime * smooth * player.GetComponent<Unit>().speed);
+            dist = Vector3.Distance(cameraPos, Vector3.zero);
+            destiPos.Set(Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.y) * dist, cameraPos.y, Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.y) * dist);
+            destiPos = player.position - destiPos;
+            destiPos.Set(destiPos.x, player.position.y + cameraPos.y, destiPos.z);
+
+            //카메라 회전을 감안해서 플레이어 캐릭터를 따라다님
+            transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * smooth * player.GetComponent<Unit>().speed);
+            //마우스 움직임에 따라 카메라 회전
+            //transform.RotateAround(player.position, player.up, Time.deltaTime);
         }
 
         #endregion
