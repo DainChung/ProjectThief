@@ -282,14 +282,14 @@
  <Reference Include="UnityEditor.iOS.Extensions">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="System.Windows.Forms">
+ <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/System.Windows.Forms.dll</HintPath>
+ </Reference>
  <Reference Include="Photon3Unity3D">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/Photon3Unity3D.dll</HintPath>
  </Reference>
  <Reference Include="websocket-sharp">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
- </Reference>
- <Reference Include="System.Windows.Forms">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/System.Windows.Forms.dll</HintPath>
  </Reference>
  <Reference Include="nunit.framework">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>

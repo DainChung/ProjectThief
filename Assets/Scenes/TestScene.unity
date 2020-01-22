@@ -587,7 +587,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraPos: {x: 0, y: 2, z: 5}
   smooth: 9
-  rotationSpeed: 2
+  rotationSpeed: 3
 --- !u!1 &1589049144
 GameObject:
   m_ObjectHideFlags: 0

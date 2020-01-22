@@ -61,6 +61,8 @@ namespace Com.MyCompany.MyGame
 
             //플레이어 캐릭터 이동
             //if ((Input.GetButton("Vertical") || Input.GetButton("Horizontal")) && 바닥과 접촉하고 있을 때)로 수정 필요
+            //바닥 접촉 문제 해결되면 숙이기 구현 -> 플레이어 이동속도 감소
+            //이후 은신 관련 기능 추가 (예시)))float cloak; if (플레이어 == 서있음) cloak = 1; else if (플레이어 == 숙이기) cloak = 0.5;)
             if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
             {
                 rigidBody.MovePosition( transform.position
