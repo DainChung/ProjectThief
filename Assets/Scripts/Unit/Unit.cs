@@ -11,6 +11,7 @@ namespace Com.MyCompany.MyGame
 
         private float _speed;
         private uint _health;
+        private bool _isOnFloor = false;
 
         #endregion
 
@@ -18,6 +19,7 @@ namespace Com.MyCompany.MyGame
 
         public float speed { get { return _speed; } set { _speed = value; } }
         public uint health { get { return _health; } }
+        public bool isOnFloor { get { return _isOnFloor; } }
 
         #endregion
 
@@ -39,6 +41,18 @@ namespace Com.MyCompany.MyGame
         void Update()
         {
 
+        }
+
+        void OnTriggerStay(Collider other)
+        {
+            if (other.tag.CompareTo("Floor") == 0)
+                _isOnFloor = true;
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.tag.CompareTo("Floor") == 0)
+                _isOnFloor = false;
         }
 
         #endregion

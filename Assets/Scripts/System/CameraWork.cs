@@ -13,8 +13,7 @@ namespace Com.MyCompany.MyGame
         public Vector3 cameraPos;
         public float smooth;
 
-        // [HideInInspector]
-        public float rotationSpeed = 100f;
+        public float rotationSpeed;
 
         #endregion
 
@@ -83,11 +82,11 @@ namespace Com.MyCompany.MyGame
             //최대 회전 제한, 내려다 볼 수 있는 최대 각도 60도, 올려다 볼 수 있는 최소 각도 -25도, z축 회전 방지
             if (transform.eulerAngles.x > 60 && transform.eulerAngles.x < 90)
             {
-                transform.rotation = Quaternion.Euler(60, curEulerAngle.y, 0);
+                transform.rotation = Quaternion.Euler(60f, curEulerAngle.y, 0);
             }
             else if (transform.eulerAngles.x > 90 && transform.eulerAngles.x < 335)
             {
-                transform.rotation = Quaternion.Euler(335, curEulerAngle.y, 0);
+                transform.rotation = Quaternion.Euler(335f, curEulerAngle.y, 0);
             }
             //최대 각도, 최소 각도 도달 못해도 z축 회전하는 경우 방지
             else
