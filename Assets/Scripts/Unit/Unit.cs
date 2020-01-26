@@ -28,7 +28,7 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             _health = 1;
-            _speed = 20.0f;
+            _speed = 50.0f;
         }
 
         // Start is called before the first frame update
@@ -71,36 +71,6 @@ namespace Com.MyCompany.MyGame
                 _health = 0;
             else
                 _health -= damage;
-        }
-
-        /// <summary>
-        /// 플레이어 캐릭터가 향할 위치를 반환하는 함수
-        /// </summary>
-        /// <param name="curPos"> 움직일 물체의 현재 위치 </param>
-        /// <param name="dirTransform"> 방향의 기준이 되는 Transform(플레이어는 메인카메라) </param>
-        /// <param name="vertical"> Input.GetAxis("Vertical") </param>
-        /// <param name="horizontal"> Input.GetAxis("Horizontal") </param>
-        /// <returns> 플레이어 캐릭터가 향할 위치 </returns>
-        public Vector3 GetDestiPos(Vector3 curPos, Transform dirTransform, float vertical, float horizontal)
-        {
-            Vector3 result = curPos + (dirTransform.forward * vertical + dirTransform.right * horizontal) * _speed * Time.deltaTime;
-            result.Set(result.x, curPos.y, result.z);
-
-            return result;
-        }
-
-        /// <summary>
-        /// 적 캐릭터가 향할 위치를 반환하는 함수
-        /// </summary>
-        /// <param name="vertical"> 전방 Or 후방 가중치 </param>
-        /// <param name="horizontal"> 좌 Or 우 가중치 </param>
-        /// <returns> 적 캐릭터가 향할 위치 </returns>
-        public Vector3 GetDestiPos(float vertical, float horizontal)
-        {
-            Vector3 result = transform.position + (transform.forward * vertical + transform.right * horizontal) * _speed * Time.deltaTime;
-            result.Set(result.x, transform.position.y, result.z);
-
-            return result;
         }
 
         #endregion
