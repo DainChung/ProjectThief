@@ -17,6 +17,8 @@ namespace Com.MyCompany.MyGame
 
         private Rigidbody rb;
 
+        private Animator animator;
+
         //높을수록 적캐릭터에게 쉽게 들킨다.
         private float aggro = 0.1f;
 
@@ -37,14 +39,14 @@ namespace Com.MyCompany.MyGame
         // Start is called before the first frame update
         void Start()
         {
-            unit = gameObject.GetComponent<Unit>();
+            unit = GetComponent<Unit>();
+            rb = GetComponent<Rigidbody>();
+            animator = unit.animator;
 
             playerSpeed = unit.speed;
 
             mainCameraTransform = Camera.main.transform;
             lookDir = mainCameraTransform.forward + transform.position;
-
-            rb = gameObject.GetComponent<Rigidbody>();
         }
 
         void FixedUpdate()

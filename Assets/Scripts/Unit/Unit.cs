@@ -21,6 +21,8 @@ namespace Com.MyCompany.MyGame
         public uint health { get { return _health; } }
         public bool isOnFloor { get { return _isOnFloor; } }
 
+        public Animator animator;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -37,10 +39,35 @@ namespace Com.MyCompany.MyGame
 
         }
 
-        // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
+            if (isOnFloor)
+            {
+                if (Input.GetAxis("Vertical") != 0)
+                {
+                    Debug.Log("V: " + Input.GetAxis("Vertical"));
+                    animator.SetFloat("movespeed", Mathf.Abs(Input.GetAxis("Vertical")));
+                    animator.SetFloat("TurnRight", Input.GetAxis("Vertical"));
+                }
+                else if (Input.GetAxis("Horizontal") != 0)
+                {
+                    Debug.Log("H: " + Input.GetAxis("Horizontal"));
+                    animator.SetFloat("movespeed", Mathf.Abs(Input.GetAxis("Horizontal")));
+                    animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
+                }
+                else
+                {
+                    animator.SetFloat("movespeed", 0);
+                    animator.SetFloat("TurnRight", 0);
+                }
 
+                Debug.Log("WTF with TurnRight: " + animator.GetFloat("TurnRight"));
+            }
+            else
+            {
+                animator.SetFloat("movespeed", 0);
+                animator.SetFloat("TurnRight", 0);
+            }
         }
 
         void OnTriggerStay(Collider other)

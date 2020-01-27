@@ -36,11 +36,11 @@ namespace Com.MyCompany.MyGame
         //프레임과 상관없이 일정 시간마다 호출
         void FixedUpdate()
         {
-            //플레이어 캐릭터를 따라다님
-            FollowPlayer();
-
             //마우스를 움직이면 카메라 회전
             CameraRotation(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+
+            //플레이어 캐릭터를 따라다님
+            FollowPlayer();
         }
 
         #endregion
