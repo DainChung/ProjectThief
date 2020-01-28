@@ -13,9 +13,6 @@ namespace Com.MyCompany.MyGame
         private uint _health;
         private bool _isOnFloor = false;
 
-        private float prevLookAngle = 0.0f;
-        private int angleDifferTimeChecker = 0;
-
         #endregion
 
         #region Public Values
@@ -42,10 +39,9 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsRunMode", true);
         }
 
-
         void FixedUpdate()
         {
-            if (isOnFloor)
+            if (_isOnFloor)
             {
                 animator.SetBool("IsFalling", false);
 
@@ -54,35 +50,28 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButton("Vertical"))
                     {
                         animator.SetBool("IsMoving", true);
+                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
                     }
                     else if (Input.GetButton("Horizontal"))
                     {
                         animator.SetBool("IsMoving", true);
+                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
                     }
                     else
                     {
                         animator.SetBool("IsMoving", false);
                         animator.SetFloat("TurnRight", 0);
+                        animator.SetFloat("MoveSpeed", 0);
                     }
-
-                    float angleDiffer = Mathf.Abs(prevLookAngle - transform.rotation.eulerAngles.y);
-                    if (angleDiffer <= 185 && angleDiffer >= 175)
-                        animator.SetBool("Opposite", true);
-                    else
-                        animator.SetBool("Opposite", false);
                 }
-                //if(animator.GetBool("Opposite") == true)
-                //    Debug.Log(animator.GetBool("Opposite"));
             }
             else
             {
                 animator.SetBool("IsFalling", true);
                 animator.SetBool("IsMoving", false);
                 animator.SetFloat("TurnRight", 0);
+                animator.SetFloat("MoveSpeed", 0);
             }
-
-
-            prevLookAngle = transform.rotation.eulerAngles.y;
         }
 
         void OnTriggerStay(Collider other)
