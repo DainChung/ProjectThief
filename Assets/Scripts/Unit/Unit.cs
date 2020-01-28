@@ -42,35 +42,41 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsRunMode", true);
         }
 
+
         void FixedUpdate()
         {
             if (isOnFloor)
             {
-                if (Input.GetButton("Vertical"))
-                {
-                    animator.SetBool("IsMoving", true);
-                }
-                else if (Input.GetButton("Horizontal"))
-                {
-                    animator.SetBool("IsMoving", true);
-                }
-                else
-                {
-                    animator.SetBool("IsMoving", false);
-                    animator.SetFloat("TurnRight", 0);
-                }
+                animator.SetBool("IsFalling", false);
 
-                float angleDiffer = Mathf.Abs(prevLookAngle - transform.rotation.eulerAngles.y);
-                if (angleDiffer < 182 && angleDiffer > 178)
-                    animator.SetBool("Opposite", true);
-                else
-                    animator.SetBool("Opposite", false);
+                if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
+                {
+                    if (Input.GetButton("Vertical"))
+                    {
+                        animator.SetBool("IsMoving", true);
+                    }
+                    else if (Input.GetButton("Horizontal"))
+                    {
+                        animator.SetBool("IsMoving", true);
+                    }
+                    else
+                    {
+                        animator.SetBool("IsMoving", false);
+                        animator.SetFloat("TurnRight", 0);
+                    }
 
+                    float angleDiffer = Mathf.Abs(prevLookAngle - transform.rotation.eulerAngles.y);
+                    if (angleDiffer <= 185 && angleDiffer >= 175)
+                        animator.SetBool("Opposite", true);
+                    else
+                        animator.SetBool("Opposite", false);
+                }
                 //if(animator.GetBool("Opposite") == true)
                 //    Debug.Log(animator.GetBool("Opposite"));
             }
             else
             {
+                animator.SetBool("IsFalling", true);
                 animator.SetBool("IsMoving", false);
                 animator.SetFloat("TurnRight", 0);
             }
