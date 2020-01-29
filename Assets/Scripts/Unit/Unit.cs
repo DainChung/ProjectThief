@@ -13,11 +13,14 @@ namespace Com.MyCompany.MyGame
         private uint _health;
         private bool _isOnFloor = false;
 
+        private float animLayerWeight = 0f;
+
         #endregion
 
         #region Public Values
 
         public float speed { get { return _speed; } set { _speed = value; } }
+        public float walkSpeed { get { return 0.5f * _speed; } }
         public uint health { get { return _health; } }
         public bool isOnFloor { get { return _isOnFloor; } }
 
@@ -37,10 +40,17 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             animator.SetBool("IsRunMode", true);
+            animator.SetLayerWeight(1, 0);
+            animator.SetBool("IsCrouchMode", false);
         }
 
         void FixedUpdate()
         {
+            ControlCrouchAnim();
+
+            if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode"))
+                animator.SetBool("IsRunMode", !animator.GetBool("IsRunMode"));
+
             if (_isOnFloor)
             {
                 animator.SetBool("IsFalling", false);
@@ -90,7 +100,35 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
+        void ControlCrouchAnim()
+        {
+            if (Input.GetButtonDown("Crouch"))
+            {
+                if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                {
+                    animator.SetLayerWeight(1, animLayerWeight);
+                    animator.SetBool("IsCrouchMode", !animator.GetBool("IsCrouchMode"));
+                }
 
+            }
+
+            if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
+            {
+                animator.SetBool("IsRunMode", false);
+
+                animLayerWeight += (Time.deltaTime * 3f);
+                animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                animator.SetLayerWeight(1, animLayerWeight);
+            }
+            else if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
+            {
+                animator.SetBool("IsRunMode", true);
+
+                animLayerWeight -= (Time.deltaTime * 3f);
+                animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                animator.SetLayerWeight(1, animLayerWeight);
+            }
+        }
 
         #endregion
 

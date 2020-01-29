@@ -9,6 +9,7 @@ namespace Com.MyCompany.MyGame
         #region Private Vars
 
         private float playerSpeed;
+        private float walkSpeed;
 
         private Transform mainCameraTransform;
         private Quaternion destiRotation;
@@ -44,6 +45,7 @@ namespace Com.MyCompany.MyGame
             animator = unit.animator;
 
             playerSpeed = unit.speed;
+            walkSpeed = playerSpeed * 0.5f;
 
             mainCameraTransform = Camera.main.transform;
             lookDir = mainCameraTransform.forward + transform.position;
@@ -51,6 +53,8 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
+            ControlSpeed();
+
             //바닥과 접촉했을 때만 가능
             //숙이기 구현 -> 플레이어 이동속도 감소
             //이후 은신 관련 기능 추가 (예시)))float cloak; if (플레이어 == 서있음) ctraloak = 1; else if (플레이어 == 숙이기) cloak = 0.5;)
@@ -90,6 +94,28 @@ namespace Com.MyCompany.MyGame
         {
             lookDir = (vertical * mainCameraTransform.forward) + (horizontal * mainCameraTransform.right) + transform.position;
             lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
+        }
+
+        //조작에 따라 이동속도를 조절하는 함수
+        void ControlSpeed()
+        {
+            //걷기 <-> 달리기 전환 이거나 서기 <-> 숙이기 전환
+            if (Input.GetButtonDown("Walk") || Input.GetButtonDown("Crouch"))
+            {
+                if (!animator.GetBool("IsCrouchMode"))
+                {
+                    if (animator.GetBool("IsRunMode"))
+                        playerSpeed = unit.speed;
+                    else
+                        playerSpeed = unit.walkSpeed;
+                }
+                else
+                {
+                    playerSpeed = unit.walkSpeed;
+                }
+            }
+
+            Debug.Log(playerSpeed);
         }
 
         #endregion
