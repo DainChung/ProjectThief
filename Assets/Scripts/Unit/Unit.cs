@@ -33,7 +33,7 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             _health = 1;
-            _speed = 50.0f;
+            _speed = 30.0f;
         }
 
         // Start is called before the first frame update
@@ -46,7 +46,56 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            ControlCrouchAnim();
+            ControlAnimation();
+        }
+
+        void OnTriggerStay(Collider other)
+        {
+            if (other.tag.CompareTo("Floor") == 0)
+                _isOnFloor = true;
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.tag.CompareTo("Floor") == 0)
+                _isOnFloor = false;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        void ControlAnimation()
+        {
+            #region Control Crouch
+
+            if (Input.GetButtonDown("Crouch"))
+            {
+                if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                {
+                    animator.SetLayerWeight(1, animLayerWeight);
+                    animator.SetBool("IsCrouchMode", !animator.GetBool("IsCrouchMode"));
+                }
+            }
+
+            if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
+            {
+                animator.SetBool("IsRunMode", false);
+
+                animLayerWeight += (Time.deltaTime * 3f);
+                animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                animator.SetLayerWeight(1, animLayerWeight);
+            }
+            else if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
+            {
+                animator.SetBool("IsRunMode", true);
+
+                animLayerWeight -= (Time.deltaTime * 3f);
+                animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                animator.SetLayerWeight(1, animLayerWeight);
+            }
+
+            #endregion
 
             if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode"))
                 animator.SetBool("IsRunMode", !animator.GetBool("IsRunMode"));
@@ -81,52 +130,6 @@ namespace Com.MyCompany.MyGame
                 animator.SetBool("IsMoving", false);
                 animator.SetFloat("TurnRight", 0);
                 animator.SetFloat("MoveSpeed", 0);
-            }
-        }
-
-        void OnTriggerStay(Collider other)
-        {
-            if (other.tag.CompareTo("Floor") == 0)
-                _isOnFloor = true;
-        }
-
-        void OnTriggerExit(Collider other)
-        {
-            if (other.tag.CompareTo("Floor") == 0)
-                _isOnFloor = false;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        void ControlCrouchAnim()
-        {
-            if (Input.GetButtonDown("Crouch"))
-            {
-                if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
-                {
-                    animator.SetLayerWeight(1, animLayerWeight);
-                    animator.SetBool("IsCrouchMode", !animator.GetBool("IsCrouchMode"));
-                }
-
-            }
-
-            if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
-            {
-                animator.SetBool("IsRunMode", false);
-
-                animLayerWeight += (Time.deltaTime * 3f);
-                animLayerWeight = Mathf.Clamp01(animLayerWeight);
-                animator.SetLayerWeight(1, animLayerWeight);
-            }
-            else if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
-            {
-                animator.SetBool("IsRunMode", true);
-
-                animLayerWeight -= (Time.deltaTime * 3f);
-                animLayerWeight = Mathf.Clamp01(animLayerWeight);
-                animator.SetLayerWeight(1, animLayerWeight);
             }
         }
 

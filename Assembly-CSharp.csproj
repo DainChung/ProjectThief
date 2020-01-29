@@ -62,6 +62,7 @@
      <Compile Include="Assets\Scripts\Server\DEMOPlayerNameInputField.cs" />
      <Compile Include="Assets\Scripts\Server\Launcher.cs" />
      <Compile Include="Assets\Scripts\System\CameraWork.cs" />
+     <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Unit\Unit.cs" />
  <Reference Include="Unity.Timeline.Editor">

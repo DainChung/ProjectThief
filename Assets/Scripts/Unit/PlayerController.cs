@@ -73,13 +73,19 @@ namespace Com.MyCompany.MyGame
                     rb.AddForce(destiPos);
                 }
 
+                //점프할 때
+                if (!animator.GetBool("IsCrouchMode") && animator.GetBool("IsRunMode"))
+                {
+                    if (Input.GetButtonDown("Jump"))
+                    {
+                        destiPos = transform.up * playerSpeed * 20;
+
+                        rb.AddForce(destiPos);
+                    }
+                }
+
                 //과도한 미끄러짐 방지
                 rb.velocity *= 0.97f;
-            }
-            else
-            {
-                //비현실적으로 느린 추락 방지
-                rb.velocity *= 1.01f;
             }
             //플레이어가 의도하지 않은 회전 방지           
             rb.angularVelocity = Vector3.zero;
@@ -114,8 +120,6 @@ namespace Com.MyCompany.MyGame
                     playerSpeed = unit.walkSpeed;
                 }
             }
-
-            Debug.Log(playerSpeed);
         }
 
         #endregion
