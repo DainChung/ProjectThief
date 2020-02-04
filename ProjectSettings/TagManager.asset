@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Floor
+  - StartArea
+  - EndArea
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -14,9 +17,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
+  - Area
+  - Structure
+  - Unit
   - 
   - 
   - 
