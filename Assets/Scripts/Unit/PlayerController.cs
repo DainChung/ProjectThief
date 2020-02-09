@@ -75,7 +75,7 @@ namespace Com.MyCompany.MyGame
                 else
                 {
                     transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
-                    transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, 0);
+                    transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
 
                     playerSpeed = unit.walkSpeed;
                 }
@@ -119,11 +119,36 @@ namespace Com.MyCompany.MyGame
                 //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
                 if (playerAnimController.isWallClose && animator.GetBool("IsCovering"))
                 {
+                    playerSpeed = unit.walkSpeed;
                     //플레이어 캐릭터 방향 고정
                     transform.LookAt(transform.position + playerAnimController.wallTransform.forward, Vector3.up);
 
                     //엄폐 상태일 때 가능한 조작 사용
+                    if (Input.GetButton("Horizontal"))
+                    {
+                        //벽 우측 끝 도달 && 우측으로 계속 이동하려는 경우
+                        if (animator.GetBool("IsWallRightEnd") && Input.GetAxis("Horizontal") > 0)
+                        {
+                            //아무것도 하지 않음 => 엄폐물 이동?
+                        }
+                        //벽 좌측 끝 도달 && 좌측으로 계속 이동하려는 경우
+                        else if (animator.GetBool("IsWallLeftEnd") && Input.GetAxis("Horizontal") < 0)
+                        {
+                            //아무것도 하지 않음 => 엄폐물 이동?
+                        }
+                        //일반적인 상황 OR 벽 우측 끝에서 좌측으로 이동 OR 벽 좌측 끝에서 우측으로 이동
+                        else
+                        {
+                            destiPos = -transform.right * Input.GetAxis("Horizontal") * playerSpeed;
+
+                            rb.AddForce(destiPos);
+                        }
+
+
+                    }
                 }
+                else if (!animator.GetBool("IsCovering"))
+                    playerSpeed = unit.speed;
                 #endregion
 
                 //과도한 미끄러짐 방지

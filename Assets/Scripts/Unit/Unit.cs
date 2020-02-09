@@ -51,14 +51,48 @@ namespace Com.MyCompany.MyGame
                 _health -= damage;
         }
 
-        public void SetCoverPosition(Vector3 wallPosition, Vector3 wallRight)
+        public IEnumerator SetCoverPosition(Vector3 wallPos, Vector3 wallRight, bool isCovering)
         {
             float newX, newZ;
-            float alpha = wallRight.z / wallRight.x;
-            newZ = wallPosition.z + alpha * (transform.position.x - wallPosition.x);
-            newX = wallPosition.x + (newZ - wallPosition.z) / alpha;
+            float alpha, beta;
 
-            transform.position = new Vector3(newX, transform.position.y, newZ);
+            alpha = wallRight.z / wallRight.x;
+            beta = wallPos.z - alpha * wallPos.x;
+
+            //벽이 좌표평면에서 x = a 그래프와 유사한 경우 alpha값이 835만 정도가 나옴
+            //=> alpha 값이 100만을 넘어서면 x = a 그래프 꼴로 인식하고 계산하도록 변경
+            if (alpha < 1000000)
+            {
+                // wallPos.z = wallPos.x * alpha + beta;    transform.pos.z = transform.pos.x / (-alpha) + gamma;
+                // newZ = newX * alpha + beta;              newZ = newX / (-alpha) + gamma;
+                newX = (alpha * transform.position.z + transform.position.x - alpha * beta) / (alpha * alpha + 1);
+                newZ = alpha * newX + beta;
+            }
+            //x = a 꼴이면 유닛 위치의 z값은 그대로 놓고 x값만 변경시켜 벽에 밀착하도록 한다.
+            else
+            {
+                newZ = transform.position.z;
+                newX = wallPos.x;
+            }
+
+            //엄폐 상태가 되면
+            if (isCovering)
+            {
+                //Collider를 조금 이동시켜서 애니메이션이 자연스럽게 보이도록 한다
+                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0.7f);
+
+                Vector3 newVector = new Vector3(newX, transform.position.y, newZ);
+                while (Vector3.Distance(transform.position, newVector) >= 0.2)
+                {
+                    transform.position = Vector3.Lerp(transform.position, newVector, Time.deltaTime * 10);
+                    yield return null;
+                }
+            }
+            //엄폐를 해제하면 Collider 위치를 초기화한다.
+            else
+                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0);
+
+            yield break;
         }
 
         #endregion

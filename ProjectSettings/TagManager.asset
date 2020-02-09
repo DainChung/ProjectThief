@@ -8,6 +8,8 @@ TagManager:
   - StartArea
   - EndArea
   - Wall
+  - WallRightEnd
+  - WallLeftEnd
   layers:
   - Default
   - TransparentFX

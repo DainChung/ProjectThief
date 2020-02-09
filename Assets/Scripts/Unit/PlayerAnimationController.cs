@@ -54,6 +54,12 @@ namespace Com.MyCompany.MyGame
                 _isWallClose = true;
                 wallTransform = other.transform;
             }
+
+            if (other.CompareTag("WallRightEnd") && _isWallClose)
+                animator.SetBool("IsWallRightEnd", true);
+
+            if (other.CompareTag("WallLeftEnd") && _isWallClose)
+                animator.SetBool("IsWallLeftEnd", true);
         }
 
         void OnTriggerStay(Collider other)
@@ -69,6 +75,12 @@ namespace Com.MyCompany.MyGame
 
             if (other.CompareTag("Wall"))
                 _isWallClose = false;
+
+            if (other.CompareTag("WallRightEnd"))
+                animator.SetBool("IsWallRightEnd", false);
+
+            if (other.CompareTag("WallLeftEnd"))
+                animator.SetBool("IsWallLeftEnd", false);
         }
 
         #endregion
@@ -143,8 +155,8 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Covering"))
                     {
                         animator.SetBool("IsCovering", !animator.GetBool("IsCovering"));
-                        //벽에 붙이기, 변경 예정
-                        unit.SetCoverPosition(wallTransform.position, wallTransform.right);
+                        //벽에 붙이기
+                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, animator.GetBool("IsCovering")));
                     }
                 }
 
@@ -153,6 +165,7 @@ namespace Com.MyCompany.MyGame
             else
             {
                 animator.SetBool("IsFalling", true);
+                animator.SetBool("IsCovering", false);
                 animator.SetFloat("TurnRight", 0);
                 animator.SetFloat("MoveSpeed", 0);
             }
