@@ -65,7 +65,7 @@ namespace Com.MyCompany.MyGame
                 if (!animator.GetBool("IsCrouchMode"))
                 {
                     transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
-                    transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, 0);
+                    transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
 
                     if (animator.GetBool("IsRunMode"))
                         playerSpeed = unit.speed;
@@ -147,8 +147,9 @@ namespace Com.MyCompany.MyGame
 
                     }
                 }
-                else if (!animator.GetBool("IsCovering"))
+                else if (!animator.GetBool("IsCovering") && animator.GetBool("IsRunMode"))
                     playerSpeed = unit.speed;
+                else { }
                 #endregion
 
                 //과도한 미끄러짐 방지

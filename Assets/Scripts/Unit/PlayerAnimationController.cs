@@ -119,8 +119,11 @@ namespace Com.MyCompany.MyGame
 
             #endregion
 
-            if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode"))
-                animator.SetBool("IsRunMode", !animator.GetBool("IsRunMode"));
+            if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode") && animator.GetBool("IsRunMode"))
+                animator.SetBool("IsRunMode", false);
+            else if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode") && !animator.GetBool("IsRunMode"))
+                animator.SetBool("IsRunMode", true);
+
 
             if (_isOnFloor)
             {
@@ -152,12 +155,44 @@ namespace Com.MyCompany.MyGame
 
                 if (_isWallClose)
                 {
+                    //엄폐 시작
                     if (Input.GetButtonDown("Covering"))
                     {
                         animator.SetBool("IsCovering", !animator.GetBool("IsCovering"));
                         //벽에 붙이기
                         StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, animator.GetBool("IsCovering")));
                     }
+
+                    //숙인 상태가 아니면 Standing Cover Layer를 활성화 한다.
+                    if (!animator.GetBool("IsCrouchMode"))
+                    {
+                        if (animator.GetBool("IsCovering"))
+                        {
+                            animator.SetLayerWeight(2, 1);
+                            animator.SetLayerWeight(3, 0);
+                        }
+                        else
+                            animator.SetLayerWeight(2, 0);
+                    }
+                    //숙인 상태면 Crouching Cover Layer를 활성화 한다.
+                    else
+                    {
+                        if (animator.GetBool("IsCovering"))
+                        {
+                            animator.SetLayerWeight(3, 1);
+                            animator.SetLayerWeight(2, 0);
+                            animator.SetLayerWeight(1, 0);
+                        }
+                        else
+                            animator.SetLayerWeight(3, 0);
+                    }
+                    // 양수면 오른쪽, 음수면 왼쪽
+                    animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
+
+                    if (animator.GetFloat("TurnRight") > 0)
+                        animator.SetBool("LookRight", true);
+                    else if(animator.GetFloat("TurnRight") < 0)
+                        animator.SetBool("LookRight", false);
                 }
 
                 #endregion

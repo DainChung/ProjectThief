@@ -61,7 +61,7 @@ namespace Com.MyCompany.MyGame
             destiPos = player.position - destiPos;
             destiPos.Set(destiPos.x, player.position.y + cameraPos.y * (1 + Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x) * 1.5f), destiPos.z);
 
-            //카메라 회전을 감안해서 플레이어 캐릭터를 따라다님
+            //카메라 회전을 감안해서 플레이어 캐릭터를 따라다님 => Vector3.Lerp 말고 방식으로 조작해야 카메라가 벽을 못 뚫게 할 수 있음
             transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * smooth * player.GetComponent<Unit>().speed);
         }
 

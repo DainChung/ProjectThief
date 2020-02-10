@@ -60,8 +60,8 @@ namespace Com.MyCompany.MyGame
             beta = wallPos.z - alpha * wallPos.x;
 
             //벽이 좌표평면에서 x = a 그래프와 유사한 경우 alpha값이 835만 정도가 나옴
-            //=> alpha 값이 100만을 넘어서면 x = a 그래프 꼴로 인식하고 계산하도록 변경
-            if (alpha < 1000000)
+            //=> alpha 값이 1000을 넘어서면 x = a 그래프 꼴로 인식하고 계산하도록 변경
+            if (alpha < 1000)
             {
                 // wallPos.z = wallPos.x * alpha + beta;    transform.pos.z = transform.pos.x / (-alpha) + gamma;
                 // newZ = newX * alpha + beta;              newZ = newX / (-alpha) + gamma;
