@@ -25,6 +25,8 @@ namespace Com.MyCompany.MyGame
 
         [HideInInspector]
         public Transform wallTransform;
+        [HideInInspector]
+        public Vector3 nearWallEndPos;
 
         public Animator animator;
 
@@ -40,6 +42,7 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsCrouchMode", false);
 
             unit = GetComponent<Unit>();
+            nearWallEndPos = Vector3.zero;
         }
 
         void FixedUpdate()
@@ -56,10 +59,16 @@ namespace Com.MyCompany.MyGame
             }
 
             if (other.CompareTag("WallRightEnd") && _isWallClose)
+            {
                 animator.SetBool("IsWallRightEnd", true);
+                nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+            }
 
             if (other.CompareTag("WallLeftEnd") && _isWallClose)
+            {
                 animator.SetBool("IsWallLeftEnd", true);
+                nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+            }
         }
 
         void OnTriggerStay(Collider other)
@@ -77,10 +86,16 @@ namespace Com.MyCompany.MyGame
                 _isWallClose = false;
 
             if (other.CompareTag("WallRightEnd"))
+            {
                 animator.SetBool("IsWallRightEnd", false);
+                nearWallEndPos = Vector3.zero;
+            }
 
             if (other.CompareTag("WallLeftEnd"))
+            {
                 animator.SetBool("IsWallLeftEnd", false);
+                nearWallEndPos = Vector3.zero;
+            }
         }
 
         #endregion

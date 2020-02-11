@@ -18,6 +18,8 @@ namespace Com.MyCompany.MyGame
         public float speed { get { return _speed; } set { _speed = value; } }
         public float walkSpeed { get { return 0.4f * _speed; } }
         public uint health { get { return _health; } }
+        [HideInInspector]
+        public bool lockControl = false;
 
         #endregion
 
@@ -92,6 +94,35 @@ namespace Com.MyCompany.MyGame
             else
                 transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0);
 
+            yield break;
+        }
+
+        //모퉁이에서 엄폐한 상태로 이동할 때 사용
+        //넘어간 벽에서 위치 보정을 다시 해줘야 될것으로 보임
+        public IEnumerator SetCoverPosition(Vector3 destiPos, bool goRight)
+        {
+            float freezeY = transform.position.y;
+            Vector3 freezeHeight = transform.position;
+
+            Vector3 dir = transform.right;
+
+            if (goRight)
+                dir *= -1;
+
+            //중간에 조작 방지
+            lockControl = true;
+
+            while (Vector3.Distance(transform.position, destiPos) >= 0.5)
+            {
+                GetComponent<Rigidbody>().AddForce((dir - transform.forward) * 76.5f);
+                transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * 10);
+
+                freezeHeight.Set(transform.position.x, freezeY, transform.position.z);
+                transform.position = freezeHeight;
+                yield return null;
+            }
+
+            lockControl = false;
             yield break;
         }
 
