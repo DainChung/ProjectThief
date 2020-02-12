@@ -122,9 +122,14 @@ namespace Com.MyCompany.MyGame
                     //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
                     if (playerAnimController.isWallClose && animator.GetBool("IsCovering"))
                     {
+                        //플레이어 속력을 걷는 속력으로 고정
                         playerSpeed = unit.walkSpeed;
                         //플레이어 캐릭터 방향 고정
                         transform.LookAt(transform.position + playerAnimController.wallTransform.forward, Vector3.up);
+
+                        //엄폐 이동 후 위치 다시 보정
+                        if (unit.rePosition)
+                            StartCoroutine(unit.SetCoverPosition(playerAnimController.wallTransform.position, playerAnimController.wallTransform.right, animator.GetBool("IsCovering")));
 
                         //엄폐 상태일 때 가능한 조작 사용
                         if (Input.GetButton("Horizontal"))
@@ -152,20 +157,16 @@ namespace Com.MyCompany.MyGame
                         if (animator.GetBool("IsWallRightEnd"))
                         {
                             if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") > 0)
-                            {
-                                Debug.Log("우측 이동: " + playerAnimController.nearWallEndPos);
-                                StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, true));
-                            }
+                                StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, true, playerAnimController.wallEndToEndPos));
                         }
                         //좌측 끝에서 좌측 이동 버튼을 다시 누르면 엄폐물 이동 수행
                         else if (animator.GetBool("IsWallLeftEnd"))
                         {
                             if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
-                            {
-                                Debug.Log("좌측 이동: " + playerAnimController.nearWallEndPos);
-                            }
+                                StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, false, playerAnimController.wallEndToEndPos));
                         }
                     }
+                    //엄폐를 해제했고 달리기 모드일 때 => 플레이어의 속력을 달리는 속력으로 변경
                     else if (!animator.GetBool("IsCovering") && animator.GetBool("IsRunMode"))
                         playerSpeed = unit.speed;
                     else { }
@@ -176,6 +177,7 @@ namespace Com.MyCompany.MyGame
                 }
 
             }
+
             //플레이어가 의도하지 않은 회전 방지           
             rb.angularVelocity = Vector3.zero;
         }

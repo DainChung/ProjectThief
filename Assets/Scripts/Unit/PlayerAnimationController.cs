@@ -27,6 +27,8 @@ namespace Com.MyCompany.MyGame
         public Transform wallTransform;
         [HideInInspector]
         public Vector3 nearWallEndPos;
+        [HideInInspector]
+        public Vector3 wallEndToEndPos;
 
         public Animator animator;
 
@@ -62,12 +64,14 @@ namespace Com.MyCompany.MyGame
             {
                 animator.SetBool("IsWallRightEnd", true);
                 nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+                wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
             }
 
             if (other.CompareTag("WallLeftEnd") && _isWallClose)
             {
                 animator.SetBool("IsWallLeftEnd", true);
                 nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+                wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
             }
         }
 
@@ -75,6 +79,12 @@ namespace Com.MyCompany.MyGame
         {
             if (other.CompareTag("Floor"))
                 _isOnFloor = true;
+
+            if (other.CompareTag("Wall"))
+            {
+                _isWallClose = true;
+                wallTransform = other.transform;
+            }
         }
 
         void OnTriggerExit(Collider other)
@@ -88,13 +98,15 @@ namespace Com.MyCompany.MyGame
             if (other.CompareTag("WallRightEnd"))
             {
                 animator.SetBool("IsWallRightEnd", false);
-                nearWallEndPos = Vector3.zero;
+                //nearWallEndPos = Vector3.zero;
+                //wallEndToEndPos = Vector3.zero;
             }
 
             if (other.CompareTag("WallLeftEnd"))
             {
                 animator.SetBool("IsWallLeftEnd", false);
-                nearWallEndPos = Vector3.zero;
+                //nearWallEndPos = Vector3.zero;
+                //wallEndToEndPos = Vector3.zero;
             }
         }
 

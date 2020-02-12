@@ -20,6 +20,8 @@ namespace Com.MyCompany.MyGame
         public uint health { get { return _health; } }
         [HideInInspector]
         public bool lockControl = false;
+        [HideInInspector]
+        public bool rePosition = false;
 
         #endregion
 
@@ -84,9 +86,13 @@ namespace Com.MyCompany.MyGame
                 transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0.7f);
 
                 Vector3 newVector = new Vector3(newX, transform.position.y, newZ);
+
+                int t = 0;
+
                 while (Vector3.Distance(transform.position, newVector) >= 0.2)
                 {
                     transform.position = Vector3.Lerp(transform.position, newVector, Time.deltaTime * 10);
+                    t++;
                     yield return null;
                 }
             }
@@ -94,35 +100,46 @@ namespace Com.MyCompany.MyGame
             else
                 transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0);
 
+            rePosition = false;
             yield break;
         }
 
         //모퉁이에서 엄폐한 상태로 이동할 때 사용
-        //넘어간 벽에서 위치 보정을 다시 해줘야 될것으로 보임
-        public IEnumerator SetCoverPosition(Vector3 destiPos, bool goRight)
+        public IEnumerator SetCoverPosition(Vector3 destiPos, bool goRight, Vector3 subDestiPos)
         {
             float freezeY = transform.position.y;
             Vector3 freezeHeight = transform.position;
+            Vector3 newLook = transform.right;
 
-            Vector3 dir = transform.right;
-
-            if (goRight)
-                dir *= -1;
+            if (goRight) newLook *= -1;
 
             //중간에 조작 방지
             lockControl = true;
 
-            while (Vector3.Distance(transform.position, destiPos) >= 0.5)
+            transform.LookAt(transform.position + newLook, Vector3.up);
+
+            while (Vector3.Distance(transform.position, subDestiPos) >= 0.1)
             {
-                GetComponent<Rigidbody>().AddForce((dir - transform.forward) * 76.5f);
+                transform.position = Vector3.Lerp(transform.position, subDestiPos, Time.deltaTime * 10);
+
+                freezeHeight.Set(transform.position.x, freezeY, transform.position.z);
+                transform.position = freezeHeight;
+                yield return null;
+            }
+            Debug.Log("Sub Done");
+
+            while (Vector3.Distance(transform.position, destiPos) >= 0.1)
+            {
                 transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * 10);
 
                 freezeHeight.Set(transform.position.x, freezeY, transform.position.z);
                 transform.position = freezeHeight;
                 yield return null;
             }
+            Debug.Log("Final Done");
 
             lockControl = false;
+            rePosition = true;
             yield break;
         }
 
