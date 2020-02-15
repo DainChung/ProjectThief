@@ -8,7 +8,7 @@ public class WeaponThrow : MonoBehaviour
 {
     public Rigidbody rb;
 
-    private const float throwPower = 13f;
+    private const float throwPower = 12f;
     private Stopwatch sw = new Stopwatch();
 
     // Start is called before the first frame update
@@ -22,6 +22,9 @@ public class WeaponThrow : MonoBehaviour
     void FixedUpdate()
     {
         if (sw.Elapsed.Seconds >= 5)
+        {
+            sw.Stop();
             Destroy(gameObject);
+        }
     }
 }

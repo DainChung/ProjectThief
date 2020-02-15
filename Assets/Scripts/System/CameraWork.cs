@@ -23,6 +23,10 @@ namespace Com.MyCompany.MyGame
         private Vector3 destiPos;
         private float dist;
 
+        private LineRenderer lineRenderer;
+        private const float gravity = 9f;
+        private const float throwPower = 12f;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -31,6 +35,8 @@ namespace Com.MyCompany.MyGame
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
             destiPos = cameraPos;
+
+            lineRenderer = GetComponent<LineRenderer>();
         }
 
         //프레임과 상관없이 일정 시간마다 호출
@@ -41,6 +47,48 @@ namespace Com.MyCompany.MyGame
 
             //플레이어 캐릭터를 따라다님
             FollowPlayer();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        //무언가를 던질때 궤적을 보여줌
+        //  https://lovelyseekerclaire.tistory.com/26 링크의 내용을 이용해서 궤적을 먼저 그린 다음(최대 거리 제한둘것)
+        //  궤적을 따라 물체가 발사되도록 변경할 것
+        public void ThrowLineRenderer(float theta, Vector3 throwPos)
+        {
+            theta = -(theta) * Mathf.Deg2Rad;
+
+            float cosY = Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
+            float sinY = Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
+            float cosEuler = Mathf.Cos(theta);
+            float sinEuler = Mathf.Sin(theta);
+
+            float t = sinEuler * throwPower / gravity;
+            t -= 0.1f;
+
+            cosY = 1;
+            float x = cosEuler * cosY * throwPower * t;
+            float y = (Mathf.Tan(theta) * x - 0.45f * x * x / (12.5f * cosEuler * cosEuler));
+            float z = cosEuler * sinY * throwPower * t;
+            z = 0;
+
+            Vector3 maxPoint = new Vector3(x, y, z);
+            Debug.Log((theta * Mathf.Rad2Deg)+ ", " +t +", " +maxPoint);
+            t *= 2;
+
+            x = cosEuler * cosY * throwPower * t + 0.4f;
+            y = (Mathf.Tan(theta) * x - 0.45f * x * x / (12.5f * cosEuler * cosEuler));
+            //y = -throwPos.y + 0.5f;
+            z = cosEuler * sinY * throwPower * t;
+            z = 0;
+
+            Vector3 EndPoint = new Vector3(x, y, z);
+
+            lineRenderer.SetPosition(0, throwPos);
+            lineRenderer.SetPosition(1, maxPoint + throwPos);
+            lineRenderer.SetPosition(2, EndPoint + throwPos);
         }
 
         #endregion

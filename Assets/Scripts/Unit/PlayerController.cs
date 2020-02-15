@@ -38,8 +38,8 @@ namespace Com.MyCompany.MyGame
         private WeaponCode curWeapon = WeaponCode.HAND;
 
         private Vector3 throwRotEuler = Vector3.zero;
-        private float theta = 10f;
-
+        private float theta;
+        private CameraWork cam;
 
         //System.Diagnostic
         //무기 딜레이
@@ -71,6 +71,7 @@ namespace Com.MyCompany.MyGame
             playerSpeed = unit.speed;
 
             mainCameraTransform = Camera.main.transform;
+            cam = mainCameraTransform.GetComponent<CameraWork>();
             lookDir = mainCameraTransform.forward + transform.position;
         }
 
@@ -255,7 +256,7 @@ namespace Com.MyCompany.MyGame
                 //Collider[] sample = Physics.OverlapSphere(......);
             }
             //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
-            //소지 개수 이상으로 사용불가 && 딜레이 존재
+            //소지 개수 이상으로 사용불가 && 딜레이 추가할 것
             //조준하는 동안 걷도록 강제할 것
             else if (curWeapon == WeaponCode.CAN)
             {
@@ -263,26 +264,39 @@ namespace Com.MyCompany.MyGame
                 //조준하는 동안 플레이어 캐릭터도 회전할 것
                 if (Input.GetButton("Fire1"))
                 {
-                    theta = mainCameraTransform.rotation.eulerAngles.x;
-
-                    if (theta > 300) theta = 0;
-
-                    theta = Mathf.Acos(Mathf.Sin(theta * Mathf.Deg2Rad));
-                    theta = Mathf.Clamp(theta, 30 * Mathf.Deg2Rad, 70 * Mathf.Deg2Rad);
-
                     //포물선 궤적 결정 => 포물선 궤적은 구글링하면 금방 나옴
                     //카메라에서 그릴지 여기서 그릴지는 고민해보삼
                     throwRotEuler = mainCameraTransform.rotation.eulerAngles;
-                    throwRotEuler.Set(throwRotEuler.x, throwRotEuler.y, Mathf.Cos(theta));
+                    theta = throwRotEuler.x;
 
-                    Debug.Log("조준 중: "+throwRotEuler);
+                    if (theta >= 334)
+                        theta = theta - 360;
+
+                    theta = theta - 35;
+
+                    throwRotEuler.Set(theta, throwRotEuler.y, 0);
+
+                    //포물선 궤적 그리기
+                    cam.ThrowLineRenderer(throwRotEuler.x, throwPos.position);
+
+                    //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
+                    playerSpeed = unit.walkSpeed;
+                    lookDir = transform.position + mainCameraTransform.forward;
+                    lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
+                    transform.LookAt(lookDir, Vector3.up);
+                    animator.SetBool("IsRunMode", false);
+                    
+                    //Debug.Log("조준 중: "+throwRotEuler);
                 }
 
                 //조준한 상태에서 놓으면 투척
                 if (Input.GetButtonUp("Fire1"))
                 {
-                    Debug.Log("Throw");
+                    //Debug.Log("Throw: " + throwRotEuler + ", Theta: " + theta);
                     Instantiate(Resources.Load(unit.weaponPath + "WeaponCan") as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
+
+                    playerSpeed = unit.speed;
+                    animator.SetBool("IsRunMode", true);
                 }
                 //else
                 //Debug.Log("소지 개수 부족");
