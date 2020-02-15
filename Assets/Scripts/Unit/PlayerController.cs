@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace Com.MyCompany.MyGame
 {
+    enum WeaponCode
+    {
+        HAND, CAN, DONUT, SMOKE
+    }
+
     public class PlayerController : MonoBehaviour
     {
         #region Private Vars
@@ -30,9 +35,21 @@ namespace Com.MyCompany.MyGame
         private Unit unit;
         private PlayerAnimationController playerAnimController;
 
+        private WeaponCode curWeapon = WeaponCode.HAND;
+
+        private Vector3 throwRotEuler = Vector3.zero;
+        private float theta = 10f;
+
+
+        //System.Diagnostic
+        //무기 딜레이
+        //private Stopwatch[] sw = new Stopwatch[5];
+
         #endregion
 
         #region Public Vars
+
+        public Transform throwPos;
 
         #endregion
 
@@ -40,6 +57,7 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
+
         }
 
         // Start is called before the first frame update
@@ -61,6 +79,31 @@ namespace Com.MyCompany.MyGame
             //움직임이 허용된 상태에서만 조작 가능
             if (!unit.lockControl)
             {
+                #region Control.Weapon: 조작에 따라 무기 변경
+
+                if (Input.GetButtonDown("Weapon1"))
+                {
+                    curWeapon = WeaponCode.HAND;
+                    Debug.Log("CurWeapon: " + curWeapon);
+                }
+                else if (Input.GetButtonDown("Weapon2"))
+                {
+                    curWeapon = WeaponCode.CAN;
+                    Debug.Log("CurWeapon: " + curWeapon);
+                }
+                else if (Input.GetButtonDown("Weapon3"))
+                {
+                    curWeapon = WeaponCode.DONUT;
+                    Debug.Log("CurWeapon: " + curWeapon);
+                }
+                else if (Input.GetButtonDown("Weapon4"))
+                {
+                    curWeapon = WeaponCode.SMOKE;
+                    Debug.Log("CurWeapon: " + curWeapon);
+                }
+
+                #endregion
+
                 #region Control.Crouch: 조작에 따라 속도와 Collider를 관리
                 //걷기 <-> 달리기 전환 이거나 서기 <-> 숙이기 전환
                 if (Input.GetButtonDown("Walk") || Input.GetButtonDown("Crouch"))
@@ -123,13 +166,9 @@ namespace Com.MyCompany.MyGame
                     if (playerAnimController.isWallClose && animator.GetBool("IsCovering"))
                     {
                         //플레이어 속력을 걷는 속력으로 고정
-                        playerSpeed = unit.walkSpeed;
+                        playerSpeed = unit.coverSpeed;
                         //플레이어 캐릭터 방향 고정
                         transform.LookAt(transform.position + playerAnimController.wallTransform.forward, Vector3.up);
-
-                        //엄폐 이동 후 위치 다시 보정
-                        if (unit.rePosition)
-                            StartCoroutine(unit.SetCoverPosition(playerAnimController.wallTransform.position, playerAnimController.wallTransform.right, animator.GetBool("IsCovering")));
 
                         //엄폐 상태일 때 가능한 조작 사용
                         if (Input.GetButton("Horizontal"))
@@ -172,6 +211,12 @@ namespace Com.MyCompany.MyGame
                     else { }
                     #endregion
 
+                    #region Control.Attack : 바닥에 서있을 때의 공격 관련 조작 관리
+
+                    ControlAttack();
+
+                    #endregion
+
                     //과도한 미끄러짐 방지
                     rb.velocity *= 0.97f;
                 }
@@ -197,6 +242,64 @@ namespace Com.MyCompany.MyGame
         {
             lookDir = (vertical * mainCameraTransform.forward) + (horizontal * mainCameraTransform.right) + transform.position;
             lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
+        }
+
+        void ControlAttack()
+        {
+            //근접 공격용 맨손 (=> 일시적 경직 ?)
+            if (curWeapon == WeaponCode.HAND)
+            {
+                if(Input.GetButtonDown("Fire1"))
+                    Debug.Log("손 공격");
+
+                //Collider[] sample = Physics.OverlapSphere(......);
+            }
+            //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
+            //소지 개수 이상으로 사용불가 && 딜레이 존재
+            //조준하는 동안 걷도록 강제할 것
+            else if (curWeapon == WeaponCode.CAN)
+            {
+                //if(canAmount > 0)
+                //조준하는 동안 플레이어 캐릭터도 회전할 것
+                if (Input.GetButton("Fire1"))
+                {
+                    theta = mainCameraTransform.rotation.eulerAngles.x;
+
+                    if (theta > 300) theta = 0;
+
+                    theta = Mathf.Acos(Mathf.Sin(theta * Mathf.Deg2Rad));
+                    theta = Mathf.Clamp(theta, 30 * Mathf.Deg2Rad, 70 * Mathf.Deg2Rad);
+
+                    //포물선 궤적 결정 => 포물선 궤적은 구글링하면 금방 나옴
+                    //카메라에서 그릴지 여기서 그릴지는 고민해보삼
+                    throwRotEuler = mainCameraTransform.rotation.eulerAngles;
+                    throwRotEuler.Set(throwRotEuler.x, throwRotEuler.y, Mathf.Cos(theta));
+
+                    Debug.Log("조준 중: "+throwRotEuler);
+                }
+
+                //조준한 상태에서 놓으면 투척
+                if (Input.GetButtonUp("Fire1"))
+                {
+                    Debug.Log("Throw");
+                    Instantiate(Resources.Load(unit.weaponPath + "WeaponCan") as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
+                }
+                //else
+                //Debug.Log("소지 개수 부족");
+
+            }
+            //플레이어 주변에 설치 OR 던지기?
+            else if (curWeapon == WeaponCode.DONUT)
+            {
+                if (Input.GetButtonDown("Fire1"))
+                    Debug.Log("도넛 설치");
+            }
+            //플레이어 위치에서 사용
+            else if (curWeapon == WeaponCode.SMOKE)
+            {
+                if (Input.GetButtonDown("Fire1"))
+                    Debug.Log("연막");
+            }
         }
 
         #endregion

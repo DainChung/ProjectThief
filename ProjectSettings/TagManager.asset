@@ -10,6 +10,8 @@ TagManager:
   - Wall
   - WallRightEnd
   - WallLeftEnd
+  - WeaponCan
+  - Can
   layers:
   - Default
   - TransparentFX
@@ -23,7 +25,7 @@ TagManager:
   - Structure
   - Unit
   - WallEnd
-  - 
+  - Item
   - 
   - 
   - 

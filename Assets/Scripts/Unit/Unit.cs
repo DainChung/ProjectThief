@@ -10,18 +10,23 @@ namespace Com.MyCompany.MyGame
 
         private float _speed;
         private uint _health;
+        private const string _weaponPath = "Weapons/";
 
         #endregion
 
         #region Public Fields
 
         public float speed { get { return _speed; } set { _speed = value; } }
-        public float walkSpeed { get { return 0.4f * _speed; } }
+        public float walkSpeed { get { return 0.41f * _speed; } }
+        public float coverSpeed { get { return 0.31f * speed; } }
         public uint health { get { return _health; } }
+
+        public string weaponPath { get { return _weaponPath; } }
+
         [HideInInspector]
         public bool lockControl = false;
-        [HideInInspector]
-        public bool rePosition = false;
+
+        
 
         #endregion
 
@@ -29,7 +34,7 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             _health = 1;
-            _speed = 40.0f;
+            _speed = 35.0f;
         }
         // Start is called before the first frame update
         void Start()
@@ -100,7 +105,6 @@ namespace Com.MyCompany.MyGame
             else
                 transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0);
 
-            rePosition = false;
             yield break;
         }
 
@@ -126,7 +130,6 @@ namespace Com.MyCompany.MyGame
                 transform.position = freezeHeight;
                 yield return null;
             }
-            Debug.Log("Sub Done");
 
             while (Vector3.Distance(transform.position, destiPos) >= 0.1)
             {
@@ -136,10 +139,8 @@ namespace Com.MyCompany.MyGame
                 transform.position = freezeHeight;
                 yield return null;
             }
-            Debug.Log("Final Done");
 
             lockControl = false;
-            rePosition = true;
             yield break;
         }
 
