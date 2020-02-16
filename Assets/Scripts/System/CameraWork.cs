@@ -37,6 +37,11 @@ namespace Com.MyCompany.MyGame
             destiPos = cameraPos;
 
             lineRenderer = GetComponent<LineRenderer>();
+            lineRenderer.startColor = Color.white;
+            lineRenderer.endColor = Color.white;
+            lineRenderer.startWidth = 0.1f;
+            lineRenderer.endWidth = 0.1f;
+            lineRenderer.positionCount = 27;
         }
 
         //프레임과 상관없이 일정 시간마다 호출
@@ -54,41 +59,17 @@ namespace Com.MyCompany.MyGame
         #region Public Methods
 
         //무언가를 던질때 궤적을 보여줌
-        //  https://lovelyseekerclaire.tistory.com/26 링크의 내용을 이용해서 궤적을 먼저 그린 다음(최대 거리 제한둘것)
-        //  궤적을 따라 물체가 발사되도록 변경할 것
+        //예상 착탄지점을 원으로 표시해줄것 & 투척 후 선을 안 보이게 처리할 것
         public void ThrowLineRenderer(float theta, Vector3 throwPos)
         {
             theta = -(theta) * Mathf.Deg2Rad;
 
-            float cosY = Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
-            float sinY = Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
-            float cosEuler = Mathf.Cos(theta);
-            float sinEuler = Mathf.Sin(theta);
-
-            float t = sinEuler * throwPower / gravity;
-            t -= 0.1f;
-
-            cosY = 1;
-            float x = cosEuler * cosY * throwPower * t;
-            float y = (Mathf.Tan(theta) * x - 0.45f * x * x / (12.5f * cosEuler * cosEuler));
-            float z = cosEuler * sinY * throwPower * t;
-            z = 0;
-
-            Vector3 maxPoint = new Vector3(x, y, z);
-            Debug.Log((theta * Mathf.Rad2Deg)+ ", " +t +", " +maxPoint);
-            t *= 2;
-
-            x = cosEuler * cosY * throwPower * t + 0.4f;
-            y = (Mathf.Tan(theta) * x - 0.45f * x * x / (12.5f * cosEuler * cosEuler));
-            //y = -throwPos.y + 0.5f;
-            z = cosEuler * sinY * throwPower * t;
-            z = 0;
-
-            Vector3 EndPoint = new Vector3(x, y, z);
-
-            lineRenderer.SetPosition(0, throwPos);
-            lineRenderer.SetPosition(1, maxPoint + throwPos);
-            lineRenderer.SetPosition(2, EndPoint + throwPos);
+            float t = 0;
+            for (int index = 0; index < lineRenderer.positionCount; index++)
+            {
+                lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos));
+                t += 0.1f;
+            }
         }
 
         #endregion
@@ -141,6 +122,22 @@ namespace Com.MyCompany.MyGame
             {
                 transform.rotation = Quaternion.Euler(curEulerAngle.x, curEulerAngle.y, 0);
             }
+        }
+
+        //탄도방정식을 이용하여 궤적을 그릴 수 있도록 Vector3 값을 반환한다.
+        //cosY와 z 값을 변화시켜 모든 방향에 대해 탄도 궤적을 그리도록 변경할 것
+        private Vector3 GetThrowLinePoint(float theta, float t, Vector3 throwPos)
+        {
+            float cosY = 1;//Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
+            float sinY = Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
+            float cosEuler = Mathf.Cos(theta);
+            float sinEuler = Mathf.Sin(theta);
+
+            float x = cosEuler * cosY * throwPower * t;
+            float y = (Mathf.Tan(theta) * x - 0.45f * x * x / (12.5f * cosEuler * cosEuler));
+            float z = 0;//cosEuler * sinY * throwPower * t;
+
+            return (new Vector3(x, y, z) + throwPos);
         }
 
         #endregion
