@@ -30,13 +30,13 @@ namespace Com.MyCompany.MyGame
         //높을수록 적캐릭터에게 쉽게 들킨다.
         private float aggro = 0.1f;
 
-        private float jumpPower = 10f;
-
         private Unit unit;
         private PlayerAnimationController playerAnimController;
 
         private WeaponCode curWeapon = WeaponCode.HAND;
 
+        //조준 후 발사되지 않는 경우 발사하도록 제어
+        private bool readyToThrowItem = false;
         private Vector3 throwRotEuler = Vector3.zero;
         private float theta;
         private CameraWork cam;
@@ -105,6 +105,7 @@ namespace Com.MyCompany.MyGame
 
                 #endregion
 
+                //ControlCover(), ControlBase()에 나누어 넣을 예정
                 #region Control.Crouch: 조작에 따라 속도와 Collider를 관리
                 //걷기 <-> 달리기 전환 이거나 서기 <-> 숙이기 전환
                 if (Input.GetButtonDown("Walk") || Input.GetButtonDown("Crouch"))
@@ -133,6 +134,7 @@ namespace Com.MyCompany.MyGame
                 //이후 은신 관련 기능 추가 (예시)))float cloak; if (플레이어 == 서있음) ctraloak = 1; else if (플레이어 == 숙이기) cloak = 0.5;)
                 if (playerAnimController.isOnFloor)
                 {
+                    //ControlBase()에 넣을 예정
                     #region Control.Base: 일반적인 상태에서의 조작 관리
                     if (!animator.GetBool("IsCovering"))
                     {
@@ -154,7 +156,7 @@ namespace Com.MyCompany.MyGame
                         {
                             if (Input.GetButtonDown("Jump"))
                             {
-                                destiPos = transform.up * playerSpeed * jumpPower;
+                                destiPos = transform.up * playerSpeed * unit.jumpPower;
 
                                 rb.AddForce(destiPos);
                             }
@@ -162,6 +164,7 @@ namespace Com.MyCompany.MyGame
                     }
                     #endregion
 
+                    //ControlCover에 넣을 예정
                     #region Control.Cover: 엄폐상태에서의 조작 관리
                     //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
                     if (playerAnimController.isWallClose && animator.GetBool("IsCovering"))
@@ -212,11 +215,8 @@ namespace Com.MyCompany.MyGame
                     else { }
                     #endregion
 
-                    #region Control.Attack : 바닥에 서있을 때의 공격 관련 조작 관리
-
+                    //바닥에 서있을 때의 공격 관련 조작 관리
                     ControlAttack();
-
-                    #endregion
 
                     //과도한 미끄러짐 방지
                     rb.velocity *= 0.97f;
@@ -247,73 +247,83 @@ namespace Com.MyCompany.MyGame
 
         void ControlAttack()
         {
-            //근접 공격용 맨손 (=> 일시적 경직 ?)
-            if (curWeapon == WeaponCode.HAND)
+            switch (curWeapon)
             {
-                if(Input.GetButtonDown("Fire1"))
-                    Debug.Log("손 공격");
-
-                //Collider[] sample = Physics.OverlapSphere(......);
+                //근접 공격용 맨손 (=> 일시적 경직 ?)
+                case WeaponCode.HAND:
+                    if (Input.GetButtonDown("Fire1"))
+                        Debug.Log("손 공격");
+                    break;
+                case WeaponCode.CAN:
+                    ThrowCan();
+                    break;
+                //플레이어 주변에 설치 OR 던지기?
+                case WeaponCode.DONUT:
+                    if (Input.GetButtonDown("Fire1"))
+                        Debug.Log("도넛 설치");
+                    break;
+                //플레이어 위치에서 사용
+                case WeaponCode.SMOKE:
+                    if (Input.GetButtonDown("Fire1"))
+                        Debug.Log("연막");
+                    break;
+                default:
+                    break;
             }
-            //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
-            //소지 개수 이상으로 사용불가 && 딜레이 추가할 것
-            //조준하는 동안 걷도록 강제할 것
-            else if (curWeapon == WeaponCode.CAN)
+        }
+
+        //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
+        //소지 개수 이상으로 사용불가 && 딜레이 추가할 것
+        //
+        private void ThrowCan()
+        {
+            //if(amountCAN > 0)
+            //조준
+            if (Input.GetButton("Fire1"))
             {
-                //if(canAmount > 0)
-                //조준하는 동안 플레이어 캐릭터도 회전할 것
-                if (Input.GetButton("Fire1"))
+                //발사각 결정
+                throwRotEuler = mainCameraTransform.rotation.eulerAngles;
+                theta = throwRotEuler.x;
+
+                if (theta >= 334)
+                    theta = theta - 360;
+
+                theta = theta - 35;
+
+                throwRotEuler.Set(theta, throwRotEuler.y, 0);
+
+                //포물선 궤적 그리기
+                cam.ThrowLineRenderer(throwRotEuler.x, throwPos.position);
+
+                //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
+                if (!animator.GetBool("IsCovering"))
                 {
-                    //포물선 궤적 결정 => 포물선 궤적은 구글링하면 금방 나옴
-                    //카메라에서 그릴지 여기서 그릴지는 고민해보삼
-                    throwRotEuler = mainCameraTransform.rotation.eulerAngles;
-                    theta = throwRotEuler.x;
-
-                    if (theta >= 334)
-                        theta = theta - 360;
-
-                    theta = theta - 35;
-
-                    throwRotEuler.Set(theta, throwRotEuler.y, 0);
-
-                    //포물선 궤적 그리기
-                    cam.ThrowLineRenderer(throwRotEuler.x, throwPos.position);
-
-                    //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
                     playerSpeed = unit.walkSpeed;
+
                     lookDir = transform.position + mainCameraTransform.forward;
                     lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
                     transform.LookAt(lookDir, Vector3.up);
-                    animator.SetBool("IsRunMode", false);
-                    
-                    //Debug.Log("조준 중: "+throwRotEuler);
                 }
+                animator.SetBool("IsRunMode", false);
 
-                //조준한 상태에서 놓으면 투척
-                if (Input.GetButtonUp("Fire1"))
+                readyToThrowItem = true;
+            }
+            //조준한 상태에서 놓으면 투척
+            else if (Input.GetButtonUp("Fire1") || readyToThrowItem)
+            {
+                Instantiate(Resources.Load(unit.weaponPath + "WeaponCan") as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
+
+                cam.HideLines();
+                if (!animator.GetBool("IsCovering"))
                 {
-                    //Debug.Log("Throw: " + throwRotEuler + ", Theta: " + theta);
-                    Instantiate(Resources.Load(unit.weaponPath + "WeaponCan") as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
-
                     playerSpeed = unit.speed;
                     animator.SetBool("IsRunMode", true);
                 }
-                //else
-                //Debug.Log("소지 개수 부족");
 
+                readyToThrowItem = false;
             }
-            //플레이어 주변에 설치 OR 던지기?
-            else if (curWeapon == WeaponCode.DONUT)
-            {
-                if (Input.GetButtonDown("Fire1"))
-                    Debug.Log("도넛 설치");
-            }
-            //플레이어 위치에서 사용
-            else if (curWeapon == WeaponCode.SMOKE)
-            {
-                if (Input.GetButtonDown("Fire1"))
-                    Debug.Log("연막");
-            }
+            //else
+            //Debug.Log("소지 개수 부족");
         }
 
         #endregion

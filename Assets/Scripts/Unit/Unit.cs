@@ -10,7 +10,9 @@ namespace Com.MyCompany.MyGame
 
         private float _speed;
         private uint _health;
+        private float _jumpPower;
         private const string _weaponPath = "Weapons/";
+        private bool _lockControl = false;
 
         #endregion
 
@@ -20,13 +22,19 @@ namespace Com.MyCompany.MyGame
         public float walkSpeed { get { return 0.41f * _speed; } }
         public float coverSpeed { get { return 0.31f * speed; } }
         public uint health { get { return _health; } }
+        public float jumpPower { get { return _jumpPower; } }
 
         public string weaponPath { get { return _weaponPath; } }
 
-        [HideInInspector]
-        public bool lockControl = false;
+        public bool lockControl { get{ return _lockControl; } }
 
-        
+        [HideInInspector]
+        public UnitState curUnitState = UnitState.MOD_RUN;
+
+        public enum UnitState
+        {
+            MOD_WALK, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH
+        }
 
         #endregion
 
@@ -35,6 +43,7 @@ namespace Com.MyCompany.MyGame
         {
             _health = 1;
             _speed = 35.0f;
+            _jumpPower = 10f;
         }
         // Start is called before the first frame update
         void Start()
@@ -118,7 +127,7 @@ namespace Com.MyCompany.MyGame
             if (goRight) newLook *= -1;
 
             //중간에 조작 방지
-            lockControl = true;
+            _lockControl = true;
 
             transform.LookAt(transform.position + newLook, Vector3.up);
 
@@ -140,7 +149,7 @@ namespace Com.MyCompany.MyGame
                 yield return null;
             }
 
-            lockControl = false;
+            _lockControl = false;
             yield break;
         }
 

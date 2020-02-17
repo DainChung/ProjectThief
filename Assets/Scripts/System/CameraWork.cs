@@ -42,6 +42,8 @@ namespace Com.MyCompany.MyGame
             lineRenderer.startWidth = 0.1f;
             lineRenderer.endWidth = 0.1f;
             lineRenderer.positionCount = 27;
+
+            lineRenderer.enabled = false;
         }
 
         //프레임과 상관없이 일정 시간마다 호출
@@ -62,14 +64,34 @@ namespace Com.MyCompany.MyGame
         //예상 착탄지점을 원으로 표시해줄것 & 투척 후 선을 안 보이게 처리할 것
         public void ThrowLineRenderer(float theta, Vector3 throwPos)
         {
+            if (!lineRenderer.enabled)
+                lineRenderer.enabled = true;
+
             theta = -(theta) * Mathf.Deg2Rad;
 
-            float t = 0;
+            //t가 0보다 조금 더 커야 궤적이 비슷해짐
+            float t = 0.08f;
+
             for (int index = 0; index < lineRenderer.positionCount; index++)
             {
                 lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos));
                 t += 0.1f;
+
+                //지표면 아래는 대부분 생략한다.
+                if (lineRenderer.GetPosition(index).y < -2)
+                {
+                    lineRenderer.SetPosition(index, lineRenderer.GetPosition(index - 1));
+                    for (int i = index; i < lineRenderer.positionCount; i++)
+                        lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
+
+                    break;
+                }
             }
+        }
+
+        public void HideLines()
+        {
+            lineRenderer.enabled = false;
         }
 
         #endregion
@@ -128,14 +150,14 @@ namespace Com.MyCompany.MyGame
         //cosY와 z 값을 변화시켜 모든 방향에 대해 탄도 궤적을 그리도록 변경할 것
         private Vector3 GetThrowLinePoint(float theta, float t, Vector3 throwPos)
         {
-            float cosY = 1;//Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
+            float cosY = Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
             float sinY = Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
             float cosEuler = Mathf.Cos(theta);
             float sinEuler = Mathf.Sin(theta);
 
-            float x = cosEuler * cosY * throwPower * t;
-            float y = (Mathf.Tan(theta) * x - 0.45f * x * x / (12.5f * cosEuler * cosEuler));
-            float z = 0;//cosEuler * sinY * throwPower * t;
+            float x = cosEuler * sinY * throwPower * t;
+            float y = (0.95f * throwPower * sinEuler - 0.5f * gravity * t * 1.09f) * t;  //0.95f, 1.09f는 임의로 추가한 계수, 이렇게 해야 궤적이 비슷해짐
+            float z = cosEuler * cosY * throwPower * t;
 
             return (new Vector3(x, y, z) + throwPos);
         }
