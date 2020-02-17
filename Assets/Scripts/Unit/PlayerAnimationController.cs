@@ -16,6 +16,9 @@ namespace Com.MyCompany.MyGame
 
         private Unit unit;
 
+        const float crouchColliderHeight = 64f;
+        const float standColliderHeight = 90f;
+
         #endregion
 
         #region Public Values
@@ -127,6 +130,9 @@ namespace Com.MyCompany.MyGame
             {
                 animator.SetBool("IsRunMode", false);
 
+                transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
+                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+
                 animLayerWeight += (Time.deltaTime * 3f);
                 animLayerWeight = Mathf.Clamp01(animLayerWeight);
                 animator.SetLayerWeight(1, animLayerWeight);
@@ -136,6 +142,9 @@ namespace Com.MyCompany.MyGame
             else if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
             {
                 animator.SetBool("IsRunMode", true);
+
+                transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
+                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
 
                 animLayerWeight -= (Time.deltaTime * 3f);
                 animLayerWeight = Mathf.Clamp01(animLayerWeight);

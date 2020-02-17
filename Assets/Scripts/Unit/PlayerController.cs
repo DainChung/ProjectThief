@@ -14,7 +14,6 @@ namespace Com.MyCompany.MyGame
         #region Private Vars
 
         private float playerSpeed;
-
         private Transform mainCameraTransform;
         private Quaternion destiRotation;
         private Vector3 lookDir;
@@ -23,9 +22,6 @@ namespace Com.MyCompany.MyGame
         private Rigidbody rb;
 
         private Animator animator;
-
-        const float crouchColliderHeight = 64f;
-        const float standColliderHeight = 90f;
 
         //높을수록 적캐릭터에게 쉽게 들킨다.
         private float aggro = 0.1f;
@@ -68,11 +64,11 @@ namespace Com.MyCompany.MyGame
             rb = GetComponent<Rigidbody>();
             animator = playerAnimController.animator;
 
-            playerSpeed = unit.speed;
-
             mainCameraTransform = Camera.main.transform;
             cam = mainCameraTransform.GetComponent<CameraWork>();
             lookDir = mainCameraTransform.forward + transform.position;
+
+            playerSpeed = unit.speed;
         }
 
         void FixedUpdate()
@@ -112,9 +108,6 @@ namespace Com.MyCompany.MyGame
                 {
                     if (!animator.GetBool("IsCrouchMode"))
                     {
-                        transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
-                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
-
                         if (animator.GetBool("IsRunMode"))
                             playerSpeed = unit.speed;
                         else
@@ -122,9 +115,6 @@ namespace Com.MyCompany.MyGame
                     }
                     else
                     {
-                        transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
-                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
-
                         playerSpeed = unit.walkSpeed;
                     }
                 }
@@ -134,85 +124,24 @@ namespace Com.MyCompany.MyGame
                 //이후 은신 관련 기능 추가 (예시)))float cloak; if (플레이어 == 서있음) ctraloak = 1; else if (플레이어 == 숙이기) cloak = 0.5;)
                 if (playerAnimController.isOnFloor)
                 {
-                    //ControlBase()에 넣을 예정
-                    #region Control.Base: 일반적인 상태에서의 조작 관리
-                    if (!animator.GetBool("IsCovering"))
+                    switch (unit.curUnitState)
                     {
-                        //플레이어 캐릭터 회전 (엄폐 상태가 아닐때만)
-                        SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
-                        transform.LookAt(lookDir, Vector3.up);
-                        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);  //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지, freezeRotation으로 제어 안 됨
-
-                        //플레이어 캐릭터 이동
-                        if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
-                        {
-                            destiPos = transform.forward * playerSpeed;
-
-                            rb.AddForce(destiPos);
-                        }
-
-                        //점프할 때
-                        if (!animator.GetBool("IsCrouchMode") && animator.GetBool("IsRunMode"))
-                        {
-                            if (Input.GetButtonDown("Jump"))
-                            {
-                                destiPos = transform.up * playerSpeed * unit.jumpPower;
-
-                                rb.AddForce(destiPos);
-                            }
-                        }
+                        case Unit.UnitState.MOD_WALK:
+                        case Unit.UnitState.MOD_RUN:
+                        case Unit.UnitState.MOD_CROUCH:
+                            ControlBase();
+                            break;
+                        case Unit.UnitState.MOD_COVERSTAND:
+                        case Unit.UnitState.MOD_COVERCROUCH:
+                            ControlCover();
+                            break;
+                        default:
+                            break;
                     }
-                    #endregion
 
                     //ControlCover에 넣을 예정
                     #region Control.Cover: 엄폐상태에서의 조작 관리
-                    //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
-                    if (playerAnimController.isWallClose && animator.GetBool("IsCovering"))
-                    {
-                        //플레이어 속력을 걷는 속력으로 고정
-                        playerSpeed = unit.coverSpeed;
-                        //플레이어 캐릭터 방향 고정
-                        transform.LookAt(transform.position + playerAnimController.wallTransform.forward, Vector3.up);
 
-                        //엄폐 상태일 때 가능한 조작 사용
-                        if (Input.GetButton("Horizontal"))
-                        {
-                            //벽 우측 끝 도달 && 우측으로 계속 이동하려는 경우
-                            if (animator.GetBool("IsWallRightEnd") && Input.GetAxis("Horizontal") > 0)
-                            {
-                                //아무것도 하지 않음
-                            }
-                            //벽 좌측 끝 도달 && 좌측으로 계속 이동하려는 경우
-                            else if (animator.GetBool("IsWallLeftEnd") && Input.GetAxis("Horizontal") < 0)
-                            {
-                                //아무것도 하지 않음
-                            }
-                            //일반적인 상황 OR 벽 우측 끝에서 좌측으로 이동 OR 벽 좌측 끝에서 우측으로 이동
-                            else
-                            {
-                                destiPos = -transform.right * Input.GetAxis("Horizontal") * playerSpeed;
-
-                                rb.AddForce(destiPos);
-                            }
-                        }
-
-                        //우측 끝에서 우측 이동 버튼을 다시 누르면 엄폐물 이동 수행
-                        if (animator.GetBool("IsWallRightEnd"))
-                        {
-                            if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") > 0)
-                                StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, true, playerAnimController.wallEndToEndPos));
-                        }
-                        //좌측 끝에서 좌측 이동 버튼을 다시 누르면 엄폐물 이동 수행
-                        else if (animator.GetBool("IsWallLeftEnd"))
-                        {
-                            if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
-                                StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, false, playerAnimController.wallEndToEndPos));
-                        }
-                    }
-                    //엄폐를 해제했고 달리기 모드일 때 => 플레이어의 속력을 달리는 속력으로 변경
-                    else if (!animator.GetBool("IsCovering") && animator.GetBool("IsRunMode"))
-                        playerSpeed = unit.speed;
-                    else { }
                     #endregion
 
                     //바닥에 서있을 때의 공격 관련 조작 관리
@@ -324,6 +253,77 @@ namespace Com.MyCompany.MyGame
             }
             //else
             //Debug.Log("소지 개수 부족");
+        }
+
+        //일반적인 상태에서의 조작
+        private void ControlBase()
+        {
+            //플레이어 캐릭터 회전 (엄폐 상태가 아닐때만)
+            SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
+            transform.LookAt(lookDir, Vector3.up);
+            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);  //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지, freezeRotation으로 제어 안 됨
+
+            //플레이어 캐릭터 이동
+            if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
+            {
+                destiPos = transform.forward * playerSpeed;
+
+                rb.AddForce(destiPos);
+            }
+
+            //점프할 때
+            if (animator.GetBool("IsRunMode"))
+            {
+                if (Input.GetButtonDown("Jump"))
+                {
+                    destiPos = transform.up * unit.speed * unit.jumpPower;
+
+                    rb.AddForce(destiPos);
+                }
+            }
+        }
+
+        private void ControlCover()
+        {
+            //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
+            //플레이어 속도는 unit.coverSpeed로 고정됨
+            //플레이어 캐릭터 방향 고정
+            transform.LookAt(transform.position + playerAnimController.wallTransform.forward, Vector3.up);
+
+            //엄폐 상태일 때 가능한 조작 사용
+            if (Input.GetButton("Horizontal"))
+            {
+                //벽 우측 끝 도달 && 우측으로 계속 이동하려는 경우
+                if (animator.GetBool("IsWallRightEnd") && Input.GetAxis("Horizontal") > 0)
+                {
+                    //아무것도 하지 않음
+                }
+                //벽 좌측 끝 도달 && 좌측으로 계속 이동하려는 경우
+                else if (animator.GetBool("IsWallLeftEnd") && Input.GetAxis("Horizontal") < 0)
+                {
+                    //아무것도 하지 않음
+                }
+                //일반적인 상황 OR 벽 우측 끝에서 좌측으로 이동 OR 벽 좌측 끝에서 우측으로 이동
+                else
+                {
+                    destiPos = -transform.right * Input.GetAxis("Horizontal") * unit.coverSpeed;
+
+                    rb.AddForce(destiPos);
+                }
+            }
+
+            //우측 끝에서 우측 이동 버튼을 다시 누르면 엄폐물 이동 수행
+            if (animator.GetBool("IsWallRightEnd"))
+            {
+                if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") > 0)
+                    StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, true, playerAnimController.wallEndToEndPos));
+            }
+            //좌측 끝에서 좌측 이동 버튼을 다시 누르면 엄폐물 이동 수행
+            else if (animator.GetBool("IsWallLeftEnd"))
+            {
+                if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
+                    StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, false, playerAnimController.wallEndToEndPos));
+            }
         }
 
         #endregion

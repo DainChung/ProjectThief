@@ -20,6 +20,7 @@ namespace Com.MyCompany.MyGame
         #region Private Var
 
         private Transform player;
+        //private Transform throwDestiPos;
         private Vector3 destiPos;
         private float dist;
 
@@ -34,6 +35,7 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
+            //throwDestiPos = transform.GetChild(0);
             destiPos = cameraPos;
 
             lineRenderer = GetComponent<LineRenderer>();
@@ -65,7 +67,10 @@ namespace Com.MyCompany.MyGame
         public void ThrowLineRenderer(float theta, Vector3 throwPos)
         {
             if (!lineRenderer.enabled)
+            {
                 lineRenderer.enabled = true;
+                //throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
+            }
 
             theta = -(theta) * Mathf.Deg2Rad;
 
@@ -75,23 +80,36 @@ namespace Com.MyCompany.MyGame
             for (int index = 0; index < lineRenderer.positionCount; index++)
             {
                 lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos));
-                t += 0.1f;
 
-                //지표면 아래는 대부분 생략한다.
-                if (lineRenderer.GetPosition(index).y < -2)
+                if (index != 0)
                 {
-                    lineRenderer.SetPosition(index, lineRenderer.GetPosition(index - 1));
-                    for (int i = index; i < lineRenderer.positionCount; i++)
-                        lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
+                    RaycastHit hit = new RaycastHit();
 
-                    break;
+                    //충돌이 발생한 부분부터 생략한다.
+                    //특정 레이어만 감지하는게 안 됨, 
+                    if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
+                    {
+                        if (hit.transform.gameObject.layer == 9)
+                        {
+                            Debug.Log("Block Here " + lineRenderer.GetPosition(index));
+
+                            lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
+                            for (int i = index; i < lineRenderer.positionCount; i++)
+                                lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
+
+                            break;
+                        }
+                    }
                 }
+
+                t += 0.1f;
             }
         }
 
         public void HideLines()
         {
             lineRenderer.enabled = false;
+            //throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
         }
 
         #endregion
