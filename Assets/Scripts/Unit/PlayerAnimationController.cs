@@ -137,7 +137,7 @@ namespace Com.MyCompany.MyGame
                 animLayerWeight = Mathf.Clamp01(animLayerWeight);
                 animator.SetLayerWeight(1, animLayerWeight);
 
-                unit.curUnitState = Unit.UnitState.MOD_CROUCH;
+                unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
             }
             else if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
             {
@@ -150,7 +150,7 @@ namespace Com.MyCompany.MyGame
                 animLayerWeight = Mathf.Clamp01(animLayerWeight);
                 animator.SetLayerWeight(1, animLayerWeight);
 
-                unit.curUnitState = Unit.UnitState.MOD_RUN;
+                unit.curUnitPose = Unit.UnitPose.MOD_RUN;
             }
 
             #endregion
@@ -158,12 +158,12 @@ namespace Com.MyCompany.MyGame
             if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode") && animator.GetBool("IsRunMode"))
             {
                 animator.SetBool("IsRunMode", false);
-                unit.curUnitState = Unit.UnitState.MOD_WALK;
+                unit.curUnitPose = Unit.UnitPose.MOD_WALK;
             }
             else if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode") && !animator.GetBool("IsRunMode"))
             {
                 animator.SetBool("IsRunMode", true);
-                unit.curUnitState = Unit.UnitState.MOD_RUN;
+                unit.curUnitPose = Unit.UnitPose.MOD_RUN;
             }
 
             if (_isOnFloor)
@@ -212,14 +212,14 @@ namespace Com.MyCompany.MyGame
                         {
                             animator.SetLayerWeight(2, 1);
                             animator.SetLayerWeight(3, 0);
-                            unit.curUnitState = Unit.UnitState.MOD_COVERSTAND;
+                            unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
                         }
                         //UnCover, Stand
                         else
                         {
                             //unit.curUnitState는 일단 MOD_RUN으로 가정한다.
                             animator.SetLayerWeight(2, 0);
-                            unit.curUnitState = Unit.UnitState.MOD_RUN;
+                            unit.curUnitPose = Unit.UnitPose.MOD_RUN;
                         }
                     }
                     //숙인 상태면 Crouching Cover Layer를 활성화 한다.
@@ -231,13 +231,13 @@ namespace Com.MyCompany.MyGame
                             animator.SetLayerWeight(3, 1);
                             animator.SetLayerWeight(2, 0);
                             animator.SetLayerWeight(1, 0);
-                            unit.curUnitState = Unit.UnitState.MOD_COVERCROUCH;
+                            unit.curUnitPose = Unit.UnitPose.MOD_COVERCROUCH;
                         }
                         //UnCover, Crouch
                         else
                         {
                             animator.SetLayerWeight(3, 0);
-                            unit.curUnitState = Unit.UnitState.MOD_CROUCH;
+                            unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
                         }
                     }
                     // 양수면 오른쪽, 음수면 왼쪽

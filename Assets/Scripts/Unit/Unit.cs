@@ -29,11 +29,20 @@ namespace Com.MyCompany.MyGame
         public bool lockControl { get{ return _lockControl; } }
 
         [HideInInspector]
-        public UnitState curUnitState = UnitState.MOD_RUN;
+        public UnitPose curUnitPose = UnitPose.MOD_RUN;
+        //적 캐릭터만 사용
+        [HideInInspector]
+        public UnitState curUnitState = UnitState.IDLE;
 
+        //Animation Layer에 관한 정보
+        public enum UnitPose
+        {
+            MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, max
+        }
+        //적 캐릭터 상태에 관한 정보
         public enum UnitState
         {
-            MOD_WALK, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH
+            IDLE = 0, ALERT, COMBAT, max
         }
 
         #endregion

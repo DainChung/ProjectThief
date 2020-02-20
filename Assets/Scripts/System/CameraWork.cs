@@ -20,7 +20,7 @@ namespace Com.MyCompany.MyGame
         #region Private Var
 
         private Transform player;
-        //private Transform throwDestiPos;
+        private Transform throwDestiPos;
         private Vector3 destiPos;
         private float dist;
 
@@ -35,7 +35,9 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
-            //throwDestiPos = transform.GetChild(0);
+            throwDestiPos = transform.GetChild(0);
+            throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
+
             destiPos = cameraPos;
 
             lineRenderer = GetComponent<LineRenderer>();
@@ -69,7 +71,7 @@ namespace Com.MyCompany.MyGame
             if (!lineRenderer.enabled)
             {
                 lineRenderer.enabled = true;
-                //throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
+                throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
             }
 
             theta = -(theta) * Mathf.Deg2Rad;
@@ -86,12 +88,12 @@ namespace Com.MyCompany.MyGame
                     RaycastHit hit = new RaycastHit();
 
                     //충돌이 발생한 부분부터 생략한다.
-                    //특정 레이어만 감지하는게 안 됨, 
                     if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
                     {
                         if (hit.transform.gameObject.layer == 9)
                         {
-                            Debug.Log("Block Here " + lineRenderer.GetPosition(index));
+                            //착탄 지점 표시(나중에 투명하게 변경하거나 평면 원으로 표시할것)
+                            throwDestiPos.position = hit.point;
 
                             lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
                             for (int i = index; i < lineRenderer.positionCount; i++)
@@ -109,7 +111,7 @@ namespace Com.MyCompany.MyGame
         public void HideLines()
         {
             lineRenderer.enabled = false;
-            //throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
+            throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
         }
 
         #endregion
