@@ -173,7 +173,7 @@ namespace Com.MyCompany.MyGame
                 if(animator.GetBool("IsFalling"))
                     animator.SetBool("IsFalling", false);
 
-                if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
+                if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing") && unit.curUnitPose != Unit.UnitPose.max)
                 {
                     if (Input.GetButton("Vertical"))
                     {

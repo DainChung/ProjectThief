@@ -37,7 +37,7 @@ namespace Com.MyCompany.MyGame
         //Animation Layer에 관한 정보
         public enum UnitPose
         {
-            MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, max
+            MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, MOD_THROW, max
         }
         //적 캐릭터 상태에 관한 정보
         public enum UnitState

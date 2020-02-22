@@ -15,6 +15,13 @@ namespace Com.MyCompany.MyGame
     {
         #region Private Vars
 
+        private enum LookDirState
+        {
+            IDLE = 0, COVER, THROW, max
+        }
+
+        private LookDirState curLookDirState = LookDirState.IDLE;
+
         private float playerSpeed;
         private Transform mainCameraTransform;
         private Quaternion destiRotation;
@@ -153,6 +160,9 @@ namespace Com.MyCompany.MyGame
                         case Unit.UnitPose.MOD_COVERCROUCH:
                             ControlCover();
                             break;
+                        case Unit.UnitPose.MOD_THROW:
+                            ControlMoveThrow();
+                            break;
                         default:
                             break;
                     }
@@ -163,9 +173,14 @@ namespace Com.MyCompany.MyGame
                     //과도한 미끄러짐 방지
                     rb.velocity *= 0.97f;
                 }
+                else
+                {
+                    cam.HideLines();
+                }
 
             }
 
+            LookDir();
             //플레이어가 의도하지 않은 회전 방지           
             rb.angularVelocity = Vector3.zero;
         }
@@ -187,33 +202,28 @@ namespace Com.MyCompany.MyGame
             lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
         }
 
-        void ControlAttack()
+        //플레이어 캐릭터가 특정 방향을 바라보게 하는 함수
+        void LookDir()
         {
-            AttackDelayManager();
-
-            switch (curWeapon)
+            switch (curLookDirState)
             {
-                //근접 공격용 맨손 (=> 일시적 경직 ?)
-                case WeaponCode.HAND:
-                    if (Input.GetButtonDown("Fire1"))
-                        UnityEngine.Debug.Log("손 공격");
+                case LookDirState.IDLE:
+                    SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
                     break;
-                case WeaponCode.CAN:
-                    AttackThrowCan();
+                case LookDirState.COVER:
+                    lookDir = transform.position + playerAnimController.wallTransform.forward;
                     break;
-                //플레이어 주변에 설치 OR 던지기?
-                case WeaponCode.DONUT:
-                    if (Input.GetButtonDown("Fire1"))
-                        UnityEngine.Debug.Log("도넛 설치");
-                    break;
-                //플레이어 위치에서 사용
-                case WeaponCode.SMOKE:
-                    if (Input.GetButtonDown("Fire1"))
-                        UnityEngine.Debug.Log("연막");
+                case LookDirState.THROW:
+                    lookDir = transform.position + mainCameraTransform.forward;
                     break;
                 default:
                     break;
             }
+
+            lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
+            transform.LookAt(lookDir, Vector3.up);
+            //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지, freezeRotation으로 제어 안 됨
+            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
         private void AttackDelayManager()
@@ -245,6 +255,9 @@ namespace Com.MyCompany.MyGame
             {
                 if (Input.GetButton("Fire1"))
                 {
+                    curLookDirState = LookDirState.THROW;
+                    unit.curUnitPose = Unit.UnitPose.MOD_THROW;
+
                     //발사각 결정
                     throwRotEuler = mainCameraTransform.rotation.eulerAngles;
                     theta = throwRotEuler.x;
@@ -261,13 +274,7 @@ namespace Com.MyCompany.MyGame
 
                     //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
                     if (!animator.GetBool("IsCovering"))
-                    {
                         playerSpeed = unit.walkSpeed;
-
-                        lookDir = transform.position + mainCameraTransform.forward;
-                        lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
-                        transform.LookAt(lookDir, Vector3.up);
-                    }
 
                     animator.SetFloat("ThrowAnimSpeed", 0);
 
@@ -280,6 +287,8 @@ namespace Com.MyCompany.MyGame
                 //조준한 상태에서 놓으면 투척
                 else if ((Input.GetButtonUp("Fire1") || readyToThrowItem) && doubleThrowLock)
                 {
+                    curLookDirState = LookDirState.THROW;
+
                     animator.SetLayerWeight(4, 1);
                     animator.SetFloat("ThrowAnimSpeed", 1);
 
@@ -303,28 +312,28 @@ namespace Com.MyCompany.MyGame
                 //else
                 //Debug.Log("소지 개수 부족");
             }
-            else
+            else if(animator.GetBool("ThrowItem"))
             {
+                //이동방지
+                unit.curUnitPose = Unit.UnitPose.max;
                 animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
             }
 
-            if (animator.GetLayerWeight(4) <= 0)
+            if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
             {
+                curLookDirState = LookDirState.IDLE;
                 animator.Play("Throw", 4, 0.0f);
                 animator.SetFloat("ThrowAnimSpeed", 0);
                 animator.SetLayerWeight(4, 0);
                 animator.SetBool("ThrowItem", false);
+
+                unit.curUnitPose = Unit.UnitPose.MOD_RUN;
             }
         }
 
         //일반적인 상태에서의 조작
         private void ControlBase()
         {
-            //플레이어 캐릭터 회전 (엄폐 상태가 아닐때만)
-            SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
-            transform.LookAt(lookDir, Vector3.up);
-            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);  //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지, freezeRotation으로 제어 안 됨
-
             //플레이어 캐릭터 이동
             if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
             {
@@ -344,13 +353,23 @@ namespace Com.MyCompany.MyGame
                 }
             }
         }
+        //조준 상태일 때의 조작
+        private void ControlMoveThrow()
+        {
+            //플레이어 캐릭터 이동
+            if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
+            {
+                destiPos = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")) * playerSpeed;
 
+                rb.AddForce(destiPos);
+            }
+        }
+        //엄폐 상태일 때의 조작
         private void ControlCover()
         {
             //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
             //플레이어 속도는 unit.coverSpeed로 고정됨
-            //플레이어 캐릭터 방향 고정
-            transform.LookAt(transform.position + playerAnimController.wallTransform.forward, Vector3.up);
+            curLookDirState = LookDirState.COVER;
 
             //엄폐 상태일 때 가능한 조작 사용
             if (Input.GetButton("Horizontal"))
@@ -385,6 +404,35 @@ namespace Com.MyCompany.MyGame
             {
                 if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
                     StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, false, playerAnimController.wallEndToEndPos));
+            }
+        }
+        //공격에 관한 조작
+        private void ControlAttack()
+        {
+            AttackDelayManager();
+
+            switch (curWeapon)
+            {
+                //근접 공격용 맨손 (=> 일시적 경직 ?)
+                case WeaponCode.HAND:
+                    if (Input.GetButtonDown("Fire1"))
+                        UnityEngine.Debug.Log("손 공격");
+                    break;
+                case WeaponCode.CAN:
+                    AttackThrowCan();
+                    break;
+                //플레이어 주변에 설치 OR 던지기?
+                case WeaponCode.DONUT:
+                    if (Input.GetButtonDown("Fire1"))
+                        UnityEngine.Debug.Log("도넛 설치");
+                    break;
+                //플레이어 위치에서 사용
+                case WeaponCode.SMOKE:
+                    if (Input.GetButtonDown("Fire1"))
+                        UnityEngine.Debug.Log("연막");
+                    break;
+                default:
+                    break;
             }
         }
 
