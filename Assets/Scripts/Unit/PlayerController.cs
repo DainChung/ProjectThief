@@ -235,6 +235,8 @@ namespace Com.MyCompany.MyGame
 
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
         //소지 개수 이상으로 사용불가
+        //조준 상태에서 조준 방향과 다른 쪽으로 이동할 때 캐릭터의 방향이 부자연스럽게 변경되는 오류 있음
+        //=> 조준 동안에는 조준점을 보지만 던질 때 이동방향을 바라봄
         private void AttackThrowCan()
         {
             //if(amountCAN > 0)
@@ -266,6 +268,10 @@ namespace Com.MyCompany.MyGame
                         lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
                         transform.LookAt(lookDir, Vector3.up);
                     }
+
+                    animator.SetFloat("ThrowAnimSpeed", 0);
+
+                    animator.SetBool("ReadyToThrow", true);
                     animator.SetBool("IsRunMode", false);
 
                     readyToThrowItem = true;
@@ -274,6 +280,9 @@ namespace Com.MyCompany.MyGame
                 //조준한 상태에서 놓으면 투척
                 else if ((Input.GetButtonUp("Fire1") || readyToThrowItem) && doubleThrowLock)
                 {
+                    animator.SetLayerWeight(4, 1);
+                    animator.SetFloat("ThrowAnimSpeed", 1);
+
                     Instantiate(Resources.Load(unit.weaponPath + "WeaponCan") as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
 
                     cam.HideLines();
@@ -283,6 +292,8 @@ namespace Com.MyCompany.MyGame
                         animator.SetBool("IsRunMode", true);
                     }
 
+                    animator.SetBool("ReadyToThrow", false);
+                    animator.SetBool("ThrowItem", true);
                     readyToThrowItem = false;
                     doubleThrowLock = false;
 
@@ -291,6 +302,18 @@ namespace Com.MyCompany.MyGame
                 }
                 //else
                 //Debug.Log("소지 개수 부족");
+            }
+            else
+            {
+                animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
+            }
+
+            if (animator.GetLayerWeight(4) <= 0)
+            {
+                animator.Play("Throw", 4, 0.0f);
+                animator.SetFloat("ThrowAnimSpeed", 0);
+                animator.SetLayerWeight(4, 0);
+                animator.SetBool("ThrowItem", false);
             }
         }
 
