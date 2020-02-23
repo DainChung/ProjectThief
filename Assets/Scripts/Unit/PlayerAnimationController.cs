@@ -115,55 +115,250 @@ namespace Com.MyCompany.MyGame
 
         void ControlPlayerAnimation()
         {
-            #region Control Crouch Animation
-
-            if (Input.GetButtonDown("Crouch"))
+            switch (unit.curUnitPose)
             {
-                if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
-                {
-                    animator.SetLayerWeight(1, animLayerWeight);
-                    animator.SetBool("IsCrouchMode", !animator.GetBool("IsCrouchMode"));
-                }
-            }
+                #region MOD_WALK
+                case Unit.UnitPose.MOD_WALK:
+                    //MOD_WALK -> MOD_RUN
+                    if (Input.GetButtonDown("Walk"))
+                    {
+                        animator.SetBool("IsRunMode", true);
+                        unit.curUnitPose = Unit.UnitPose.MOD_RUN;
 
-            if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
-            {
-                animator.SetBool("IsRunMode", false);
+                        break;
+                    }
 
-                transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
-                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+                    //MOD_WALK -> MOD_COVERSTAND
+                    if (Input.GetButtonDown("Covering"))
+                    {
+                        animator.SetBool("IsCovering", true);
+                        //벽에 붙이기
+                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
+                        animator.SetLayerWeight(2, 1);
+                        animator.SetLayerWeight(3, 0);
+                        unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
 
-                animLayerWeight += (Time.deltaTime * 3f);
-                animLayerWeight = Mathf.Clamp01(animLayerWeight);
-                animator.SetLayerWeight(1, animLayerWeight);
+                        break;
+                    }
 
-                unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
-            }
-            else if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
-            {
-                animator.SetBool("IsRunMode", true);
+                    //MOD_WALK -> MOD_CROUCH
+                    if (Input.GetButtonDown("Crouch"))
+                    {
+                        if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                        {
+                            animator.SetLayerWeight(1, animLayerWeight);
+                            animator.SetBool("IsCrouchMode", true);
+                        }
+                    }
 
-                transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
-                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+                    if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
+                    {
+                        animator.SetBool("IsRunMode", false);
 
-                animLayerWeight -= (Time.deltaTime * 3f);
-                animLayerWeight = Mathf.Clamp01(animLayerWeight);
-                animator.SetLayerWeight(1, animLayerWeight);
+                        transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
+                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
 
-                unit.curUnitPose = Unit.UnitPose.MOD_RUN;
-            }
+                        animLayerWeight += (Time.deltaTime * 3f);
+                        animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                        if (animLayerWeight == 1)
+                            unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
 
-            #endregion
+                        animator.SetLayerWeight(1, animLayerWeight);
+                    }
 
-            if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode") && animator.GetBool("IsRunMode"))
-            {
-                animator.SetBool("IsRunMode", false);
-                unit.curUnitPose = Unit.UnitPose.MOD_WALK;
-            }
-            else if (Input.GetButtonDown("Walk") && !animator.GetBool("IsCrouchMode") && !animator.GetBool("IsRunMode"))
-            {
-                animator.SetBool("IsRunMode", true);
-                unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+                    break;
+                #endregion
+
+                #region MOD_RUN
+                case Unit.UnitPose.MOD_RUN:
+                    //MOD_WALK -> MOD_RUN
+                    if (Input.GetButtonDown("Walk"))
+                    {
+                        animator.SetBool("IsRunMode", false);
+                        unit.curUnitPose = Unit.UnitPose.MOD_WALK;
+
+                        break;
+                    }
+
+                    //MOD_RUN -> MOD_COVERSTAND
+                    if (Input.GetButtonDown("Covering"))
+                    {
+                        animator.SetBool("IsCovering", true);
+                        //벽에 붙이기
+                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
+                        animator.SetLayerWeight(2, 1);
+                        animator.SetLayerWeight(3, 0);
+                        unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
+
+                        break;
+                    }
+
+                    //MOD_WALK -> MOD_CROUCH
+                    if (Input.GetButtonDown("Crouch"))
+                    {
+                        if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                        {
+                            animator.SetLayerWeight(1, animLayerWeight);
+                            animator.SetBool("IsCrouchMode", true);
+                        }
+                    }
+
+                    if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
+                    {
+                        animator.SetBool("IsRunMode", false);
+
+                        transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
+                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+
+                        animLayerWeight += (Time.deltaTime * 3f);
+                        animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                        if (animLayerWeight == 1)
+                            unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
+
+                        animator.SetLayerWeight(1, animLayerWeight);
+
+                        break;
+                    }
+                    //Debug.Log(unit.curUnitPose);
+                    break;
+                #endregion
+
+                #region MOD_CROUCH
+                case Unit.UnitPose.MOD_CROUCH:
+                    //MOD_CROUCH -> MOD_COVERCROUCH
+                    if (Input.GetButtonDown("Covering"))
+                    {
+                        animator.SetBool("IsCovering", true);
+                        //벽에 붙이기
+                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
+                        animator.SetLayerWeight(2, 0);
+                        animator.SetLayerWeight(3, 1);
+                        unit.curUnitPose = Unit.UnitPose.MOD_COVERCROUCH;
+
+                        break;
+                    }
+
+                    //MOD_CROUCH -> MOD_RUN
+                    if (Input.GetButtonDown("Crouch"))
+                    {
+                        if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                        {
+                            animator.SetLayerWeight(1, animLayerWeight);
+                            animator.SetBool("IsCrouchMode", false);
+                        }
+                    }
+
+                    if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
+                    {
+                        animator.SetBool("IsRunMode", true);
+
+                        transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
+                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+
+                        animLayerWeight -= (Time.deltaTime * 3f);
+                        animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                        if (animLayerWeight == 0)
+                            unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+
+                        animator.SetLayerWeight(1, animLayerWeight);
+
+                        break;
+                    }
+                    break;
+                #endregion
+
+                #region MOD_COVERSTAND
+                case Unit.UnitPose.MOD_COVERSTAND:
+                    //MOD_COVERSTAND -> MOD_RUN
+                    if (Input.GetButtonDown("Covering"))
+                    {
+                        animator.SetBool("IsCovering", false);
+                        //벽에 붙이기
+                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, false));
+                        animator.SetLayerWeight(2, 0);
+                        unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+
+                        break;
+                    }
+
+                    //MOD_COVERSTAND -> MOD_COVERCROUCH
+                    if (Input.GetButtonDown("Crouch"))
+                    {
+                        if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                        {
+                            animator.SetLayerWeight(1, animLayerWeight);
+                            animator.SetBool("IsCrouchMode", true);
+                        }
+                    }
+
+                    if (animator.GetLayerWeight(1) < 1 && animator.GetBool("IsCrouchMode"))
+                    {
+                        transform.GetComponent<CapsuleCollider>().height = crouchColliderHeight;
+                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, crouchColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+
+                        animLayerWeight += (Time.deltaTime * 3f);
+                        animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                        if (animLayerWeight == 1)
+                            unit.curUnitPose = Unit.UnitPose.MOD_COVERCROUCH;
+
+                        animator.SetLayerWeight(1, animLayerWeight);
+                        animator.SetLayerWeight(2, 1 - animLayerWeight);
+                        animator.SetLayerWeight(3, animLayerWeight);
+
+                        break;
+                    }
+                    break;
+                #endregion
+
+                #region MOD_COVERCROUCH
+                case Unit.UnitPose.MOD_COVERCROUCH:
+                    //MOD_COVERCROUCH -> MOD_CROUCH
+                    if (Input.GetButtonDown("Covering"))
+                    {
+                        animator.SetBool("IsCovering", false);
+                        //벽에 붙이기
+                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, false));
+                        animator.SetLayerWeight(1, 1);
+                        animator.SetLayerWeight(2, 0);
+                        animator.SetLayerWeight(3, 0);
+                        unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
+
+                        break;
+                    }
+
+                    //MOD_COVERCROUCH -> MOD_COVERSTAND
+                    if (Input.GetButtonDown("Crouch"))
+                    {
+                        if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
+                        {
+                            animator.SetLayerWeight(1, animLayerWeight);
+                            animator.SetBool("IsCrouchMode", false);
+                        }
+                    }
+
+                    if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
+                    {
+                        transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
+                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
+
+                        animLayerWeight -= (Time.deltaTime * 3f);
+                        animLayerWeight = Mathf.Clamp01(animLayerWeight);
+                        if (animLayerWeight == 0)
+                            unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
+
+                        animator.SetLayerWeight(1, animLayerWeight);
+                        animator.SetLayerWeight(2, 1 - animLayerWeight);
+                        animator.SetLayerWeight(3, animLayerWeight);
+
+                        break;
+                    }
+                    break;
+                #endregion
+
+                case Unit.UnitPose.MOD_THROW:
+                    break;
+                default:
+                    break;
             }
 
             if (_isOnFloor)
@@ -196,50 +391,6 @@ namespace Com.MyCompany.MyGame
 
                 if (_isWallClose)
                 {
-                    //엄폐 시작
-                    if (Input.GetButtonDown("Covering"))
-                    {
-                        animator.SetBool("IsCovering", !animator.GetBool("IsCovering"));
-                        //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, animator.GetBool("IsCovering")));
-                    }
-
-                    //숙인 상태가 아니면 Standing Cover Layer를 활성화 한다.
-                    if (!animator.GetBool("IsCrouchMode"))
-                    {
-                        //Cover, Stand
-                        if (animator.GetBool("IsCovering"))
-                        {
-                            animator.SetLayerWeight(2, 1);
-                            animator.SetLayerWeight(3, 0);
-                            unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
-                        }
-                        //UnCover, Stand
-                        else
-                        {
-                            //unit.curUnitState는 일단 MOD_RUN으로 가정한다.
-                            animator.SetLayerWeight(2, 0);
-                            unit.curUnitPose = Unit.UnitPose.MOD_RUN;
-                        }
-                    }
-                    //숙인 상태면 Crouching Cover Layer를 활성화 한다.
-                    else
-                    {
-                        //Cover, Crouch
-                        if (animator.GetBool("IsCovering"))
-                        {
-                            animator.SetLayerWeight(3, 1);
-                            animator.SetLayerWeight(2, 0);
-                            animator.SetLayerWeight(1, 0);
-                            unit.curUnitPose = Unit.UnitPose.MOD_COVERCROUCH;
-                        }
-                        //UnCover, Crouch
-                        else
-                        {
-                            animator.SetLayerWeight(3, 0);
-                            unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
-                        }
-                    }
                     // 양수면 오른쪽, 음수면 왼쪽
                     animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
 

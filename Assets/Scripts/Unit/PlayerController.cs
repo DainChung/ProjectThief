@@ -334,6 +334,8 @@ namespace Com.MyCompany.MyGame
         //일반적인 상태에서의 조작
         private void ControlBase()
         {
+            curLookDirState = LookDirState.IDLE;
+
             //플레이어 캐릭터 이동
             if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
             {

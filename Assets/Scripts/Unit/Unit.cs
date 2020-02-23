@@ -114,6 +114,7 @@ namespace Com.MyCompany.MyGame
 
                 while (Vector3.Distance(transform.position, newVector) >= 0.2)
                 {
+                    //Debug.Log(Vector3.Distance(transform.position, newVector));
                     transform.position = Vector3.Lerp(transform.position, newVector, Time.deltaTime * 10);
                     t++;
                     yield return null;
