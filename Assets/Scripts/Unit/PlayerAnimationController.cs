@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Com.MyCompany.MyGame.Collections;
+
 namespace Com.MyCompany.MyGame
 {
 
@@ -118,25 +120,25 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitPose)
             {
                 #region MOD_WALK
-                case Unit.UnitPose.MOD_WALK:
+                case UnitPose.MOD_WALK:
                     //MOD_WALK -> MOD_RUN
                     if (Input.GetButtonDown("Walk"))
                     {
                         animator.SetBool("IsRunMode", true);
-                        unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+                        unit.curUnitPose = UnitPose.MOD_RUN;
 
                         break;
                     }
 
                     //MOD_WALK -> MOD_COVERSTAND
-                    if (Input.GetButtonDown("Covering"))
+                    if (Input.GetButtonDown("Covering") && _isWallClose)
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
                         StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
                         animator.SetLayerWeight(2, 1);
                         animator.SetLayerWeight(3, 0);
-                        unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
+                        unit.curUnitPose = UnitPose.MOD_COVERSTAND;
 
                         break;
                     }
@@ -161,7 +163,7 @@ namespace Com.MyCompany.MyGame
                         animLayerWeight += (Time.deltaTime * 3f);
                         animLayerWeight = Mathf.Clamp01(animLayerWeight);
                         if (animLayerWeight == 1)
-                            unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
+                            unit.curUnitPose = UnitPose.MOD_CROUCH;
 
                         animator.SetLayerWeight(1, animLayerWeight);
                     }
@@ -170,25 +172,25 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 #region MOD_RUN
-                case Unit.UnitPose.MOD_RUN:
+                case UnitPose.MOD_RUN:
                     //MOD_WALK -> MOD_RUN
                     if (Input.GetButtonDown("Walk"))
                     {
                         animator.SetBool("IsRunMode", false);
-                        unit.curUnitPose = Unit.UnitPose.MOD_WALK;
+                        unit.curUnitPose = UnitPose.MOD_WALK;
 
                         break;
                     }
 
                     //MOD_RUN -> MOD_COVERSTAND
-                    if (Input.GetButtonDown("Covering"))
+                    if (Input.GetButtonDown("Covering") && _isWallClose)
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
                         StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
                         animator.SetLayerWeight(2, 1);
                         animator.SetLayerWeight(3, 0);
-                        unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
+                        unit.curUnitPose = UnitPose.MOD_COVERSTAND;
 
                         break;
                     }
@@ -213,7 +215,7 @@ namespace Com.MyCompany.MyGame
                         animLayerWeight += (Time.deltaTime * 3f);
                         animLayerWeight = Mathf.Clamp01(animLayerWeight);
                         if (animLayerWeight == 1)
-                            unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
+                            unit.curUnitPose = UnitPose.MOD_CROUCH;
 
                         animator.SetLayerWeight(1, animLayerWeight);
 
@@ -224,16 +226,16 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 #region MOD_CROUCH
-                case Unit.UnitPose.MOD_CROUCH:
+                case UnitPose.MOD_CROUCH:
                     //MOD_CROUCH -> MOD_COVERCROUCH
-                    if (Input.GetButtonDown("Covering"))
+                    if (Input.GetButtonDown("Covering") && _isWallClose)
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
                         StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
                         animator.SetLayerWeight(2, 0);
                         animator.SetLayerWeight(3, 1);
-                        unit.curUnitPose = Unit.UnitPose.MOD_COVERCROUCH;
+                        unit.curUnitPose = UnitPose.MOD_COVERCROUCH;
 
                         break;
                     }
@@ -258,7 +260,7 @@ namespace Com.MyCompany.MyGame
                         animLayerWeight -= (Time.deltaTime * 3f);
                         animLayerWeight = Mathf.Clamp01(animLayerWeight);
                         if (animLayerWeight == 0)
-                            unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+                            unit.curUnitPose = UnitPose.MOD_RUN;
 
                         animator.SetLayerWeight(1, animLayerWeight);
 
@@ -268,7 +270,7 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 #region MOD_COVERSTAND
-                case Unit.UnitPose.MOD_COVERSTAND:
+                case UnitPose.MOD_COVERSTAND:
                     //MOD_COVERSTAND -> MOD_RUN
                     if (Input.GetButtonDown("Covering"))
                     {
@@ -276,7 +278,7 @@ namespace Com.MyCompany.MyGame
                         //벽에 붙이기
                         StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, false));
                         animator.SetLayerWeight(2, 0);
-                        unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+                        unit.curUnitPose = UnitPose.MOD_RUN;
 
                         break;
                     }
@@ -299,7 +301,7 @@ namespace Com.MyCompany.MyGame
                         animLayerWeight += (Time.deltaTime * 3f);
                         animLayerWeight = Mathf.Clamp01(animLayerWeight);
                         if (animLayerWeight == 1)
-                            unit.curUnitPose = Unit.UnitPose.MOD_COVERCROUCH;
+                            unit.curUnitPose = UnitPose.MOD_COVERCROUCH;
 
                         animator.SetLayerWeight(1, animLayerWeight);
                         animator.SetLayerWeight(2, 1 - animLayerWeight);
@@ -311,7 +313,7 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 #region MOD_COVERCROUCH
-                case Unit.UnitPose.MOD_COVERCROUCH:
+                case UnitPose.MOD_COVERCROUCH:
                     //MOD_COVERCROUCH -> MOD_CROUCH
                     if (Input.GetButtonDown("Covering"))
                     {
@@ -321,7 +323,7 @@ namespace Com.MyCompany.MyGame
                         animator.SetLayerWeight(1, 1);
                         animator.SetLayerWeight(2, 0);
                         animator.SetLayerWeight(3, 0);
-                        unit.curUnitPose = Unit.UnitPose.MOD_CROUCH;
+                        unit.curUnitPose = UnitPose.MOD_CROUCH;
 
                         break;
                     }
@@ -344,7 +346,7 @@ namespace Com.MyCompany.MyGame
                         animLayerWeight -= (Time.deltaTime * 3f);
                         animLayerWeight = Mathf.Clamp01(animLayerWeight);
                         if (animLayerWeight == 0)
-                            unit.curUnitPose = Unit.UnitPose.MOD_COVERSTAND;
+                            unit.curUnitPose = UnitPose.MOD_COVERSTAND;
 
                         animator.SetLayerWeight(1, animLayerWeight);
                         animator.SetLayerWeight(2, 1 - animLayerWeight);
@@ -355,8 +357,38 @@ namespace Com.MyCompany.MyGame
                     break;
                 #endregion
 
-                case Unit.UnitPose.MOD_THROW:
+                #region MOD_THROW
+                case UnitPose.MOD_THROW:
+                    //Control Throw Move Animation
+                    //조준하는 동안 애니메이션 제어
+                    if (_isOnFloor)
+                    {
+                        //조준하는 동안 이동 애니메이션 제어
+                        if (Input.GetButton("Vertical"))
+                            animator.SetFloat("MoveSpeed", Input.GetAxis("Vertical"));
+                        else
+                            animator.SetFloat("MoveSpeed", 0);
+
+                        if (Input.GetButton("Horizontal"))
+                            animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
+                        else
+                            animator.SetFloat("TurnRight", 0);
+
+                        //Animation Layer 제어
+                        if (animator.GetFloat("TurnRight") == 0 && animator.GetFloat("MoveSpeed") == 0)
+                        {
+                            animator.SetLayerWeight(4, 1);
+                            animator.SetLayerWeight(5, 0);
+                        }
+                        else
+                        {
+                            animator.SetLayerWeight(4, 0);
+                            animator.SetLayerWeight(5, 1);
+                        }
+                    }
                     break;
+                #endregion
+
                 default:
                     break;
             }
@@ -365,39 +397,48 @@ namespace Com.MyCompany.MyGame
             {
                 #region Control Move Animation
 
-                if(animator.GetBool("IsFalling"))
-                    animator.SetBool("IsFalling", false);
-
-                if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing") && unit.curUnitPose != Unit.UnitPose.max)
+                //WALK, RUN, CROUCH
+                if (unit.curUnitPose == UnitPose.MOD_WALK || unit.curUnitPose == UnitPose.MOD_RUN || unit.curUnitPose == UnitPose.MOD_CROUCH)
                 {
-                    if (Input.GetButton("Vertical"))
+                    if (animator.GetBool("IsFalling"))
+                        animator.SetBool("IsFalling", false);
+
+                    if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing") && unit.curUnitPose != UnitPose.max)
                     {
-                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
-                    }
-                    else if (Input.GetButton("Horizontal"))
-                    {
-                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-                    }
-                    else
-                    {
-                        animator.SetFloat("TurnRight", 0);
-                        animator.SetFloat("MoveSpeed", 0);
+                        if (Input.GetButton("Vertical"))
+                        {
+                            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
+                        }
+                        else if (Input.GetButton("Horizontal"))
+                        {
+                            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
+                        }
+                        else
+                        {
+                            animator.SetFloat("TurnRight", 0);
+                            animator.SetFloat("MoveSpeed", 0);
+                        }
                     }
                 }
-
                 #endregion
 
-                #region Control Cover Animation
+                #region Control Cover Move Animation
 
                 if (_isWallClose)
                 {
-                    // 양수면 오른쪽, 음수면 왼쪽
-                    animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
+                    //COVERCROUCH, COVERSTAND
+                    if (unit.curUnitPose == UnitPose.MOD_COVERCROUCH || unit.curUnitPose == UnitPose.MOD_COVERSTAND)
+                    {
+                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
 
-                    if (animator.GetFloat("TurnRight") > 0)
-                        animator.SetBool("LookRight", true);
-                    else if(animator.GetFloat("TurnRight") < 0)
-                        animator.SetBool("LookRight", false);
+                        // 양수면 오른쪽, 음수면 왼쪽
+                        animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
+
+                        if (animator.GetFloat("TurnRight") > 0)
+                            animator.SetBool("LookRight", true);
+                        else if (animator.GetFloat("TurnRight") < 0)
+                            animator.SetBool("LookRight", false);
+                    }
                 }
 
                 #endregion

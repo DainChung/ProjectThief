@@ -1,1 +1,14 @@
-All Files in Assets/Models are from https://www.mixamo.com/
+//*****	[Character Models with Materials and Textures]	*****
+[0] All Animation and Character Model Files (with Materials & Textures) in Assets\Models are from
+https://www.mixamo.com/
+*************************	end	*************************//
+
+//*****	[Models with Materials and Textures]		*****
+[0] Can.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
+https://www.cgtrader.com/free-3d-models/food/miscellaneous/coca-cola-can-60b7e50c-5679-4f5f-a9eb-ff6c26fe5744
+
+
+[1] Donuts.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
+https://www.turbosquid.com/ko/3d-models/doughnuts-mug-lighting-3d-model-1277936
+
+*************************	end	*************************//

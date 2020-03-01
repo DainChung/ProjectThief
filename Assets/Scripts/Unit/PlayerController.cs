@@ -1,16 +1,12 @@
-﻿using System.Collections;
+﻿using System.Diagnostics;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using System.Diagnostics;
+using Com.MyCompany.MyGame.Collections;
 
 namespace Com.MyCompany.MyGame
-{
-    enum WeaponCode
-    {
-        HAND, CAN, DONUT, SMOKE
-    }
-
+{ 
     public class PlayerController : MonoBehaviour
     {
         #region Private Vars
@@ -46,12 +42,13 @@ namespace Com.MyCompany.MyGame
         private bool doubleThrowLock = false;
 
         private Vector3 throwRotEuler = Vector3.zero;
-        private float theta;
         private CameraWork cam;
 
         //무기 딜레이
         private Stopwatch[] attackSW = new Stopwatch[4];
         private int[] attackDelayTime = new int[4];
+
+        private Stopwatch throwAnimSW = new Stopwatch();
 
         #endregion
 
@@ -94,6 +91,8 @@ namespace Com.MyCompany.MyGame
             attackSW[1].Start();
             attackSW[2].Start();
             attackSW[3].Start();
+
+            throwAnimSW.Start();
         }
 
         void FixedUpdate()
@@ -146,21 +145,25 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 //바닥 위에 있을 때
-                //이후 은신 관련 기능 추가 (예시)))float cloak; if (플레이어 == 서있음) ctraloak = 1; else if (플레이어 == 숙이기) cloak = 0.5;)
                 if (playerAnimController.isOnFloor)
                 {
+                    #region Control.Move & AttackThrow
                     switch (unit.curUnitPose)
                     {
-                        case Unit.UnitPose.MOD_WALK:
-                        case Unit.UnitPose.MOD_RUN:
-                        case Unit.UnitPose.MOD_CROUCH:
+                        case UnitPose.MOD_WALK:
                             ControlBase();
                             break;
-                        case Unit.UnitPose.MOD_COVERSTAND:
-                        case Unit.UnitPose.MOD_COVERCROUCH:
+                        case UnitPose.MOD_RUN:
+                            ControlBase();
+                            break;
+                        case UnitPose.MOD_CROUCH:
+                            ControlBase();
+                            break;
+                        case UnitPose.MOD_COVERSTAND:
+                        case UnitPose.MOD_COVERCROUCH:
                             ControlCover();
                             break;
-                        case Unit.UnitPose.MOD_THROW:
+                        case UnitPose.MOD_THROW:
                             ControlMoveThrow();
                             break;
                         default:
@@ -172,9 +175,12 @@ namespace Com.MyCompany.MyGame
 
                     //과도한 미끄러짐 방지
                     rb.velocity *= 0.97f;
+                    #endregion
                 }
                 else
                 {
+                    animator.SetLayerWeight(4, 0);
+                    animator.SetLayerWeight(5, 0);
                     cam.HideLines();
                 }
 
@@ -244,91 +250,127 @@ namespace Com.MyCompany.MyGame
         }
 
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
-        //소지 개수 이상으로 사용불가
-        //조준 상태에서 조준 방향과 다른 쪽으로 이동할 때 캐릭터의 방향이 부자연스럽게 변경되는 오류 있음
-        //=> 조준 동안에는 조준점을 보지만 던질 때 이동방향을 바라봄
-        private void AttackThrowCan()
+        //소지 개수 이상으로 사용불가(예정)
+        private void AttackThrow()
         {
-            //if(amountCAN > 0)
-            //조준
-            if (AttackDelayDone(curWeapon))
+            //특정 상태일 때만 투척 허용
+            //달리기, 걷기, 던지기, 투척 직후
+            switch (unit.curUnitPose)
             {
-                if (Input.GetButton("Fire1"))
-                {
-                    curLookDirState = LookDirState.THROW;
-                    unit.curUnitPose = Unit.UnitPose.MOD_THROW;
-
-                    //발사각 결정
-                    throwRotEuler = mainCameraTransform.rotation.eulerAngles;
-                    theta = throwRotEuler.x;
-
-                    if (theta >= 334)
-                        theta = theta - 360;
-
-                    theta = theta - 35;
-
-                    throwRotEuler.Set(theta, throwRotEuler.y, 0);
-
-                    //포물선 궤적 그리기
-                    cam.ThrowLineRenderer(throwRotEuler.x, throwPos.position);
-
-                    //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
-                    if (!animator.GetBool("IsCovering"))
-                        playerSpeed = unit.walkSpeed;
-
-                    animator.SetFloat("ThrowAnimSpeed", 0);
-
-                    animator.SetBool("ReadyToThrow", true);
-                    animator.SetBool("IsRunMode", false);
-
-                    readyToThrowItem = true;
-                    doubleThrowLock = true;
-                }
-                //조준한 상태에서 놓으면 투척
-                else if ((Input.GetButtonUp("Fire1") || readyToThrowItem) && doubleThrowLock)
-                {
-                    curLookDirState = LookDirState.THROW;
-
-                    animator.SetLayerWeight(4, 1);
-                    animator.SetFloat("ThrowAnimSpeed", 1);
-
-                    Instantiate(Resources.Load(unit.weaponPath + "WeaponCan") as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
-
-                    cam.HideLines();
-                    if (!animator.GetBool("IsCovering"))
+                case UnitPose.MOD_RUN:
+                case UnitPose.MOD_WALK:
+                case UnitPose.MOD_THROW:
+                case UnitPose.MOD_THROWEND:
+                    #region 조준 및 투척
+                    //if(amountCAN > 0)
+                    if (AttackDelayDone(curWeapon))
                     {
-                        playerSpeed = unit.speed;
-                        animator.SetBool("IsRunMode", true);
+                        //조준
+                        if (Input.GetButton("Fire1"))
+                            AttackAimingPhase();
+                        //조준한 상태에서 놓으면 투척
+                        else if ((Input.GetButtonUp("Fire1") || readyToThrowItem) && doubleThrowLock)
+                            AttackThrowPhase();
+                    }
+                    //Throw 애니메이션이 재생 중
+                    else if (animator.GetBool("ThrowItem"))
+                    {
+                        //이동방지
+                        unit.curUnitPose = UnitPose.MOD_THROWEND;
+                        animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
                     }
 
-                    animator.SetBool("ReadyToThrow", false);
-                    animator.SetBool("ThrowItem", true);
-                    readyToThrowItem = false;
-                    doubleThrowLock = false;
+                    //Throw 애니메이션 종료 후
+                    if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
+                    {
+                        curLookDirState = LookDirState.IDLE;
+                        unit.curUnitPose = UnitPose.MOD_RUN;
 
-                    //타이머 작동
-                    attackSW[(int)(WeaponCode.CAN)].Restart();
-                }
-                //else
-                //Debug.Log("소지 개수 부족");
+                        animator.Play("Throw", 4, 0.0f);
+                        animator.SetFloat("ThrowAnimSpeed", 0);
+                        animator.SetLayerWeight(4, 0);
+                        animator.SetLayerWeight(5, 0);
+                        animator.SetBool("ThrowItem", false);
+
+                        throwAnimSW.Stop();
+                    }
+                    //else
+                    //Debug.Log("소지 개수 부족");
+                    #endregion
+                    break;
+                default:
+                    break;
             }
-            else if(animator.GetBool("ThrowItem"))
+        }
+
+        //Fire 1 키를 누르고 있으면 조준
+        //GetButton("Fire1") => 조준
+        private void AttackAimingPhase()
+        {
+            float theta;
+
+            animator.SetBool("IsThrowMode", true);
+            curLookDirState = LookDirState.THROW;
+            unit.curUnitPose = UnitPose.MOD_THROW;
+
+            //발사각 결정
+            throwRotEuler = mainCameraTransform.rotation.eulerAngles;
+            theta = throwRotEuler.x;
+
+            if (theta >= 334)
+                theta = theta - 360;
+
+            theta = theta - 35;
+
+            throwRotEuler.Set(theta, throwRotEuler.y, 0);
+
+            //포물선 궤적 그리기
+            cam.ThrowLineRenderer(throwRotEuler.x, throwPos.position);
+
+            //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
+            playerSpeed = unit.walkSpeed;
+
+            animator.SetLayerWeight(4, 1);
+            animator.SetFloat("ThrowAnimSpeed", 0.01f);
+            if (throwAnimSW.Elapsed.Seconds >= 1)
             {
-                //이동방지
-                unit.curUnitPose = Unit.UnitPose.max;
-                animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
+                animator.Play("Throw", 4, 0);
+                throwAnimSW.Restart();
             }
+            //animator.SetFloat("ThrowAnimSpeed", 0);
 
-            if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
+            animator.SetBool("IsRunMode", false);
+
+            readyToThrowItem = true;
+            doubleThrowLock = true;
+        }
+
+        //Fire 1 키를 떼면 투척
+        //GetButtonUp("Fire1") => 투척
+        private void AttackThrowPhase()
+        {
+            animator.SetBool("IsThrowMode", false);
+            curLookDirState = LookDirState.THROW;
+
+            animator.SetLayerWeight(4, 1);
+            animator.SetLayerWeight(5, 0);
+            animator.SetFloat("ThrowAnimSpeed", 1);
+
+            Instantiate(Resources.Load(unit.weaponPath + curWeapon.ToString()) as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
+
+            cam.HideLines();
+            if (!animator.GetBool("IsCovering"))
             {
-                curLookDirState = LookDirState.IDLE;
-                animator.Play("Throw", 4, 0.0f);
-                animator.SetFloat("ThrowAnimSpeed", 0);
-                animator.SetLayerWeight(4, 0);
-                animator.SetBool("ThrowItem", false);
-
-                unit.curUnitPose = Unit.UnitPose.MOD_RUN;
+                playerSpeed = unit.speed;
+                animator.SetBool("IsRunMode", true);
             }
+
+            animator.SetBool("ThrowItem", true);
+            readyToThrowItem = false;
+            doubleThrowLock = false;
+
+            //타이머 작동
+            attackSW[(int)curWeapon].Restart();
         }
 
         //일반적인 상태에서의 조작
@@ -367,10 +409,11 @@ namespace Com.MyCompany.MyGame
             }
         }
         //엄폐 상태일 때의 조작
+        //플레이어 속도는 unit.coverSpeed로 고정됨
         private void ControlCover()
         {
             //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
-            //플레이어 속도는 unit.coverSpeed로 고정됨
+
             curLookDirState = LookDirState.COVER;
 
             //엄폐 상태일 때 가능한 조작 사용
@@ -415,29 +458,40 @@ namespace Com.MyCompany.MyGame
 
             switch (curWeapon)
             {
-                //근접 공격용 맨손 (=> 일시적 경직 ?)
+                //비무장, 아무것도 할 수 없음
                 case WeaponCode.HAND:
-                    if (Input.GetButtonDown("Fire1"))
-                        UnityEngine.Debug.Log("손 공격");
                     break;
                 case WeaponCode.CAN:
-                    AttackThrowCan();
+                    AttackThrow();
                     break;
                 //플레이어 주변에 설치 OR 던지기?
                 case WeaponCode.DONUT:
-                    if (Input.GetButtonDown("Fire1"))
-                        UnityEngine.Debug.Log("도넛 설치");
+                    AttackThrow();
                     break;
                 //플레이어 위치에서 사용
                 case WeaponCode.SMOKE:
-                    if (Input.GetButtonDown("Fire1"))
-                        UnityEngine.Debug.Log("연막");
+                    if (Input.GetButtonDown("Fire1") && AttackDelayDone(curWeapon))
+                    {
+                        Instantiate(Resources.Load(unit.weaponPath + curWeapon.ToString()) as GameObject,
+                                                    transform.position + TransformCollections.weaponSmokeVec,
+                                                    TransformCollections.weaponSmokeQuat);
+                        attackSW[(int)curWeapon].Restart();
+                    }
                     break;
                 default:
                     break;
             }
         }
-
+        //아이템을 주울때
+        private void ControlGetItem()
+        {
+            /*
+             if(Input.GetButton("GetItem"))
+             {
+                
+             }
+             */
+        }
         #endregion
     }
 }

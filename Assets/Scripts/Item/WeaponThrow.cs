@@ -2,29 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using System.Diagnostics;
-
-public class WeaponThrow : MonoBehaviour
+public class WeaponThrow : Weapon
 {
-    public Rigidbody rb;
+    public float timeValue;
 
     private const float throwPower = 12f;
-    private Stopwatch sw = new Stopwatch();
+
+    void Awake()
+    {
+        base.rb = transform.GetComponent<Rigidbody>();
+        base.time = timeValue;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        rb.AddForce(transform.forward * throwPower, ForceMode.Impulse);
-        sw.Start();
-    }
-
-    //생성 5초 후 자동 파괴
-    void FixedUpdate()
-    {
-        if (sw.Elapsed.Seconds >= 5)
-        {
-            sw.Stop();
-            Destroy(gameObject);
-        }
+        base.rb.AddForce(transform.forward * throwPower, ForceMode.Impulse);
+        //생성 몇 초 후 자동 파괴
+        Destroy(gameObject, base.time);
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Com.MyCompany.MyGame.Collections;
+
 namespace Com.MyCompany.MyGame
 {
     public class Unit : MonoBehaviour
@@ -11,7 +13,7 @@ namespace Com.MyCompany.MyGame
         private float _speed;
         private uint _health;
         private float _jumpPower;
-        private const string _weaponPath = "Weapons/";
+        private const string _weaponPath = "Weapons/Weapon";
         private bool _lockControl = false;
 
         #endregion
@@ -33,17 +35,6 @@ namespace Com.MyCompany.MyGame
         //적 캐릭터만 사용
         [HideInInspector]
         public UnitState curUnitState = UnitState.IDLE;
-
-        //Animation Layer에 관한 정보
-        public enum UnitPose
-        {
-            MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, MOD_THROW, max
-        }
-        //적 캐릭터 상태에 관한 정보
-        public enum UnitState
-        {
-            IDLE = 0, ALERT, COMBAT, max
-        }
 
         #endregion
 
@@ -136,11 +127,12 @@ namespace Com.MyCompany.MyGame
 
             if (goRight) newLook *= -1;
 
-            //중간에 조작 방지
+            //이동할 때 조작 방지
             _lockControl = true;
 
             transform.LookAt(transform.position + newLook, Vector3.up);
 
+            //중간 지점까지 이동
             while (Vector3.Distance(transform.position, subDestiPos) >= 0.1)
             {
                 transform.position = Vector3.Lerp(transform.position, subDestiPos, Time.deltaTime * 10);
@@ -150,6 +142,7 @@ namespace Com.MyCompany.MyGame
                 yield return null;
             }
 
+            //목표 지점까지 이동
             while (Vector3.Distance(transform.position, destiPos) >= 0.1)
             {
                 transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * 10);
