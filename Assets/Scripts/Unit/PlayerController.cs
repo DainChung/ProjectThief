@@ -11,11 +11,6 @@ namespace Com.MyCompany.MyGame
     {
         #region Private Vars
 
-        private enum LookDirState
-        {
-            IDLE = 0, COVER, THROW, max
-        }
-
         private LookDirState curLookDirState = LookDirState.IDLE;
 
         private float playerSpeed;
@@ -44,10 +39,6 @@ namespace Com.MyCompany.MyGame
         private Vector3 throwRotEuler = Vector3.zero;
         private CameraWork cam;
 
-        //무기 딜레이
-        private Stopwatch[] attackSW = new Stopwatch[4];
-        private int[] attackDelayTime = new int[4];
-
         private Stopwatch throwAnimSW = new Stopwatch();
 
         #endregion
@@ -62,10 +53,7 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
-            attackDelayTime[0] = 1;
-            attackDelayTime[1] = 2;
-            attackDelayTime[2] = 3;
-            attackDelayTime[3] = 4;
+
         }
 
         // Start is called before the first frame update
@@ -74,23 +62,13 @@ namespace Com.MyCompany.MyGame
             unit = GetComponent<Unit>();
             playerAnimController = GetComponent<PlayerAnimationController>();
             rb = GetComponent<Rigidbody>();
-            animator = playerAnimController.animator;
+            animator = unit.animator;
 
             mainCameraTransform = Camera.main.transform;
             cam = mainCameraTransform.GetComponent<CameraWork>();
             lookDir = mainCameraTransform.forward + transform.position;
 
             playerSpeed = unit.speed;
-
-            attackSW[0] = new Stopwatch();
-            attackSW[1] = new Stopwatch();
-            attackSW[2] = new Stopwatch();
-            attackSW[3] = new Stopwatch();
-
-            attackSW[0].Start();
-            attackSW[1].Start();
-            attackSW[2].Start();
-            attackSW[3].Start();
 
             throwAnimSW.Start();
         }
@@ -114,7 +92,7 @@ namespace Com.MyCompany.MyGame
                 }
                 else if (Input.GetButtonDown("Weapon3"))
                 {
-                    curWeapon = WeaponCode.DONUT;
+                    curWeapon = WeaponCode.CHEESE;
                     UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
                 }
                 else if (Input.GetButtonDown("Weapon4"))
@@ -166,6 +144,11 @@ namespace Com.MyCompany.MyGame
                         case UnitPose.MOD_THROW:
                             ControlMoveThrow();
                             break;
+                        case UnitPose.MOD_THROWEND:
+                            break;
+                        case UnitPose.MOD_FALL:
+                            unit.UnitIsOnFloor();
+                            break;
                         default:
                             break;
                     }
@@ -179,9 +162,7 @@ namespace Com.MyCompany.MyGame
                 }
                 else
                 {
-                    animator.SetLayerWeight(4, 0);
-                    animator.SetLayerWeight(5, 0);
-                    cam.HideLines();
+                    unit.Fall();
                 }
 
             }
@@ -232,23 +213,6 @@ namespace Com.MyCompany.MyGame
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
-        private void AttackDelayManager()
-        {
-            for (int i = 0; i < attackSW.Length; i++)
-            {
-                if (attackSW[i].IsRunning)
-                {
-                    if (attackSW[i].Elapsed.Seconds >= attackDelayTime[i])
-                        attackSW[i].Stop();
-                }
-            }     
-        }
-
-        private bool AttackDelayDone(WeaponCode code)
-        {
-            return attackSW[(int)(code)].Elapsed.Seconds >= attackDelayTime[(int)(code)];
-        }
-
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
         //소지 개수 이상으로 사용불가(예정)
         private void AttackThrow()
@@ -263,14 +227,14 @@ namespace Com.MyCompany.MyGame
                 case UnitPose.MOD_THROWEND:
                     #region 조준 및 투척
                     //if(amountCAN > 0)
-                    if (AttackDelayDone(curWeapon))
+                    if (unit.AttackDelayDone(curWeapon))
                     {
                         //조준
                         if (Input.GetButton("Fire1"))
-                            AttackAimingPhase();
+                            unit.AttackPhaseAiming(throwPos.position, mainCameraTransform.rotation.eulerAngles, ref playerSpeed, ref curLookDirState);
                         //조준한 상태에서 놓으면 투척
-                        else if ((Input.GetButtonUp("Fire1") || readyToThrowItem) && doubleThrowLock)
-                            AttackThrowPhase();
+                        else if ((Input.GetButtonUp("Fire1") || unit.readyToThrowItem) && unit.doubleThrowLock)
+                            unit.AttackPhaseThrow(throwPos.position, curWeapon, ref playerSpeed);
                     }
                     //Throw 애니메이션이 재생 중
                     else if (animator.GetBool("ThrowItem"))
@@ -279,7 +243,6 @@ namespace Com.MyCompany.MyGame
                         unit.curUnitPose = UnitPose.MOD_THROWEND;
                         animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
                     }
-
                     //Throw 애니메이션 종료 후
                     if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
                     {
@@ -301,76 +264,6 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
-        }
-
-        //Fire 1 키를 누르고 있으면 조준
-        //GetButton("Fire1") => 조준
-        private void AttackAimingPhase()
-        {
-            float theta;
-
-            animator.SetBool("IsThrowMode", true);
-            curLookDirState = LookDirState.THROW;
-            unit.curUnitPose = UnitPose.MOD_THROW;
-
-            //발사각 결정
-            throwRotEuler = mainCameraTransform.rotation.eulerAngles;
-            theta = throwRotEuler.x;
-
-            if (theta >= 334)
-                theta = theta - 360;
-
-            theta = theta - 35;
-
-            throwRotEuler.Set(theta, throwRotEuler.y, 0);
-
-            //포물선 궤적 그리기
-            cam.ThrowLineRenderer(throwRotEuler.x, throwPos.position);
-
-            //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
-            playerSpeed = unit.walkSpeed;
-
-            animator.SetLayerWeight(4, 1);
-            animator.SetFloat("ThrowAnimSpeed", 0.01f);
-            if (throwAnimSW.Elapsed.Seconds >= 1)
-            {
-                animator.Play("Throw", 4, 0);
-                throwAnimSW.Restart();
-            }
-            //animator.SetFloat("ThrowAnimSpeed", 0);
-
-            animator.SetBool("IsRunMode", false);
-
-            readyToThrowItem = true;
-            doubleThrowLock = true;
-        }
-
-        //Fire 1 키를 떼면 투척
-        //GetButtonUp("Fire1") => 투척
-        private void AttackThrowPhase()
-        {
-            animator.SetBool("IsThrowMode", false);
-            curLookDirState = LookDirState.THROW;
-
-            animator.SetLayerWeight(4, 1);
-            animator.SetLayerWeight(5, 0);
-            animator.SetFloat("ThrowAnimSpeed", 1);
-
-            Instantiate(Resources.Load(unit.weaponPath + curWeapon.ToString()) as GameObject, throwPos.position, Quaternion.Euler(throwRotEuler));
-
-            cam.HideLines();
-            if (!animator.GetBool("IsCovering"))
-            {
-                playerSpeed = unit.speed;
-                animator.SetBool("IsRunMode", true);
-            }
-
-            animator.SetBool("ThrowItem", true);
-            readyToThrowItem = false;
-            doubleThrowLock = false;
-
-            //타이머 작동
-            attackSW[(int)curWeapon].Restart();
         }
 
         //일반적인 상태에서의 조작
@@ -454,7 +347,7 @@ namespace Com.MyCompany.MyGame
         //공격에 관한 조작
         private void ControlAttack()
         {
-            AttackDelayManager();
+            unit.AttackDelayManager();
 
             switch (curWeapon)
             {
@@ -464,18 +357,17 @@ namespace Com.MyCompany.MyGame
                 case WeaponCode.CAN:
                     AttackThrow();
                     break;
-                //플레이어 주변에 설치 OR 던지기?
-                case WeaponCode.DONUT:
+                case WeaponCode.CHEESE:
                     AttackThrow();
                     break;
                 //플레이어 위치에서 사용
                 case WeaponCode.SMOKE:
-                    if (Input.GetButtonDown("Fire1") && AttackDelayDone(curWeapon))
+                    if (Input.GetButtonDown("Fire1") && unit.AttackDelayDone(curWeapon))
                     {
                         Instantiate(Resources.Load(unit.weaponPath + curWeapon.ToString()) as GameObject,
                                                     transform.position + TransformCollections.weaponSmokeVec,
                                                     TransformCollections.weaponSmokeQuat);
-                        attackSW[(int)curWeapon].Restart();
+                        unit.RestartAttackStopwatch((int)curWeapon);
                     }
                     break;
                 default:

@@ -5,6 +5,13 @@ TagManager:
   serializedVersion: 2
   tags:
   - Shootable
+  - Wall
+  - Floor
+  - WallLeftEnd
+  - StartArea
+  - EndArea
+  - WallRightEnd
+  - WeaponCan
   layers:
   - Default
   - TransparentFX
@@ -16,9 +23,9 @@ TagManager:
   - 
   - Lighting
   - Ground
-  - Postprocessing
-  - 
-  - 
+  - Structure
+  - Unit
+  - Throw
   - 
   - 
   - 

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6488601423251088509}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Main Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 3383171903200720127}
   - component: {fileID: 195357023706825606}
   - component: {fileID: 7787033503746345745}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 6673458798143837976}
   - component: {fileID: 3651510141028473594}
   - component: {fileID: 1756725437082801288}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Circle.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6988636929016067873}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Chapa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -227,7 +227,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5262146738994669914}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Lata
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,8 +261,8 @@ GameObject:
   - component: {fileID: 6510317012552832052}
   - component: {fileID: -945746905619722431}
   - component: {fileID: 4385702786850018141}
-  m_Layer: 12
-  m_Name: WeaponCan
+  m_Layer: 0
+  m_Name: WeaponCAN
   m_TagString: WeaponCan
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -357,7 +357,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5596232117350282387}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Sky
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -387,7 +387,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3311258892910550539}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LataLow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -419,7 +419,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6713963843513123968}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Render
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -34,7 +34,7 @@ namespace Com.MyCompany.MyGame
         public Vector3 nearWallEndPos;
         [HideInInspector]
         public Vector3 wallEndToEndPos;
-
+        [HideInInspector]
         public Animator animator;
 
         #endregion
@@ -44,12 +44,14 @@ namespace Com.MyCompany.MyGame
         // Start is called before the first frame update
         void Start()
         {
+            unit = GetComponent<Unit>();
+            nearWallEndPos = Vector3.zero;
+
+            animator = unit.animator;
+
             animator.SetBool("IsRunMode", true);
             animator.SetLayerWeight(1, 0);
             animator.SetBool("IsCrouchMode", false);
-
-            unit = GetComponent<Unit>();
-            nearWallEndPos = Vector3.zero;
         }
 
         void FixedUpdate()
@@ -57,6 +59,7 @@ namespace Com.MyCompany.MyGame
             ControlPlayerAnimation();
         }
 
+        //OnTrigger의 모든 내용을 Unit으로 옮길 예정
         void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Wall"))
@@ -400,8 +403,8 @@ namespace Com.MyCompany.MyGame
                 //WALK, RUN, CROUCH
                 if (unit.curUnitPose == UnitPose.MOD_WALK || unit.curUnitPose == UnitPose.MOD_RUN || unit.curUnitPose == UnitPose.MOD_CROUCH)
                 {
-                    if (animator.GetBool("IsFalling"))
-                        animator.SetBool("IsFalling", false);
+                    //if (animator.GetBool("IsFalling"))
+                    //    animator.SetBool("IsFalling", false);
 
                     if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing") && unit.curUnitPose != UnitPose.max)
                     {
@@ -445,7 +448,7 @@ namespace Com.MyCompany.MyGame
             }
             else
             {
-                animator.SetBool("IsFalling", true);
+                //animator.SetBool("IsFalling", true);
                 animator.SetBool("IsCovering", false);
                 animator.SetFloat("TurnRight", 0);
                 animator.SetFloat("MoveSpeed", 0);

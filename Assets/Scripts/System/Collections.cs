@@ -9,24 +9,29 @@ namespace Com.MyCompany.MyGame.Collections
     #region Enums
     public enum Item
     {
-        GOLD = 0, CAN, DONUT, SMOKE, max
+        GOLD = 0, CAN, CHEESE, SMOKE, max
     }
 
     public enum WeaponCode
     {
-        HAND = 0, CAN, DONUT, SMOKE, max
+        HAND = 0, CAN, CHEESE, SMOKE, max
     }
 
     //Animation Layer에 관한 정보
     public enum UnitPose
     {
         MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, MOD_THROW,
-        MOD_THROWEND, max
+        MOD_THROWEND, MOD_FALL, max
     }
     //적 캐릭터 상태에 관한 정보
     public enum UnitState
     {
         IDLE = 0, ALERT, COMBAT, max
+    }
+    //플레이어 캐릭터가 바라보는 방향
+    public enum LookDirState
+    {
+        IDLE = 0, COVER, THROW, max
     }
     #endregion
 
