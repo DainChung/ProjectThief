@@ -39,8 +39,6 @@ namespace Com.MyCompany.MyGame
         private Vector3 throwRotEuler = Vector3.zero;
         private CameraWork cam;
 
-        private Stopwatch throwAnimSW = new Stopwatch();
-
         #endregion
 
         #region Public Vars
@@ -69,8 +67,6 @@ namespace Com.MyCompany.MyGame
             lookDir = mainCameraTransform.forward + transform.position;
 
             playerSpeed = unit.speed;
-
-            throwAnimSW.Start();
         }
 
         void FixedUpdate()
@@ -227,7 +223,7 @@ namespace Com.MyCompany.MyGame
                 case UnitPose.MOD_THROWEND:
                     #region 조준 및 투척
                     //if(amountCAN > 0)
-                    if (unit.AttackDelayDone(curWeapon))
+                    if (unit.swManager.AttackDelayDone(curWeapon))
                     {
                         //조준
                         if (Input.GetButton("Fire1"))
@@ -239,7 +235,6 @@ namespace Com.MyCompany.MyGame
                     //Throw 애니메이션이 재생 중
                     else if (animator.GetBool("ThrowItem"))
                     {
-                        //이동방지
                         unit.curUnitPose = UnitPose.MOD_THROWEND;
                         animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
                     }
@@ -247,15 +242,7 @@ namespace Com.MyCompany.MyGame
                     if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
                     {
                         curLookDirState = LookDirState.IDLE;
-                        unit.curUnitPose = UnitPose.MOD_RUN;
-
-                        animator.Play("Throw", 4, 0.0f);
-                        animator.SetFloat("ThrowAnimSpeed", 0);
-                        animator.SetLayerWeight(4, 0);
-                        animator.SetLayerWeight(5, 0);
-                        animator.SetBool("ThrowItem", false);
-
-                        throwAnimSW.Stop();
+                        unit.ResetThrowAnimation();
                     }
                     //else
                     //Debug.Log("소지 개수 부족");
@@ -301,6 +288,7 @@ namespace Com.MyCompany.MyGame
                 rb.AddForce(destiPos);
             }
         }
+
         //엄폐 상태일 때의 조작
         //플레이어 속도는 unit.coverSpeed로 고정됨
         private void ControlCover()
@@ -347,7 +335,7 @@ namespace Com.MyCompany.MyGame
         //공격에 관한 조작
         private void ControlAttack()
         {
-            unit.AttackDelayManager();
+            unit.swManager.AttackDelayManager();
 
             switch (curWeapon)
             {
@@ -362,12 +350,12 @@ namespace Com.MyCompany.MyGame
                     break;
                 //플레이어 위치에서 사용
                 case WeaponCode.SMOKE:
-                    if (Input.GetButtonDown("Fire1") && unit.AttackDelayDone(curWeapon))
+                    if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon))
                     {
                         Instantiate(Resources.Load(unit.weaponPath + curWeapon.ToString()) as GameObject,
                                                     transform.position + TransformCollections.weaponSmokeVec,
                                                     TransformCollections.weaponSmokeQuat);
-                        unit.RestartAttackStopwatch((int)curWeapon);
+                        unit.swManager.RestartAttackStopwatch((int)curWeapon);
                     }
                     break;
                 default:

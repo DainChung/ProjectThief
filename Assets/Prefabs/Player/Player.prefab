@@ -198,7 +198,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   curUnitPose: 1
   curUnitState: 0
-  animator: {fileID: 0}
+  animator: {fileID: 720688317449403614}
+  throwDestiPos: {fileID: 4965526212764896308}
 --- !u!54 &1711946303659950610
 Rigidbody:
   m_ObjectHideFlags: 0

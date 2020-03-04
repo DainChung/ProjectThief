@@ -15,10 +15,161 @@ namespace Com.MyCompany.MyGame
 {
     public class Unit : MonoBehaviour
     {
+        #region SubClasses
+
+        public class ThrowLineRenderer
+        {
+            private const float gravity = 9f;
+            private const float throwPower = 12f;
+
+            public Transform throwDestiPos;
+            public LineRenderer lineRenderer;
+
+            public ThrowLineRenderer()
+            {
+            }
+
+            public ThrowLineRenderer(Transform throwDestiPos, LineRenderer lineRenderer)
+            {
+                this.throwDestiPos = throwDestiPos;
+                this.lineRenderer = lineRenderer;
+
+                throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
+                lineRenderer.startColor = Color.white;
+                lineRenderer.endColor = Color.white;
+                lineRenderer.startWidth = 0.1f;
+                lineRenderer.endWidth = 0.1f;
+                lineRenderer.positionCount = 27;
+
+                lineRenderer.enabled = false;
+            }
+
+            //탄도방정식을 이용하여 궤적을 그릴 수 있도록 Vector3 값을 반환한다.
+            //cosY와 z 값을 변화시켜 모든 방향에 대해 탄도 궤적을 그리도록 변경할 것
+            private Vector3 GetThrowLinePoint(float theta, float t, Vector3 throwPos, float eulerAngleY)
+            {
+                float cosY = Mathf.Cos(eulerAngleY * Mathf.Deg2Rad);
+                float sinY = Mathf.Sin(eulerAngleY * Mathf.Deg2Rad);
+                float cosEuler = Mathf.Cos(theta);
+                float sinEuler = Mathf.Sin(theta);
+
+                float x = cosEuler * sinY * throwPower * t;
+                float y = (0.95f * throwPower * sinEuler - 0.5f * gravity * t * 1.09f) * t;  //0.95f, 1.09f는 임의로 추가한 계수, 이렇게 해야 궤적이 비슷해짐
+                float z = cosEuler * cosY * throwPower * t;
+
+                return (new Vector3(x, y, z) + throwPos);
+            }
+
+            //무언가를 던질때 궤적을 보여줌
+            //예상 착탄지점을 원으로 표시해줄것 & 투척 후 선을 안 보이게 처리할 것
+            public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
+            {
+                if (!lineRenderer.enabled)
+                {
+                    lineRenderer.enabled = true;
+                    throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
+                }
+
+                theta = -(theta) * Mathf.Deg2Rad;
+
+                //t가 0보다 조금 더 커야 궤적이 비슷해짐
+                float t = 0.08f;
+
+                for (int index = 0; index < lineRenderer.positionCount; index++)
+                {
+                    lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos, eulerAngleY));
+
+                    if (index != 0)
+                    {
+                        RaycastHit hit = new RaycastHit();
+
+                        //충돌이 발생한 부분부터 생략한다.
+                        if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
+                        {
+                            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Structure"))
+                            {
+                                //착탄 지점 표시(나중에 투명하게 변경하거나 평면 원으로 표시할것)
+                                throwDestiPos.position = hit.point;
+
+                                lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
+                                for (int i = index; i < lineRenderer.positionCount; i++)
+                                    lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
+
+                                break;
+                            }
+                        }
+                    }
+
+                    t += 0.1f;
+                }
+            }
+
+            //궤적 숨기기
+            public void HideLines()
+            {
+                lineRenderer.enabled = false;
+                throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+
+        public class StopwatchManager
+        {
+            //무기 딜레이
+            private Stopwatch[] attackSW = new Stopwatch[4];
+            private int[] attackDelayTime = new int[4];
+
+            public Stopwatch throwAnimSW = new Stopwatch();
+            public int secThrowAnimSW { get { return throwAnimSW.Elapsed.Seconds; } }
+
+            public void InitStopwatch()
+            {
+                attackDelayTime[0] = 1;
+                attackDelayTime[1] = 2;
+                attackDelayTime[2] = 3;
+                attackDelayTime[3] = 4;
+
+                attackSW[0] = new Stopwatch();
+                attackSW[1] = new Stopwatch();
+                attackSW[2] = new Stopwatch();
+                attackSW[3] = new Stopwatch();
+
+                attackSW[0].Start();
+                attackSW[1].Start();
+                attackSW[2].Start();
+                attackSW[3].Start();
+
+                throwAnimSW.Start();
+            }
+
+            public void RestartAttackStopwatch(int index)
+            {
+                attackSW[index].Restart();
+            }
+
+            public void AttackDelayManager()
+            {
+                for (int i = 0; i < attackSW.Length; i++)
+                {
+                    if (attackSW[i].IsRunning)
+                    {
+                        if (attackSW[i].Elapsed.Seconds >= attackDelayTime[i])
+                            attackSW[i].Stop();
+                    }
+                }
+            }
+
+            public bool AttackDelayDone(WeaponCode code)
+            {
+                return attackSW[(int)(code)].Elapsed.Seconds >= attackDelayTime[(int)(code)];
+            }
+        }
+
+        #endregion
+
         #region Private Fields
 
         private float _speed;
-        private uint _health;
+        private int _health;
         private float _jumpPower;
         private const string _weaponPath = "Weapons/Weapon";
         private bool _lockControl = false;
@@ -28,20 +179,8 @@ namespace Com.MyCompany.MyGame
         //동시에 두번 발사 되는 현상 방지
         private bool _doubleThrowLock = false;
 
-        //투척 궤도 그리기
-        private LineRenderer lineRenderer;
-        //착탄 지점
-        private Transform throwDestiPos;
         //발사각
         private Quaternion throwRot = new Quaternion();
-        private const float gravity = 9f;
-        private const float throwPower = 12f;
-
-        //무기 딜레이
-        private Stopwatch[] attackSW = new Stopwatch[4];
-        private int[] attackDelayTime = new int[4];
-
-        private Stopwatch throwAnimSW = new Stopwatch();
 
         #endregion
 
@@ -50,13 +189,12 @@ namespace Com.MyCompany.MyGame
         public float speed { get { return _speed; } set { _speed = value; } }
         public float walkSpeed { get { return 0.41f * _speed; } }
         public float coverSpeed { get { return 0.31f * speed; } }
-        public uint health { get { return _health; } }
+        public int health { get { return _health; } }
         public float jumpPower { get { return _jumpPower; } }
 
         public string weaponPath { get { return _weaponPath; } }
 
         public bool lockControl { get{ return _lockControl; } }
-
 
         public bool readyToThrowItem { get { return _readyToThrowItem; } }
         public bool doubleThrowLock { get { return _doubleThrowLock; } }
@@ -67,69 +205,26 @@ namespace Com.MyCompany.MyGame
         [HideInInspector]
         public UnitState curUnitState = UnitState.IDLE;
 
-        [HideInInspector]
         public Animator animator;
+        public Transform throwDestiPos;
+
+        public ThrowLineRenderer throwLine;
+        public StopwatchManager swManager = new StopwatchManager();
 
         #endregion
 
         #region MonoBehaviour CallBacks
         void Awake()
         {
-            attackDelayTime[0] = 1;
-            attackDelayTime[1] = 2;
-            attackDelayTime[2] = 3;
-            attackDelayTime[3] = 4;
-
             _health = 1;
             _speed = 35.0f;
             _jumpPower = 10f;
-
-            try
-            {
-                //수정 중
-                //GetChild(public int Can_Change_In_Inspector).GetComp...
-                animator = transform.GetChild(2).GetComponent<Animator>();
-            }
-            catch (MissingComponentException)
-            {
-                UnityEngine.Debug.Log("Child doesn't have Animator");
-            }
         }
         // Start is called before the first frame update
         void Start()
         {
-            try
-            {
-                //수정 중
-                //GetChild(public int Can_Change_In_Inspector).GetComp...
-                throwDestiPos = transform.GetChild(0);
-                throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
-
-                lineRenderer = GetComponent<LineRenderer>();
-                lineRenderer.startColor = Color.white;
-                lineRenderer.endColor = Color.white;
-                lineRenderer.startWidth = 0.1f;
-                lineRenderer.endWidth = 0.1f;
-                lineRenderer.positionCount = 27;
-
-                lineRenderer.enabled = false;
-            }
-            catch (MissingComponentException)
-            {
-                UnityEngine.Debug.Log("수정 중");
-            }
-
-            attackSW[0] = new Stopwatch();
-            attackSW[1] = new Stopwatch();
-            attackSW[2] = new Stopwatch();
-            attackSW[3] = new Stopwatch();
-
-            attackSW[0].Start();
-            attackSW[1].Start();
-            attackSW[2].Start();
-            attackSW[3].Start();
-
-            throwAnimSW.Start();
+            throwLine = new ThrowLineRenderer(throwDestiPos, transform.GetComponent<LineRenderer>());
+            swManager.InitStopwatch();
         }
 
         // Update is called once per frame
@@ -142,21 +237,6 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
-        //탄도방정식을 이용하여 궤적을 그릴 수 있도록 Vector3 값을 반환한다.
-        //cosY와 z 값을 변화시켜 모든 방향에 대해 탄도 궤적을 그리도록 변경할 것
-        private Vector3 GetThrowLinePoint(float theta, float t, Vector3 throwPos)
-        {
-            float cosY = Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
-            float sinY = Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
-            float cosEuler = Mathf.Cos(theta);
-            float sinEuler = Mathf.Sin(theta);
-
-            float x = cosEuler * sinY * throwPower * t;
-            float y = (0.95f * throwPower * sinEuler - 0.5f * gravity * t * 1.09f) * t;  //0.95f, 1.09f는 임의로 추가한 계수, 이렇게 해야 궤적이 비슷해짐
-            float z = cosEuler * cosY * throwPower * t;
-
-            return (new Vector3(x, y, z) + throwPos);
-        }
 
         #endregion
 
@@ -259,78 +339,7 @@ namespace Com.MyCompany.MyGame
         }
         #endregion
 
-        //무언가를 던질때 궤적을 보여줌
-        //예상 착탄지점을 원으로 표시해줄것 & 투척 후 선을 안 보이게 처리할 것
-        public void ThrowLineRenderer(float theta, Vector3 throwPos)
-        {
-            if (!lineRenderer.enabled)
-            {
-                lineRenderer.enabled = true;
-                throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
-            }
-
-            theta = -(theta) * Mathf.Deg2Rad;
-
-            //t가 0보다 조금 더 커야 궤적이 비슷해짐
-            float t = 0.08f;
-
-            for (int index = 0; index < lineRenderer.positionCount; index++)
-            {
-                lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos));
-
-                if (index != 0)
-                {
-                    RaycastHit hit = new RaycastHit();
-
-                    //충돌이 발생한 부분부터 생략한다.
-                    if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
-                    {
-                        if (hit.transform.gameObject.layer == 9)
-                        {
-                            //착탄 지점 표시(나중에 투명하게 변경하거나 평면 원으로 표시할것)
-                            throwDestiPos.position = hit.point;
-
-                            lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
-                            for (int i = index; i < lineRenderer.positionCount; i++)
-                                lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
-
-                            break;
-                        }
-                    }
-                }
-
-                t += 0.1f;
-            }
-        }
-
-        //궤적 숨기기
-        public void HideLines()
-        {
-            lineRenderer.enabled = false;
-            throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
-        }
-
-        public void AttackDelayManager()
-        {
-            for (int i = 0; i < attackSW.Length; i++)
-            {
-                if (attackSW[i].IsRunning)
-                {
-                    if (attackSW[i].Elapsed.Seconds >= attackDelayTime[i])
-                        attackSW[i].Stop();
-                }
-            }
-        }
-
-        public bool AttackDelayDone(WeaponCode code)
-        {
-            return attackSW[(int)(code)].Elapsed.Seconds >= attackDelayTime[(int)(code)];
-        }
-
-        public void RestartAttackStopwatch(int index)
-        {
-            attackSW[index].Restart();
-        }
+        #region 던지기 동작 및 기능 제어
 
         //캐릭터가 아이템을 던지기 전에 조준하는 함수
         public void AttackPhaseAiming(Vector3 throwPos, Vector3 throwRotEuler, ref float unitSpeed, ref LookDirState lookDir)
@@ -351,17 +360,17 @@ namespace Com.MyCompany.MyGame
             throwRot = Quaternion.Euler(throwRotEuler);
 
             //포물선 궤적 그리기
-            ThrowLineRenderer(throwRotEuler.x, throwPos);
+            throwLine.Draw(throwRotEuler.x, throwPos, transform.rotation.eulerAngles.y);
 
             //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
             unitSpeed = walkSpeed;
 
             animator.SetLayerWeight(4, 1);
             animator.SetFloat("ThrowAnimSpeed", 0.01f);
-            if (throwAnimSW.Elapsed.Seconds >= 1)
+            if (swManager.secThrowAnimSW >= 1)
             {
                 animator.Play("Throw", 4, 0);
-                throwAnimSW.Restart();
+                swManager.throwAnimSW.Restart();
             }
             animator.SetFloat("ThrowAnimSpeed", 0);
 
@@ -382,7 +391,7 @@ namespace Com.MyCompany.MyGame
             Instantiate(Resources.Load(weaponPath + curWeapon.ToString()) as GameObject, throwPos, throwRot);
 
             //포물선 숨기기
-            HideLines();
+            throwLine.HideLines();
             //엄폐 상태 아닐 때 수행
             if (!animator.GetBool("IsCovering"))
             {
@@ -396,9 +405,24 @@ namespace Com.MyCompany.MyGame
             _readyToThrowItem = false;
             _doubleThrowLock = false;
 
-            //타이머 작동
-            attackSW[(int)curWeapon].Restart();
+            swManager.RestartAttackStopwatch((int)curWeapon);
         }
+
+        //Throw 애니메이션 종료
+        public void ResetThrowAnimation()
+        {
+            curUnitPose = UnitPose.MOD_RUN;
+
+            swManager.throwAnimSW.Restart();
+
+            animator.Play("Throw", 4, 0.0f);
+            animator.SetFloat("ThrowAnimSpeed", 0);
+            animator.SetLayerWeight(4, 0);
+            animator.SetLayerWeight(5, 0);
+            animator.SetBool("ThrowItem", false);
+        }
+
+        #endregion
 
         //캐릭터가 추락 중일 때
         public void Fall()
@@ -408,7 +432,7 @@ namespace Com.MyCompany.MyGame
 
             animator.SetLayerWeight(4, 0);
             animator.SetLayerWeight(5, 0);
-            HideLines();
+            throwLine.HideLines();
         }
 
         //캐릭터가 땅 위에 있을 때

@@ -20,13 +20,9 @@ namespace Com.MyCompany.MyGame
         #region Private Var
 
         private Transform player;
-        private Transform throwDestiPos;
         private Vector3 destiPos;
         private float dist;
 
-        private LineRenderer lineRenderer;
-        private const float gravity = 9f;
-        private const float throwPower = 12f;
 
         #endregion
 
@@ -35,19 +31,8 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
-            throwDestiPos = transform.GetChild(0);
-            throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
 
             destiPos = cameraPos;
-
-            lineRenderer = GetComponent<LineRenderer>();
-            lineRenderer.startColor = Color.white;
-            lineRenderer.endColor = Color.white;
-            lineRenderer.startWidth = 0.1f;
-            lineRenderer.endWidth = 0.1f;
-            lineRenderer.positionCount = 27;
-
-            lineRenderer.enabled = false;
         }
 
         //프레임과 상관없이 일정 시간마다 호출
@@ -63,56 +48,6 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Public Methods
-
-        //무언가를 던질때 궤적을 보여줌
-        //예상 착탄지점을 원으로 표시해줄것 & 투척 후 선을 안 보이게 처리할 것
-        public void ThrowLineRenderer(float theta, Vector3 throwPos)
-        {
-            if (!lineRenderer.enabled)
-            {
-                lineRenderer.enabled = true;
-                throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
-            }
-
-            theta = -(theta) * Mathf.Deg2Rad;
-
-            //t가 0보다 조금 더 커야 궤적이 비슷해짐
-            float t = 0.08f;
-
-            for (int index = 0; index < lineRenderer.positionCount; index++)
-            {
-                lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos));
-
-                if (index != 0)
-                {
-                    RaycastHit hit = new RaycastHit();
-
-                    //충돌이 발생한 부분부터 생략한다.
-                    if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
-                    {
-                        if (hit.transform.gameObject.layer == 9)
-                        {
-                            //착탄 지점 표시(나중에 투명하게 변경하거나 평면 원으로 표시할것)
-                            throwDestiPos.position = hit.point;
-
-                            lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
-                            for (int i = index; i < lineRenderer.positionCount; i++)
-                                lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
-
-                            break;
-                        }
-                    }
-                }
-
-                t += 0.1f;
-            }
-        }
-
-        public void HideLines()
-        {
-            lineRenderer.enabled = false;
-            throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
-        }
 
         #endregion
 
@@ -164,22 +99,6 @@ namespace Com.MyCompany.MyGame
             {
                 transform.rotation = Quaternion.Euler(curEulerAngle.x, curEulerAngle.y, 0);
             }
-        }
-
-        //탄도방정식을 이용하여 궤적을 그릴 수 있도록 Vector3 값을 반환한다.
-        //cosY와 z 값을 변화시켜 모든 방향에 대해 탄도 궤적을 그리도록 변경할 것
-        private Vector3 GetThrowLinePoint(float theta, float t, Vector3 throwPos)
-        {
-            float cosY = Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
-            float sinY = Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad);
-            float cosEuler = Mathf.Cos(theta);
-            float sinEuler = Mathf.Sin(theta);
-
-            float x = cosEuler * sinY * throwPower * t;
-            float y = (0.95f * throwPower * sinEuler - 0.5f * gravity * t * 1.09f) * t;  //0.95f, 1.09f는 임의로 추가한 계수, 이렇게 해야 궤적이 비슷해짐
-            float z = cosEuler * cosY * throwPower * t;
-
-            return (new Vector3(x, y, z) + throwPos);
         }
 
         #endregion
