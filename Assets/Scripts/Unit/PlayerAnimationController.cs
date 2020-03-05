@@ -11,9 +11,6 @@ namespace Com.MyCompany.MyGame
     {
         #region Private Values
 
-        private bool _isOnFloor = false;
-        private bool _isWallClose = false;
-
         private float animLayerWeight = 0f;
 
         private Unit unit;
@@ -25,15 +22,6 @@ namespace Com.MyCompany.MyGame
 
         #region Public Values
 
-        public bool isOnFloor { get { return _isOnFloor; } }
-        public bool isWallClose { get { return _isWallClose; } }
-
-        [HideInInspector]
-        public Transform wallTransform;
-        [HideInInspector]
-        public Vector3 nearWallEndPos;
-        [HideInInspector]
-        public Vector3 wallEndToEndPos;
         [HideInInspector]
         public Animator animator;
 
@@ -45,8 +33,7 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             unit = GetComponent<Unit>();
-            nearWallEndPos = Vector3.zero;
-
+          
             animator = unit.animator;
 
             animator.SetBool("IsRunMode", true);
@@ -57,61 +44,6 @@ namespace Com.MyCompany.MyGame
         void FixedUpdate()
         {
             ControlPlayerAnimation();
-        }
-
-        //OnTrigger의 모든 내용을 Unit으로 옮길 예정
-        void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Wall"))
-            {
-                _isWallClose = true;
-                wallTransform = other.transform;
-            }
-
-            if (other.CompareTag("WallRightEnd") && _isWallClose)
-            {
-                animator.SetBool("IsWallRightEnd", true);
-                nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
-                wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
-            }
-
-            if (other.CompareTag("WallLeftEnd") && _isWallClose)
-            {
-                animator.SetBool("IsWallLeftEnd", true);
-                nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
-                wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
-            }
-        }
-
-        void OnTriggerStay(Collider other)
-        {
-            if (other.CompareTag("Floor"))
-                _isOnFloor = true;
-
-            if (other.CompareTag("Wall"))
-            {
-                _isWallClose = true;
-                wallTransform = other.transform;
-            }
-        }
-
-        void OnTriggerExit(Collider other)
-        {
-            if (other.CompareTag("Floor"))
-                _isOnFloor = false;
-
-            if (other.CompareTag("Wall"))
-                _isWallClose = false;
-
-            if (other.CompareTag("WallRightEnd"))
-            {
-                animator.SetBool("IsWallRightEnd", false);
-            }
-
-            if (other.CompareTag("WallLeftEnd"))
-            {
-                animator.SetBool("IsWallLeftEnd", false);
-            }
         }
 
         #endregion
@@ -134,11 +66,11 @@ namespace Com.MyCompany.MyGame
                     }
 
                     //MOD_WALK -> MOD_COVERSTAND
-                    if (Input.GetButtonDown("Covering") && _isWallClose)
+                    if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
+                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, true));
                         animator.SetLayerWeight(2, 1);
                         animator.SetLayerWeight(3, 0);
                         unit.curUnitPose = UnitPose.MOD_COVERSTAND;
@@ -186,11 +118,11 @@ namespace Com.MyCompany.MyGame
                     }
 
                     //MOD_RUN -> MOD_COVERSTAND
-                    if (Input.GetButtonDown("Covering") && _isWallClose)
+                    if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
+                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, true));
                         animator.SetLayerWeight(2, 1);
                         animator.SetLayerWeight(3, 0);
                         unit.curUnitPose = UnitPose.MOD_COVERSTAND;
@@ -231,11 +163,11 @@ namespace Com.MyCompany.MyGame
                 #region MOD_CROUCH
                 case UnitPose.MOD_CROUCH:
                     //MOD_CROUCH -> MOD_COVERCROUCH
-                    if (Input.GetButtonDown("Covering") && _isWallClose)
+                    if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, true));
+                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, true));
                         animator.SetLayerWeight(2, 0);
                         animator.SetLayerWeight(3, 1);
                         unit.curUnitPose = UnitPose.MOD_COVERCROUCH;
@@ -279,7 +211,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", false);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, false));
+                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, false));
                         animator.SetLayerWeight(2, 0);
                         unit.curUnitPose = UnitPose.MOD_RUN;
 
@@ -322,7 +254,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", false);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(wallTransform.position, wallTransform.right, false));
+                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, false));
                         animator.SetLayerWeight(1, 1);
                         animator.SetLayerWeight(2, 0);
                         animator.SetLayerWeight(3, 0);
@@ -364,7 +296,7 @@ namespace Com.MyCompany.MyGame
                 case UnitPose.MOD_THROW:
                     //Control Throw Move Animation
                     //조준하는 동안 애니메이션 제어
-                    if (_isOnFloor)
+                    if (unit.IsOnFloor())
                     {
                         //조준하는 동안 이동 애니메이션 제어
                         if (Input.GetButton("Vertical"))
@@ -396,7 +328,7 @@ namespace Com.MyCompany.MyGame
                     break;
             }
 
-            if (_isOnFloor)
+            if (unit.IsOnFloor())
             {
                 #region Control Move Animation
 
@@ -427,7 +359,7 @@ namespace Com.MyCompany.MyGame
 
                 #region Control Cover Move Animation
 
-                if (_isWallClose)
+                if (unit.IsWallClose())
                 {
                     //COVERCROUCH, COVERSTAND
                     if (unit.curUnitPose == UnitPose.MOD_COVERCROUCH || unit.curUnitPose == UnitPose.MOD_COVERSTAND)

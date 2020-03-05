@@ -25,10 +25,6 @@ namespace Com.MyCompany.MyGame
             public Transform throwDestiPos;
             public LineRenderer lineRenderer;
 
-            public ThrowLineRenderer()
-            {
-            }
-
             public ThrowLineRenderer(Transform throwDestiPos, LineRenderer lineRenderer)
             {
                 this.throwDestiPos = throwDestiPos;
@@ -164,6 +160,32 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        public class UnitAnimationManager
+        {
+            #region Private Fields
+
+            private bool _isOnFloor = false;
+            private bool _isWallClose = false;
+
+            #endregion
+
+            #region Public Fields
+
+            public bool isOnFloor { get { return _isOnFloor; } set { _isOnFloor = value; } }
+            public bool isWallClose { get { return _isWallClose; } set { _isWallClose = value; } }
+
+            public Transform wallTransform;
+            public Vector3 nearWallEndPos;
+            public Vector3 wallEndToEndPos;
+
+            #endregion
+
+            public UnitAnimationManager()
+            {
+                nearWallEndPos = Vector3.zero;
+            }
+        }
+
         #endregion
 
         #region Private Fields
@@ -210,6 +232,7 @@ namespace Com.MyCompany.MyGame
 
         public ThrowLineRenderer throwLine;
         public StopwatchManager swManager = new StopwatchManager();
+        public UnitAnimationManager unitAnimManager = new UnitAnimationManager();
 
         #endregion
 
@@ -233,6 +256,60 @@ namespace Com.MyCompany.MyGame
 
         }
 
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Wall"))
+            {
+                unitAnimManager.isWallClose = true;
+                unitAnimManager.wallTransform = other.transform;
+            }
+
+            if (other.CompareTag("WallRightEnd") && unitAnimManager.isWallClose)
+            {
+                animator.SetBool("IsWallRightEnd", true);
+                unitAnimManager.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+                unitAnimManager.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
+            }
+
+            if (other.CompareTag("WallLeftEnd") && unitAnimManager.isWallClose)
+            {
+                animator.SetBool("IsWallLeftEnd", true);
+                unitAnimManager.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+                unitAnimManager.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
+            }
+        }
+
+        void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Floor"))
+                unitAnimManager.isOnFloor = true;
+
+            if (other.CompareTag("Wall"))
+            {
+                unitAnimManager.isWallClose = true;
+                unitAnimManager.wallTransform = other.transform;
+            }
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Floor"))
+                unitAnimManager.isOnFloor = false;
+
+            if (other.CompareTag("Wall"))
+                unitAnimManager.isWallClose = false;
+
+            if (other.CompareTag("WallRightEnd"))
+            {
+                animator.SetBool("IsWallRightEnd", false);
+            }
+
+            if (other.CompareTag("WallLeftEnd"))
+            {
+                animator.SetBool("IsWallLeftEnd", false);
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -242,7 +319,7 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
-        public void HitHealth(uint damage)
+        public void HitHealth(int damage)
         {
             if (damage >= _health)
                 _health = 0;
@@ -250,7 +327,7 @@ namespace Com.MyCompany.MyGame
                 _health -= damage;
         }
 
-        #region 엄폐 시 특별한 이동 제어
+            #region 엄폐 시 특별한 이동 제어
         public IEnumerator SetCoverPosition(Vector3 wallPos, Vector3 wallRight, bool isCovering)
         {
             float newX, newZ;
@@ -337,9 +414,9 @@ namespace Com.MyCompany.MyGame
             _lockControl = false;
             yield break;
         }
-        #endregion
+            #endregion
 
-        #region 던지기 동작 및 기능 제어
+            #region 던지기 동작 및 기능 제어
 
         //캐릭터가 아이템을 던지기 전에 조준하는 함수
         public void AttackPhaseAiming(Vector3 throwPos, Vector3 throwRotEuler, ref float unitSpeed, ref LookDirState lookDir)
@@ -422,7 +499,30 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("ThrowItem", false);
         }
 
-        #endregion
+            #endregion
+
+            #region UnitAnimationManager 관련 함수
+        public bool IsOnFloor()
+        {
+            return unitAnimManager.isOnFloor;
+        }
+        public bool IsWallClose()
+        {
+            return unitAnimManager.isWallClose;
+        }
+        public Vector3 NearWallEndPos()
+        {
+            return unitAnimManager.nearWallEndPos;
+        }
+        public Vector3 WallEndToEndPos()
+        {
+            return unitAnimManager.wallEndToEndPos;
+        }
+        public Transform WallTransform()
+        {
+            return unitAnimManager.wallTransform;
+        }
+            #endregion
 
         //캐릭터가 추락 중일 때
         public void Fall()

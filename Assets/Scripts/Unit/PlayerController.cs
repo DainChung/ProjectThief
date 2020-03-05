@@ -119,7 +119,7 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 //바닥 위에 있을 때
-                if (playerAnimController.isOnFloor)
+                if (unit.unitAnimManager.isOnFloor)
                 {
                     #region Control.Move & AttackThrow
                     switch (unit.curUnitPose)
@@ -194,7 +194,7 @@ namespace Com.MyCompany.MyGame
                     SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
                     break;
                 case LookDirState.COVER:
-                    lookDir = transform.position + playerAnimController.wallTransform.forward;
+                    lookDir = transform.position + unit.unitAnimManager.wallTransform.forward;
                     break;
                 case LookDirState.THROW:
                     lookDir = transform.position + mainCameraTransform.forward;
@@ -323,13 +323,13 @@ namespace Com.MyCompany.MyGame
             if (animator.GetBool("IsWallRightEnd"))
             {
                 if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") > 0)
-                    StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, true, playerAnimController.wallEndToEndPos));
+                    StartCoroutine(unit.SetCoverPosition(unit.NearWallEndPos(), true, unit.WallEndToEndPos()));
             }
             //좌측 끝에서 좌측 이동 버튼을 다시 누르면 엄폐물 이동 수행
             else if (animator.GetBool("IsWallLeftEnd"))
             {
                 if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
-                    StartCoroutine(unit.SetCoverPosition(playerAnimController.nearWallEndPos, false, playerAnimController.wallEndToEndPos));
+                    StartCoroutine(unit.SetCoverPosition(unit.NearWallEndPos(), false, unit.WallEndToEndPos()));
             }
         }
         //공격에 관한 조작
