@@ -22,9 +22,9 @@ TagManager:
   - 
   - 
   - Lighting
-  - 
   - Structure
-  - Unit
+  - Enemy
+  - Player
   - Throw
   - 
   - 

@@ -261,6 +261,7 @@ GameObject:
   - component: {fileID: 6510317012552832052}
   - component: {fileID: -945746905619722431}
   - component: {fileID: 4385702786850018141}
+  - component: {fileID: 67510675}
   m_Layer: 0
   m_Name: WeaponCAN
   m_TagString: WeaponCan
@@ -347,6 +348,19 @@ CapsuleCollider:
   m_Radius: 1.2
   m_Height: 4
   m_Direction: 1
+  m_Center: {x: 0, y: 1.35, z: 0}
+--- !u!135 &67510675
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6670630277979103049}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2
   m_Center: {x: 0, y: 1.35, z: 0}
 --- !u!1 &7488508537021694082
 GameObject:

@@ -9,10 +9,175 @@ namespace Com.MyCompany.MyGame
 { 
     public class PlayerController : MonoBehaviour
     {
-        #region Private Vars
+        #region Sub Classes
+
+        public class Inventory
+        {
+            private bool _takeGold = false;
+            private int[] _items = new int[(int)Item.max - 1];
+            private int[] maxAmount = new int[(int)Item.max - 1];
+
+            public bool takeGold { get { return _takeGold; } }
+            public int[] items { get { return _items; } }
+
+            public Inventory()
+            {
+                for (int i = 0; i < _items.Length; i++)
+                {
+                    _items[i] = 0;
+                    maxAmount[i] = ValueCollections.itemMaxAmount[i];
+                }
+                _takeGold = false;
+            }
+
+            public void Add(Item item, int amount)
+            {
+                switch (item)
+                {
+                    case Item.CAN:
+                    case Item.CHEESE:
+                    case Item.SMOKE:
+
+                        int index = (int)(item) - 1;
+
+                        if (amount > 0)
+                        {
+                            if (_items[index] + amount > maxAmount[index])
+                                _items[index] = maxAmount[index];
+                            else
+                                _items[index] += amount;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+            public void Add(Item item)
+            { 
+                switch (item)
+                {
+                    case Item.CAN:
+                    case Item.CHEESE:
+                    case Item.SMOKE:
+
+                        int index = (int)(item) - 1;
+
+                        if (_items[index] + 1 > maxAmount[index])
+                            _items[index] = maxAmount[index];
+                        else
+                            _items[index]++;
+                        break;
+                    case Item.GOLD:
+                        _takeGold = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            public void Add(int index)
+            {
+                index--;
+
+                if (_items[index] + 1 > maxAmount[index])
+                    _items[index] = maxAmount[index];
+                else
+                    _items[index]++;
+
+                ShowInvnetory();
+            }
+
+            public void Remove(Item item, int amount)
+            {
+                switch (item)
+                {
+                    case Item.CAN:
+                    case Item.CHEESE:
+                    case Item.SMOKE:
+
+                        int index = (int)(item) - 1;
+
+                        if (amount > 0)
+                        {
+                            if (_items[index] - amount < 0)
+                                _items[index] = 0;
+                            else
+                                _items[index] -= amount;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            public void Remove(Item item)
+            {
+                switch (item)
+                {
+                    case Item.CAN:
+                    case Item.CHEESE:
+                    case Item.SMOKE:
+
+                        int index = (int)(item) - 1;
+
+                        if (_items[index] - 1 < 0)
+                            _items[index] = 0;
+                        else
+                            _items[index]--;
+                        break;
+                    case Item.GOLD:
+                        _takeGold = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            public void Remove(int index)
+            {
+                index--;
+
+                if (_items[index] - 1 < 0)
+                    _items[index] = 0;
+                else
+                    _items[index]--;
+
+                ShowInvnetory();
+            }
+
+            public bool CheckWeapon(WeaponCode weapon)
+            {
+                bool result = false;
+
+                switch (weapon)
+                {
+                    case WeaponCode.CAN:
+                    case WeaponCode.CHEESE:
+                    case WeaponCode.SMOKE:
+                        result = _items[(int)(weapon) - 1] > 0;
+                        break;
+                    case WeaponCode.HAND:
+                    default:
+                        result =  true;
+                        break;
+                }
+
+                if (!result)
+                    UnityEngine.Debug.Log("Not Enough " + weapon.ToString());
+
+                return result;
+            }
+            public void ShowInvnetory()
+            {
+                UnityEngine.Debug.Log("GOLD: " + _takeGold + ", CAN: " + _items[0] + ", CHEESE: " + _items[1] + ", SMOKE: " + _items[2]);
+            }
+        }
+
+        #endregion
+
+        #region Private Fields
 
         private LookDirState curLookDirState = LookDirState.IDLE;
 
+            #region 기본 이동 및 물리
         private float playerSpeed;
         private Transform mainCameraTransform;
         private Quaternion destiRotation;
@@ -20,15 +185,14 @@ namespace Com.MyCompany.MyGame
         private Vector3 destiPos;
 
         private Rigidbody rb;
+        #endregion
 
+            #region 애니메이션
         private Animator animator;
-
-        //높을수록 적캐릭터에게 쉽게 들킨다.
-        private float aggro = 0.1f;
-
-        private Unit unit;
         private PlayerAnimationController playerAnimController;
+        #endregion
 
+            #region 무기
         private WeaponCode curWeapon = WeaponCode.HAND;
 
         //조준 후 발사되지 않는 경우 발사하도록 제어
@@ -37,11 +201,20 @@ namespace Com.MyCompany.MyGame
         private bool doubleThrowLock = false;
 
         private Vector3 throwRotEuler = Vector3.zero;
+            #endregion
+
+        //높을수록 적캐릭터에게 쉽게 들킨다.
+        private float aggro = 0.1f;
+
+        private Unit unit;
+
         private CameraWork cam;
+
+        private Inventory pInventory = new Inventory();
 
         #endregion
 
-        #region Public Vars
+        #region Public Fields
 
         public Transform throwPos;
 
@@ -51,7 +224,10 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
-
+            //인벤토리 초기화
+            pInventory.Add(Item.CAN, 3);
+            pInventory.Add(Item.CHEESE, 1);
+            pInventory.Add(Item.SMOKE, 0);
         }
 
         // Start is called before the first frame update
@@ -119,7 +295,7 @@ namespace Com.MyCompany.MyGame
                 #endregion
 
                 //바닥 위에 있을 때
-                if (unit.unitAnimManager.isOnFloor)
+                if (unit.IsOnFloor())
                 {
                     #region Control.Move & AttackThrow
                     switch (unit.curUnitPose)
@@ -194,7 +370,7 @@ namespace Com.MyCompany.MyGame
                     SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
                     break;
                 case LookDirState.COVER:
-                    lookDir = transform.position + unit.unitAnimManager.wallTransform.forward;
+                    lookDir = transform.position + unit.WallTransform().forward;
                     break;
                 case LookDirState.THROW:
                     lookDir = transform.position + mainCameraTransform.forward;
@@ -226,11 +402,14 @@ namespace Com.MyCompany.MyGame
                     if (unit.swManager.AttackDelayDone(curWeapon))
                     {
                         //조준
-                        if (Input.GetButton("Fire1"))
+                        if (Input.GetButton("Fire1") && pInventory.CheckWeapon(curWeapon))
                             unit.AttackPhaseAiming(throwPos.position, mainCameraTransform.rotation.eulerAngles, ref playerSpeed, ref curLookDirState);
                         //조준한 상태에서 놓으면 투척
                         else if ((Input.GetButtonUp("Fire1") || unit.readyToThrowItem) && unit.doubleThrowLock)
+                        {
                             unit.AttackPhaseThrow(throwPos.position, curWeapon, ref playerSpeed);
+                            pInventory.Remove((int)curWeapon);
+                        }
                     }
                     //Throw 애니메이션이 재생 중
                     else if (animator.GetBool("ThrowItem"))
@@ -238,6 +417,7 @@ namespace Com.MyCompany.MyGame
                         unit.curUnitPose = UnitPose.MOD_THROWEND;
                         animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
                     }
+
                     //Throw 애니메이션 종료 후
                     if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
                     {
@@ -350,12 +530,10 @@ namespace Com.MyCompany.MyGame
                     break;
                 //플레이어 위치에서 사용
                 case WeaponCode.SMOKE:
-                    if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon))
+                    if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
                     {
-                        Instantiate(Resources.Load(unit.weaponPath + curWeapon.ToString()) as GameObject,
-                                                    transform.position + TransformCollections.weaponSmokeVec,
-                                                    TransformCollections.weaponSmokeQuat);
-                        unit.swManager.RestartAttackStopwatch((int)curWeapon);
+                        unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
+                        pInventory.Remove((int)curWeapon);
                     }
                     break;
                 default:

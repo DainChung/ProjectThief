@@ -82,7 +82,7 @@ namespace Com.MyCompany.MyGame
                         //충돌이 발생한 부분부터 생략한다.
                         if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
                         {
-                            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Structure"))
+                            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Structure") || hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))
                             {
                                 //착탄 지점 표시(나중에 투명하게 변경하거나 평면 원으로 표시할것)
                                 throwDestiPos.position = hit.point;
@@ -160,7 +160,7 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public class UnitAnimationManager
+        public class UnitAnimationHelper
         {
             #region Private Fields
 
@@ -180,7 +180,7 @@ namespace Com.MyCompany.MyGame
 
             #endregion
 
-            public UnitAnimationManager()
+            public UnitAnimationHelper()
             {
                 nearWallEndPos = Vector3.zero;
             }
@@ -193,7 +193,6 @@ namespace Com.MyCompany.MyGame
         private float _speed;
         private int _health;
         private float _jumpPower;
-        private const string _weaponPath = "Weapons/Weapon";
         private bool _lockControl = false;
 
         //조준 후 발사되지 않는 경우 발사하도록 제어
@@ -204,6 +203,8 @@ namespace Com.MyCompany.MyGame
         //발사각
         private Quaternion throwRot = new Quaternion();
 
+        private UnitAnimationHelper unitAnimHelper = new UnitAnimationHelper();
+
         #endregion
 
         #region Public Fields
@@ -213,8 +214,6 @@ namespace Com.MyCompany.MyGame
         public float coverSpeed { get { return 0.31f * speed; } }
         public int health { get { return _health; } }
         public float jumpPower { get { return _jumpPower; } }
-
-        public string weaponPath { get { return _weaponPath; } }
 
         public bool lockControl { get{ return _lockControl; } }
 
@@ -232,7 +231,6 @@ namespace Com.MyCompany.MyGame
 
         public ThrowLineRenderer throwLine;
         public StopwatchManager swManager = new StopwatchManager();
-        public UnitAnimationManager unitAnimManager = new UnitAnimationManager();
 
         #endregion
 
@@ -260,44 +258,44 @@ namespace Com.MyCompany.MyGame
         {
             if (other.CompareTag("Wall"))
             {
-                unitAnimManager.isWallClose = true;
-                unitAnimManager.wallTransform = other.transform;
+                unitAnimHelper.isWallClose = true;
+                unitAnimHelper.wallTransform = other.transform;
             }
 
-            if (other.CompareTag("WallRightEnd") && unitAnimManager.isWallClose)
+            if (other.CompareTag("WallRightEnd") && unitAnimHelper.isWallClose)
             {
                 animator.SetBool("IsWallRightEnd", true);
-                unitAnimManager.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
-                unitAnimManager.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
+                unitAnimHelper.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+                unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
             }
 
-            if (other.CompareTag("WallLeftEnd") && unitAnimManager.isWallClose)
+            if (other.CompareTag("WallLeftEnd") && unitAnimHelper.isWallClose)
             {
                 animator.SetBool("IsWallLeftEnd", true);
-                unitAnimManager.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
-                unitAnimManager.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
+                unitAnimHelper.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+                unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
             }
         }
 
         void OnTriggerStay(Collider other)
         {
             if (other.CompareTag("Floor"))
-                unitAnimManager.isOnFloor = true;
+                unitAnimHelper.isOnFloor = true;
 
             if (other.CompareTag("Wall"))
             {
-                unitAnimManager.isWallClose = true;
-                unitAnimManager.wallTransform = other.transform;
+                unitAnimHelper.isWallClose = true;
+                unitAnimHelper.wallTransform = other.transform;
             }
         }
 
         void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Floor"))
-                unitAnimManager.isOnFloor = false;
+                unitAnimHelper.isOnFloor = false;
 
             if (other.CompareTag("Wall"))
-                unitAnimManager.isWallClose = false;
+                unitAnimHelper.isWallClose = false;
 
             if (other.CompareTag("WallRightEnd"))
             {
@@ -458,14 +456,14 @@ namespace Com.MyCompany.MyGame
         }
 
         //캐릭터가 아이템을 투척하기 위한 함수
-        public void AttackPhaseThrow(Vector3 throwPos, WeaponCode curWeapon, ref float unitSpeed)
+        public void AttackPhaseThrow(Vector3 throwPos, WeaponCode weapon, ref float unitSpeed)
         {
             animator.SetBool("IsThrowMode", false);
             animator.SetLayerWeight(4, 1);
             animator.SetLayerWeight(5, 0);
             animator.SetFloat("ThrowAnimSpeed", 1);
 
-            Instantiate(Resources.Load(weaponPath + curWeapon.ToString()) as GameObject, throwPos, throwRot);
+            InstantiateWeapon(weapon, throwPos, throwRot);
 
             //포물선 숨기기
             throwLine.HideLines();
@@ -481,8 +479,6 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("ThrowItem", true);
             _readyToThrowItem = false;
             _doubleThrowLock = false;
-
-            swManager.RestartAttackStopwatch((int)curWeapon);
         }
 
         //Throw 애니메이션 종료
@@ -499,28 +495,35 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("ThrowItem", false);
         }
 
+        public void InstantiateWeapon(WeaponCode weapon, Vector3 pos, Quaternion rot)
+        {
+            GameObject obj = Instantiate(Resources.Load(FilePaths.weaponPath + weapon.ToString()) as GameObject, pos, rot) as GameObject;
+            obj.GetComponent<WeaponThrow>().SetCode(weapon);
+            swManager.RestartAttackStopwatch((int)weapon);
+        }
+
             #endregion
 
             #region UnitAnimationManager 관련 함수
         public bool IsOnFloor()
         {
-            return unitAnimManager.isOnFloor;
+            return unitAnimHelper.isOnFloor;
         }
         public bool IsWallClose()
         {
-            return unitAnimManager.isWallClose;
+            return unitAnimHelper.isWallClose;
         }
         public Vector3 NearWallEndPos()
         {
-            return unitAnimManager.nearWallEndPos;
+            return unitAnimHelper.nearWallEndPos;
         }
         public Vector3 WallEndToEndPos()
         {
-            return unitAnimManager.wallEndToEndPos;
+            return unitAnimHelper.wallEndToEndPos;
         }
         public Transform WallTransform()
         {
-            return unitAnimManager.wallTransform;
+            return unitAnimHelper.wallTransform;
         }
             #endregion
 

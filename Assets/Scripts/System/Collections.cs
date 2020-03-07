@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Com.MyCompany.MyGame.Collections
 {
+
     #region Enums
     public enum Item
     {
@@ -53,8 +54,11 @@ namespace Com.MyCompany.MyGame.Collections
         }
     }
 
-    public static class TransformCollections
+    public static class ValueCollections
     {
+        private static int[] _itemMaxAmount = { 5, 3, 2 };
+        public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
+
         #region Weapons
         //연막탄 위치 벡터
         private static Vector3 _WeaponSmokeVector3 = new Vector3(0, 1.2f, 0);
@@ -62,14 +66,14 @@ namespace Com.MyCompany.MyGame.Collections
 
         //연막탄 방향
         private static Quaternion _WeaponSmokeQuat = new Quaternion(-0.7f, 0, 0, 0.7f);
-        public static Quaternion weaponSmokeQuat { get{ return _WeaponSmokeQuat; } }
+        public static Quaternion weaponSmokeQuat { get { return _WeaponSmokeQuat; } }
         #endregion
     }
 
-    public static class AnimationCollections
+    public static class FilePaths
     {
-        #region
-        
-        #endregion
+        private static string _weaponPath = "Weapons/Weapon";
+
+        public static string weaponPath { get { return _weaponPath; } }
     }
 }

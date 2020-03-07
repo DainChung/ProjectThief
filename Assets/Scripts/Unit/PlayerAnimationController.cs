@@ -9,7 +9,7 @@ namespace Com.MyCompany.MyGame
 
     public class PlayerAnimationController : MonoBehaviour
     {
-        #region Private Values
+        #region Private Fields
 
         private float animLayerWeight = 0f;
 
@@ -20,7 +20,7 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region Public Values
+        #region Public Fields
 
         [HideInInspector]
         public Animator animator;

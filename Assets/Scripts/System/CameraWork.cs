@@ -8,7 +8,7 @@ namespace Com.MyCompany.MyGame
 {
     public class CameraWork : MonoBehaviour
     {
-        #region Public Var
+        #region Public Fields
 
         public Vector3 cameraPos;
         public float smooth;
@@ -17,7 +17,7 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region Private Var
+        #region Private Fields
 
         private Transform player;
         private Vector3 destiPos;
