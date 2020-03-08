@@ -302,9 +302,11 @@ namespace Com.MyCompany.MyGame
                     {
                         case UnitPose.MOD_WALK:
                             ControlBase();
+                            ControlAttack();
                             break;
                         case UnitPose.MOD_RUN:
                             ControlBase();
+                            ControlAttack();
                             break;
                         case UnitPose.MOD_CROUCH:
                             ControlBase();
@@ -315,8 +317,10 @@ namespace Com.MyCompany.MyGame
                             break;
                         case UnitPose.MOD_THROW:
                             ControlMoveThrow();
+                            ControlAttack();
                             break;
                         case UnitPose.MOD_THROWEND:
+                            ControlAttack();
                             break;
                         case UnitPose.MOD_FALL:
                             unit.UnitIsOnFloor();
@@ -326,7 +330,7 @@ namespace Com.MyCompany.MyGame
                     }
 
                     //바닥에 서있을 때의 공격 관련 조작 관리
-                    ControlAttack();
+                    //ControlAttack();
 
                     //과도한 미끄러짐 방지
                     rb.velocity *= 0.97f;
@@ -386,50 +390,32 @@ namespace Com.MyCompany.MyGame
         }
 
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
-        //소지 개수 이상으로 사용불가(예정)
         private void AttackThrow()
         {
-            //특정 상태일 때만 투척 허용
-            //달리기, 걷기, 던지기, 투척 직후
-            switch (unit.curUnitPose)
+            if (unit.swManager.AttackDelayDone(curWeapon))
             {
-                case UnitPose.MOD_RUN:
-                case UnitPose.MOD_WALK:
-                case UnitPose.MOD_THROW:
-                case UnitPose.MOD_THROWEND:
-                    #region 조준 및 투척
-                    //if(amountCAN > 0)
-                    if (unit.swManager.AttackDelayDone(curWeapon))
-                    {
-                        //조준
-                        if (Input.GetButton("Fire1") && pInventory.CheckWeapon(curWeapon))
-                            unit.AttackPhaseAiming(throwPos.position, mainCameraTransform.rotation.eulerAngles, ref playerSpeed, ref curLookDirState);
-                        //조준한 상태에서 놓으면 투척
-                        else if ((Input.GetButtonUp("Fire1") || unit.readyToThrowItem) && unit.doubleThrowLock)
-                        {
-                            unit.AttackPhaseThrow(throwPos.position, curWeapon, ref playerSpeed);
-                            pInventory.Remove((int)curWeapon);
-                        }
-                    }
-                    //Throw 애니메이션이 재생 중
-                    else if (animator.GetBool("ThrowItem"))
-                    {
-                        unit.curUnitPose = UnitPose.MOD_THROWEND;
-                        animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
-                    }
+                //조준
+                if (Input.GetButton("Fire1") && pInventory.CheckWeapon(curWeapon))
+                    unit.AttackPhaseAiming(throwPos.position, mainCameraTransform.rotation.eulerAngles, ref playerSpeed, ref curLookDirState);
+                //조준한 상태에서 놓으면 투척
+                else if ((Input.GetButtonUp("Fire1") || unit.readyToThrowItem) && unit.doubleThrowLock)
+                {
+                    unit.AttackPhaseThrow(throwPos.position, curWeapon, ref playerSpeed);
+                    pInventory.Remove((int)curWeapon);
+                }
+            }
+            //Throw 애니메이션이 재생 중
+            else if (animator.GetBool("ThrowItem"))
+            {
+                unit.curUnitPose = UnitPose.MOD_THROWEND;
+                animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
+            }
 
-                    //Throw 애니메이션 종료 후
-                    if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
-                    {
-                        curLookDirState = LookDirState.IDLE;
-                        unit.ResetThrowAnimation();
-                    }
-                    //else
-                    //Debug.Log("소지 개수 부족");
-                    #endregion
-                    break;
-                default:
-                    break;
+            //Throw 애니메이션 종료 후
+            if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
+            {
+                curLookDirState = LookDirState.IDLE;
+                unit.ResetThrowAnimation();
             }
         }
 

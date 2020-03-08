@@ -249,9 +249,9 @@ namespace Com.MyCompany.MyGame
         }
 
         // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
-
+            animator.SetBool("IsFalling", !(unitAnimHelper.isOnFloor));
         }
 
         void OnTriggerEnter(Collider other)
@@ -527,6 +527,7 @@ namespace Com.MyCompany.MyGame
         }
             #endregion
 
+        //아래 함수들을 Unit에서 호출하도록 변경할 것
         //캐릭터가 추락 중일 때
         public void Fall()
         {
@@ -538,7 +539,7 @@ namespace Com.MyCompany.MyGame
             throwLine.HideLines();
         }
 
-        //캐릭터가 땅 위에 있을 때
+        //캐릭터가 착지했을 때
         public void UnitIsOnFloor()
         {
             animator.SetBool("IsFalling", false);

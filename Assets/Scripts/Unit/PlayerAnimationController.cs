@@ -335,9 +335,6 @@ namespace Com.MyCompany.MyGame
                 //WALK, RUN, CROUCH
                 if (unit.curUnitPose == UnitPose.MOD_WALK || unit.curUnitPose == UnitPose.MOD_RUN || unit.curUnitPose == UnitPose.MOD_CROUCH)
                 {
-                    //if (animator.GetBool("IsFalling"))
-                    //    animator.SetBool("IsFalling", false);
-
                     if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing") && unit.curUnitPose != UnitPose.MOD_FALL)
                     {
                         if (Input.GetButton("Vertical"))
@@ -380,7 +377,6 @@ namespace Com.MyCompany.MyGame
             }
             else
             {
-                //animator.SetBool("IsFalling", true);
                 animator.SetBool("IsCovering", false);
                 animator.SetFloat("TurnRight", 0);
                 animator.SetFloat("MoveSpeed", 0);
