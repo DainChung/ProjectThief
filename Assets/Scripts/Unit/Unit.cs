@@ -234,7 +234,7 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region MonoBehaviour CallBacks
+        #region MonoBehaviour Callbacks
         void Awake()
         {
             _health = 1;
@@ -251,7 +251,10 @@ namespace Com.MyCompany.MyGame
         // Update is called once per frame
         void FixedUpdate()
         {
-            animator.SetBool("IsFalling", !(unitAnimHelper.isOnFloor));
+            if (gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            {
+                //AttackPhaseAiming();
+            }
         }
 
         void OnTriggerEnter(Collider other)
@@ -326,8 +329,13 @@ namespace Com.MyCompany.MyGame
         }
 
             #region 엄폐 시 특별한 이동 제어
-        public IEnumerator SetCoverPosition(Vector3 wallPos, Vector3 wallRight, bool isCovering)
+        public IEnumerator SetCoverPosition(bool isCovering)
         {
+            Vector3 wallPos = WallTransform().position;
+            Vector3 wallRight = WallTransform().right;
+
+            float colliderHeight = transform.GetComponent<CapsuleCollider>().center.y;
+
             float newX, newZ;
             float alpha, beta;
 
@@ -354,7 +362,7 @@ namespace Com.MyCompany.MyGame
             if (isCovering)
             {
                 //Collider를 조금 이동시켜서 애니메이션이 자연스럽게 보이도록 한다
-                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0.7f);
+                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, colliderHeight, 0.7f);
 
                 Vector3 newVector = new Vector3(newX, transform.position.y, newZ);
 
@@ -370,17 +378,20 @@ namespace Com.MyCompany.MyGame
             }
             //엄폐를 해제하면 Collider 위치를 초기화한다.
             else
-                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, transform.GetComponent<CapsuleCollider>().center.y, 0);
+                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, colliderHeight, 0);
 
             yield break;
         }
 
         //모퉁이에서 엄폐한 상태로 이동할 때 사용
-        public IEnumerator SetCoverPosition(Vector3 destiPos, bool goRight, Vector3 subDestiPos)
+        public IEnumerator MoveEndToEnd(bool goRight)
         {
             float freezeY = transform.position.y;
             Vector3 freezeHeight = transform.position;
             Vector3 newLook = transform.right;
+
+            Vector3 destiPos = unitAnimHelper.nearWallEndPos;
+            Vector3 subDestiPos = unitAnimHelper.wallEndToEndPos;
 
             if (goRight) newLook *= -1;
 

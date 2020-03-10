@@ -220,7 +220,7 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region MonoBehaviour Callback
+        #region MonoBehaviour Callbacks
 
         void Awake()
         {
@@ -489,13 +489,13 @@ namespace Com.MyCompany.MyGame
             if (animator.GetBool("IsWallRightEnd"))
             {
                 if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") > 0)
-                    StartCoroutine(unit.SetCoverPosition(unit.NearWallEndPos(), true, unit.WallEndToEndPos()));
+                    StartCoroutine(unit.MoveEndToEnd(true));
             }
             //좌측 끝에서 좌측 이동 버튼을 다시 누르면 엄폐물 이동 수행
             else if (animator.GetBool("IsWallLeftEnd"))
             {
                 if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
-                    StartCoroutine(unit.SetCoverPosition(unit.NearWallEndPos(), false, unit.WallEndToEndPos()));
+                    StartCoroutine(unit.MoveEndToEnd(false));
             }
         }
         //공격에 관한 조작

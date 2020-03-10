@@ -69,6 +69,7 @@
      <Compile Include="Assets\Scripts\System\Collections.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />
+     <Compile Include="Assets\Scripts\Unit\EnemyController.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerAnimationController.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Unit\Unit.cs" />

@@ -70,7 +70,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, true));
+                        StartCoroutine(unit.SetCoverPosition(true));
                         animator.SetLayerWeight(2, 1);
                         animator.SetLayerWeight(3, 0);
                         unit.curUnitPose = UnitPose.MOD_COVERSTAND;
@@ -122,7 +122,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, true));
+                        StartCoroutine(unit.SetCoverPosition(true));
                         animator.SetLayerWeight(2, 1);
                         animator.SetLayerWeight(3, 0);
                         unit.curUnitPose = UnitPose.MOD_COVERSTAND;
@@ -167,7 +167,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", true);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, true));
+                        StartCoroutine(unit.SetCoverPosition(true));
                         animator.SetLayerWeight(2, 0);
                         animator.SetLayerWeight(3, 1);
                         unit.curUnitPose = UnitPose.MOD_COVERCROUCH;
@@ -211,7 +211,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", false);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, false));
+                        StartCoroutine(unit.SetCoverPosition(false));
                         animator.SetLayerWeight(2, 0);
                         unit.curUnitPose = UnitPose.MOD_RUN;
 
@@ -254,7 +254,7 @@ namespace Com.MyCompany.MyGame
                     {
                         animator.SetBool("IsCovering", false);
                         //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(unit.WallTransform().position, unit.WallTransform().right, false));
+                        StartCoroutine(unit.SetCoverPosition(false));
                         animator.SetLayerWeight(1, 1);
                         animator.SetLayerWeight(2, 0);
                         animator.SetLayerWeight(3, 0);
