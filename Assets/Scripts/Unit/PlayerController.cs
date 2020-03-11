@@ -11,7 +11,7 @@ namespace Com.MyCompany.MyGame
     {
         #region Sub Classes
 
-        public class Inventory
+        private class Inventory
         {
             private bool _takeGold = false;
             private int[] _items = new int[(int)Item.max - 1];
@@ -167,7 +167,7 @@ namespace Com.MyCompany.MyGame
             }
             public void ShowInvnetory()
             {
-                UnityEngine.Debug.Log("GOLD: " + _takeGold + ", CAN: " + _items[0] + ", CHEESE: " + _items[1] + ", SMOKE: " + _items[2]);
+                UnityEngine.Debug.Log("[ShowInventory] GOLD: " + _takeGold + ", CAN: " + _items[0] + ", CHEESE: " + _items[1] + ", SMOKE: " + _items[2]);
             }
         }
 
@@ -322,23 +322,13 @@ namespace Com.MyCompany.MyGame
                         case UnitPose.MOD_THROWEND:
                             ControlAttack();
                             break;
-                        case UnitPose.MOD_FALL:
-                            unit.UnitIsOnFloor();
-                            break;
                         default:
                             break;
                     }
 
-                    //바닥에 서있을 때의 공격 관련 조작 관리
-                    //ControlAttack();
-
                     //과도한 미끄러짐 방지
                     rb.velocity *= 0.97f;
                     #endregion
-                }
-                else
-                {
-                    unit.Fall();
                 }
 
             }

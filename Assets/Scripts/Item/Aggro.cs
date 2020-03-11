@@ -4,22 +4,29 @@ using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
 
-public class Aggro : MonoBehaviour
+namespace Com.MyCompany.MyGame
 {
-    private WeaponCode _code;
-
-    public WeaponCode code { get { return _code; } }
-
-    public void SetCode(WeaponCode weaponCode)
+    public class Aggro : MonoBehaviour
     {
-        _code = weaponCode;
-    }
+        private WeaponCode code;
 
-    void Start()
-    {
-        //소음 파일 찾아서(?) 재생
+        public void SetCode(WeaponCode weaponCode)
+        {
+            code = weaponCode;
+        }
 
-        //지속시간 짧음
-        Destroy(gameObject, 2.0f);
+        void Start()
+        {
+            //소음 파일 찾아서(?) 재생
+
+            //지속시간 짧음
+            Destroy(gameObject, 2.0f);
+        }
+
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+                other.transform.GetComponent<EnemyController>().DetectWeapon(code, transform.position);
+        }
     }
 }

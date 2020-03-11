@@ -27,7 +27,7 @@ namespace Com.MyCompany.MyGame.Collections
     //적 캐릭터 상태에 관한 정보
     public enum UnitState
     {
-        IDLE = 0, ALERT, COMBAT, max
+        IDLE = 0, ALERT, COMBAT, CHEESE, max
     }
     //플레이어 캐릭터가 바라보는 방향
     public enum LookDirState

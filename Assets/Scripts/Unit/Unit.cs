@@ -104,6 +104,7 @@ namespace Com.MyCompany.MyGame
             public void HideLines()
             {
                 lineRenderer.enabled = false;
+                throwDestiPos.GetComponent<SphereCollider>().enabled = false;
                 throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
             }
         }
@@ -245,15 +246,28 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             throwLine = new ThrowLineRenderer(throwDestiPos, transform.GetComponent<LineRenderer>());
+            throwLine.HideLines();
             swManager.InitStopwatch();
         }
 
         // Update is called once per frame
         void FixedUpdate()
         {
-            if (gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            //추락, 착륙시 변수 제어
+            if (IsOnFloor())
             {
-                //AttackPhaseAiming();
+                switch (curUnitPose)
+                {
+                    case UnitPose.MOD_FALL:
+                        UnitIsOnFloor();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                Fall();
             }
         }
 
