@@ -21,13 +21,22 @@ namespace Com.MyCompany.MyGame
 
         #region Sub Classes
 
+        //우선순위 : 치즈 > 캔 = 연막
         private class DetectedWeaponQueue
         {
             //어그로 끈 Weapon을 저장하는 스택, 최대 3개까지만 기억
-            //4번째 입력 OR 치즈가 감지된 경우 초기화 후 재입력
-            private Queue<DetectedWeapon> queue = new Queue<DetectedWeapon>();
+            private DetectedWeapon[] queue = new DetectedWeapon[3];
 
-            public int Count { get { return queue.Count; } }
+            public DetectedWeaponQueue()
+            {
+                DetectedWeapon init;
+                init.code = WeaponCode.max;
+                init.pos = new Vector3(-1,-1,-1);
+
+                queue[0] = init;
+                queue[1] = init;
+                queue[2] = init;
+            }
 
             public void Enqueue(WeaponCode weaponCode, Vector3 position)
             {
@@ -35,16 +44,27 @@ namespace Com.MyCompany.MyGame
                 input.code = weaponCode;
                 input.pos = position;
 
-                //중복 내용이 없을 때 입력
-                if (!queue.Contains(input))
+                //중복된 내용 아님
+                if (!IsItDuplicate(input))
                 {
-                    //4번째 입력 시 초기화 OR 치즈인 경우 초기화
-                    if (queue.Count >= 3 || weaponCode == WeaponCode.CHEESE)
-                        queue.Clear();
+                    if (Count() <= 2)
+                    {
+                        if (weaponCode != WeaponCode.CHEESE && weaponCode != WeaponCode.max)
+                        {
+                            queue[Count()] = input;
+                        }
+                        else if (weaponCode == WeaponCode.CHEESE)
+                        {
+                            //치즈면 최우선순위로 설정
+                            PushQueueReverse();
+                            queue[0] = input;
+                        }
+                    }
 
-                    queue.Enqueue(input);
-
-                    UnityEngine.Debug.Log("Enqueue " + queue.Count + " : " + input.code + ", " + input.pos);
+                    //for (int i = 0; i < 3; i++)
+                    //{
+                    //    UnityEngine.Debug.Log(i + ") Code: " + queue[i].code + ", Pos: " + queue[i].pos);
+                    //}
                 }
             }
 
@@ -52,15 +72,62 @@ namespace Com.MyCompany.MyGame
             {
                 DetectedWeapon result;
 
-                if (queue.Count > 0)
-                    result = queue.Dequeue();
+                if (Count() > 0)
+                {
+                    result = queue[0];
+                    PushQueue();
+                }
                 else
                 {
                     result.code = WeaponCode.max;
-                    result.pos = new Vector3(-1,-1,-1);
+                    result.pos = new Vector3(-1, -1, -1);
                 }
 
                 return result;
+            }
+
+            public int Count()
+            {
+                int result = 0;
+
+                for (int i = 0; i < queue.Length; i++)
+                {
+                    if (queue[i].code != WeaponCode.max)
+                        result = i+1;
+                }
+
+                return result;
+            }
+
+            //중복된 내용이면 true, 아니면 false
+            private bool IsItDuplicate(DetectedWeapon input)
+            {
+                for (int i = 0; i < queue.Length; i++)
+                {
+                    if ((queue[i].code == input.code) && (queue[i].pos == input.pos))
+                        return true;
+                }
+
+                return false;
+            }
+
+            private void PushQueue()
+            {
+                for (int i = 1; i < queue.Length; i++)
+                {
+                    queue[i - 1] = queue[i];
+                    queue[i].code = WeaponCode.max;
+                    queue[i].pos.Set(-1,-1,-1);
+                }
+            }
+            private void PushQueueReverse()
+            {
+                for (int i = queue.Length - 2; i >= 0; i--)
+                {
+                    queue[i + 1] = queue[i];
+                    queue[i].code = WeaponCode.max;
+                    queue[i].pos.Set(-1, -1, -1);
+                }
             }
         }
 
@@ -100,15 +167,7 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            //if (queue.Count >= 3)
-            //{
-            //    DetectedWeapon w = queue.Dequeue();
-            //    UnityEngine.Debug.Log("1 Dequeue: " + w.code + ", " + w.pos);
-            //    w = queue.Dequeue();
-            //    UnityEngine.Debug.Log("2 Dequeue: " + w.code + ", " + w.pos);
-            //    w = queue.Dequeue();
-            //    UnityEngine.Debug.Log("3 Dequeue: " + w.code + ", " + w.pos);
-            //}
+
         }
         #endregion
 
@@ -124,6 +183,7 @@ namespace Com.MyCompany.MyGame
             //UnityEngine.Debug.Log("Detect: " + code + ", Pos: " + pos + ", State: " + curState);
 
             queue.Enqueue(code, pos);
+            DetectedWeapon ss = queue.Dequeue();
         }
 
 
