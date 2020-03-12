@@ -201,10 +201,10 @@ namespace Com.MyCompany.MyGame
         private bool doubleThrowLock = false;
 
         private Vector3 throwRotEuler = Vector3.zero;
-            #endregion
+        #endregion
 
         //높을수록 적캐릭터에게 쉽게 들킨다.
-        private float aggro = 0.1f;
+        private float aggro;
 
         private Unit unit;
 
@@ -224,6 +224,8 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
+            aggro = AggroCollections.aggroRun;
+
             //인벤토리 초기화
             pInventory.Add(Item.CAN, 3);
             pInventory.Add(Item.CHEESE, 1);
@@ -312,15 +314,19 @@ namespace Com.MyCompany.MyGame
                             ControlBase();
                             break;
                         case UnitPose.MOD_COVERSTAND:
+                            ControlCover();
+                            break;
                         case UnitPose.MOD_COVERCROUCH:
                             ControlCover();
                             break;
                         case UnitPose.MOD_THROW:
                             ControlMoveThrow();
                             ControlAttack();
+                            SetAggro();
                             break;
                         case UnitPose.MOD_THROWEND:
                             ControlAttack();
+                            SetAggro();
                             break;
                         default:
                             break;
@@ -332,6 +338,8 @@ namespace Com.MyCompany.MyGame
                 }
 
             }
+
+            //UnityEngine.Debug.Log("Aggro: " + aggro);
 
             LookDir();
             //플레이어가 의도하지 않은 회전 방지           
@@ -398,6 +406,7 @@ namespace Com.MyCompany.MyGame
             else if (animator.GetBool("ThrowItem"))
             {
                 unit.curUnitPose = UnitPose.MOD_THROWEND;
+                SetAggro();
                 animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
             }
 
@@ -405,7 +414,9 @@ namespace Com.MyCompany.MyGame
             if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
             {
                 curLookDirState = LookDirState.IDLE;
+  
                 unit.ResetThrowAnimation();
+                SetAggro();
             }
         }
 
@@ -472,6 +483,10 @@ namespace Com.MyCompany.MyGame
                     destiPos = -transform.right * Input.GetAxis("Horizontal") * unit.coverSpeed;
 
                     rb.AddForce(destiPos);
+
+                    //엄폐 직후 이동이 안 되는 오류 시
+                    if (rb.velocity == Vector3.zero)
+                        rb.velocity = destiPos;
                 }
             }
 
@@ -526,6 +541,38 @@ namespace Com.MyCompany.MyGame
              }
              */
         }
+        #endregion
+
+        #region Public Methods
+
+        //Player의 Aggro를 변경할 때 사용
+        public void SetAggro()
+        {
+            switch (unit.curUnitPose)
+            {
+                case UnitPose.MOD_WALK:
+                    aggro = AggroCollections.aggroWalk;
+                    break;
+                case UnitPose.MOD_RUN:
+                    aggro = AggroCollections.aggroRun;
+                    break;
+                case UnitPose.MOD_CROUCH:
+                    aggro = AggroCollections.aggroCrouch;
+                    break;
+                case UnitPose.MOD_COVERSTAND:
+                    aggro = AggroCollections.aggroWalk;
+                    break;
+                case UnitPose.MOD_COVERCROUCH:
+                    aggro = AggroCollections.aggroCrouch;
+                    break;
+                case UnitPose.MOD_THROW:
+                    aggro = AggroCollections.aggroWalk;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         #endregion
     }
 }

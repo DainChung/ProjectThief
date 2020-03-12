@@ -34,6 +34,7 @@ namespace Com.MyCompany.MyGame.Collections
     {
         IDLE = 0, COVER, THROW, max
     }
+
     #endregion
 
     public static class EnumCollections
@@ -75,5 +76,43 @@ namespace Com.MyCompany.MyGame.Collections
         private static string _weaponPath = "Weapons/Weapon";
 
         public static string weaponPath { get { return _weaponPath; } }
+    }
+
+    public static class AggroCollections
+    {
+        private static float _aggroRun = 0.1f;
+        private static float _aggroWalk = 0.05f;
+        private static float _aggroCrouch = 0.01f;
+
+        //1.0f 이상이면 curUnitState = ALERT
+        private static float _alertMin = 1.0f;
+        //2.0f 이상이면 curUnitState = COMBAT
+        private static float _combatMin = 2.0f;
+
+
+        public static float aggroRun { get { return _aggroRun; } }
+        public static float aggroWalk { get { return _aggroWalk; } }
+        public static float aggroCrouch { get { return _aggroCrouch; } }
+
+        public static float alertMin { get { return _alertMin; } }
+        public static float combatMin { get { return _combatMin; } }
+    }
+
+    //애니메이션 레이어
+    public static class AnimationLayers
+    {
+        private static int _standing = 0;
+        private static int _crouch = 1;
+        private static int _coverStanding = 2;
+        private static int _coverCrouch = 3;
+        private static int _throw = 4;
+        private static int _throwMove = 5;
+
+        public static int Standing { get { return _standing; } }
+        public static int Crouch { get { return _crouch; } }
+        public static int CoverStanding { get { return _coverStanding; } }
+        public static int CoverCrouch { get { return _coverCrouch; } }
+        public static int Throw { get { return _throw; } }
+        public static int ThrowMove { get { return _throwMove; } }
     }
 }

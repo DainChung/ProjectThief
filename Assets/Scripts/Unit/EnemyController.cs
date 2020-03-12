@@ -24,7 +24,7 @@ namespace Com.MyCompany.MyGame
         //우선순위 : 치즈 > 캔 = 연막
         private class DetectedWeaponQueue
         {
-            //어그로 끈 Weapon을 저장하는 스택, 최대 3개까지만 기억
+            //어그로 끈 Weapon을 저장하는 배열, 최대 3개까지만 기억
             private DetectedWeapon[] queue = new DetectedWeapon[3];
 
             public DetectedWeaponQueue()
@@ -60,14 +60,10 @@ namespace Com.MyCompany.MyGame
                             queue[0] = input;
                         }
                     }
-
-                    //for (int i = 0; i < 3; i++)
-                    //{
-                    //    UnityEngine.Debug.Log(i + ") Code: " + queue[i].code + ", Pos: " + queue[i].pos);
-                    //}
                 }
             }
 
+            //queue[0]부터 차례대로 리턴
             public DetectedWeapon Dequeue()
             {
                 DetectedWeapon result;
@@ -142,6 +138,8 @@ namespace Com.MyCompany.MyGame
 
         private Unit unit;
 
+        private float alert = 0.0f;
+
         #endregion
 
         #region Public Fields
@@ -180,10 +178,8 @@ namespace Com.MyCompany.MyGame
         {
             curState = UnitState.ALERT;
 
-            //UnityEngine.Debug.Log("Detect: " + code + ", Pos: " + pos + ", State: " + curState);
-
+            alert = AggroCollections.alertMin;
             queue.Enqueue(code, pos);
-            DetectedWeapon ss = queue.Dequeue();
         }
 
 
