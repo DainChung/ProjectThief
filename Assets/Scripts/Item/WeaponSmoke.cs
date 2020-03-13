@@ -2,18 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponSmoke : Weapon
+using Com.MyCompany.MyGame.Collections;
+
+namespace Com.MyCompany.MyGame
 {
-    public float timeValue;
-
-    void Awake()
+    public class WeaponSmoke : Weapon
     {
-        base.time = timeValue;
-    }
+        public float timeValue;
 
-    void Start()
-    {
-        //생성 몇 초 후 자동 파괴
-        Destroy(gameObject, base.time);
+        public WeaponCode code { get { return base._code; } }
+
+        void Awake()
+        {
+            base.time = timeValue;
+        }
+
+        void Start()
+        {
+            //생성 몇 초 후 자동 파괴
+            Destroy(gameObject, base.time);
+        }
+
+        public new void SetCode(WeaponCode input)
+        {
+            base.SetCode(input);
+        }
+
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+                other.transform.GetComponent<EnemyController>().DetectWeapon(code, transform.position);
+        }
     }
 }

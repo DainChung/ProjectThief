@@ -1399,6 +1399,24 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1072714982 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8522971605098587056, guid: f239fb2b4aa026f4b8e61aa8b38b2b8e,
+    type: 3}
+  m_PrefabInstance: {fileID: 389069417887919908}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1072714983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072714982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dda04aac1c1b04438e48911689d9438, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1151579775
 GameObject:
   m_ObjectHideFlags: 0
@@ -1864,11 +1882,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 821457172375949950, guid: cb8d51e13d707b148adde513d2479560,
-        type: 3}
-      propertyPath: timeValue
-      value: 20
-      objectReference: {fileID: 0}
     - target: {fileID: 6408966162214673708, guid: cb8d51e13d707b148adde513d2479560,
         type: 3}
       propertyPath: m_Name
@@ -1933,21 +1946,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6500844504602612132, guid: cb8d51e13d707b148adde513d2479560,
-        type: 3}
-      propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.69803923
-      objectReference: {fileID: 0}
-    - target: {fileID: 6500844504602612132, guid: cb8d51e13d707b148adde513d2479560,
-        type: 3}
-      propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.69411767
-      objectReference: {fileID: 0}
-    - target: {fileID: 6500844504602612132, guid: cb8d51e13d707b148adde513d2479560,
-        type: 3}
-      propertyPath: InitialModule.startColor.maxColor.b
-      value: 0.69411767
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb8d51e13d707b148adde513d2479560, type: 3}

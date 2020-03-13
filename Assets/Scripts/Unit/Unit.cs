@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -206,6 +207,10 @@ namespace Com.MyCompany.MyGame
 
         private UnitAnimationHelper unitAnimHelper = new UnitAnimationHelper();
 
+        //Player => Enemy에게 얼마나 들켰는지에 대한 정보
+        //Enemy => 주변을 경계하는 정도
+        private UnitState _curUnitState = UnitState.IDLE;
+
         #endregion
 
         #region Public Fields
@@ -221,11 +226,10 @@ namespace Com.MyCompany.MyGame
         public bool readyToThrowItem { get { return _readyToThrowItem; } }
         public bool doubleThrowLock { get { return _doubleThrowLock; } }
 
+        public UnitState curUnitState { get { return _curUnitState; } set { curUnitState = value; } }
+
         [HideInInspector]
         public UnitPose curUnitPose = UnitPose.MOD_RUN;
-        //적 캐릭터만 사용
-        [HideInInspector]
-        public UnitState curUnitState = UnitState.IDLE;
 
         public Animator animator;
         public Transform throwDestiPos;
@@ -523,13 +527,20 @@ namespace Com.MyCompany.MyGame
         public void InstantiateWeapon(WeaponCode weapon, Vector3 pos, Quaternion rot)
         {
             GameObject obj = Instantiate(Resources.Load(FilePaths.weaponPath + weapon.ToString()) as GameObject, pos, rot) as GameObject;
-            obj.GetComponent<WeaponThrow>().SetCode(weapon);
+
+            if (weapon != WeaponCode.max)
+            {
+                if (weapon != WeaponCode.SMOKE)
+                    obj.GetComponent<WeaponThrow>().SetCode(weapon);
+                else
+                    obj.GetComponent<WeaponSmoke>().SetCode(weapon);
+            }
             swManager.RestartAttackStopwatch((int)weapon);
         }
 
             #endregion
 
-            #region UnitAnimationManager 관련 함수
+            #region UnitAnimationManager 변수 읽기
         public bool IsOnFloor()
         {
             return unitAnimHelper.isOnFloor;
@@ -556,6 +567,9 @@ namespace Com.MyCompany.MyGame
         //캐릭터가 추락 중일 때
         public void Fall()
         {
+            animator.SetBool("IsCovering", false);
+            animator.SetFloat("TurnRight", 0);
+            animator.SetFloat("MoveSpeed", 0);
             animator.SetBool("IsFalling", true);
             curUnitPose = UnitPose.MOD_FALL;
 

@@ -203,8 +203,11 @@ namespace Com.MyCompany.MyGame
         private Vector3 throwRotEuler = Vector3.zero;
         #endregion
 
+            #region 어그로 관련 변수
         //높을수록 적캐릭터에게 쉽게 들킨다.
-        private float aggro;
+        private float aggroValue;
+        
+            #endregion
 
         private Unit unit;
         private CameraWork cam;
@@ -222,12 +225,12 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
-            aggro = AggroCollections.aggroRun;
+            aggroValue = AggroCollections.aggroRun;
 
             //인벤토리 초기화
-            pInventory.Add(Item.CAN, 3);
-            pInventory.Add(Item.CHEESE, 1);
-            pInventory.Add(Item.SMOKE, 0);
+            pInventory.Add(Item.CAN, 5);
+            pInventory.Add(Item.CHEESE, 3);
+            pInventory.Add(Item.SMOKE, 2);
         }
 
         // Start is called before the first frame update
@@ -405,11 +408,11 @@ namespace Com.MyCompany.MyGame
             {
                 unit.curUnitPose = UnitPose.MOD_THROWEND;
                 SetBYCurUnitPose();
-                animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
+                animator.SetLayerWeight(AnimationLayers.Throw, animator.GetLayerWeight(AnimationLayers.Throw) - Time.deltaTime);
             }
 
             //Throw 애니메이션 종료 후
-            if (animator.GetLayerWeight(4) <= 0 && animator.GetBool("ThrowItem"))
+            if (animator.GetLayerWeight(AnimationLayers.Throw) <= 0 && animator.GetBool("ThrowItem"))
             {
                 curLookDirState = LookDirState.IDLE;
   
@@ -549,27 +552,27 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitPose)
             {
                 case UnitPose.MOD_WALK:
-                    aggro = AggroCollections.aggroWalk;
+                    aggroValue = AggroCollections.aggroWalk;
                     playerSpeed = unit.walkSpeed;
                     break;
                 case UnitPose.MOD_RUN:
-                    aggro = AggroCollections.aggroRun;
+                    aggroValue = AggroCollections.aggroRun;
                     playerSpeed = unit.speed;
                     break;
                 case UnitPose.MOD_CROUCH:
-                    aggro = AggroCollections.aggroCrouch;
+                    aggroValue = AggroCollections.aggroCrouch;
                     playerSpeed = unit.walkSpeed;
                     break;
                 case UnitPose.MOD_COVERSTAND:
-                    aggro = AggroCollections.aggroWalk;
+                    aggroValue = AggroCollections.aggroWalk;
                     playerSpeed = unit.coverSpeed;
                     break;
                 case UnitPose.MOD_COVERCROUCH:
-                    aggro = AggroCollections.aggroCrouch;
+                    aggroValue = AggroCollections.aggroCrouch;
                     playerSpeed = unit.coverSpeed;
                     break;
                 case UnitPose.MOD_THROW:
-                    aggro = AggroCollections.aggroWalk;
+                    aggroValue = AggroCollections.aggroWalk;
                     playerSpeed = unit.walkSpeed;
                     break;
                 default:

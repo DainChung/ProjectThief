@@ -35,7 +35,7 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-
+            ControlEnemyAnimation();
         }
 
         #endregion
@@ -46,33 +46,77 @@ namespace Com.MyCompany.MyGame
         {
             switch (unit.curUnitPose)
             {
-                #region MOD_WALK(== curUnitState.IDLE)
+                #region MOD_WALK(== UnitState.IDLE)
                 case UnitPose.MOD_WALK:
+                    if(unit.curUnitState == UnitState.ALERT)
+                        unitAnimController.WalkPoseTONewPose(UnitPose.MOD_CROUCH);
+                    else if (unit.curUnitState == UnitState.COMBAT || unit.curUnitState == UnitState.CHEESE)
+                        unitAnimController.WalkPoseTONewPose(UnitPose.MOD_RUN);
+
+                    unitAnimController.SmoothCrouching(collider, crouchColliderHeight);
                     break;
                 #endregion
 
-                #region MOD_RUN(== curUnitState.COMBAT)
+                #region MOD_RUN(== UnitState.COMBAT || UnitState.CHEESE)
                 case UnitPose.MOD_RUN:
+                    if (unit.curUnitState == UnitState.IDLE)
+                        unitAnimController.RunPoseTONewPose(UnitPose.MOD_WALK);
+                    else if(unit.curUnitState == UnitState.ALERT)
+                        unitAnimController.RunPoseTONewPose(UnitPose.MOD_CROUCH);
+
+                    unitAnimController.SmoothCrouching(collider, crouchColliderHeight);
                     break;
                 #endregion
 
-                #region MOD_CROUCH(== curUnitState.ALERT)
+                #region MOD_CROUCH(== UnitState.ALERT)
                 case UnitPose.MOD_CROUCH:
+                    if (unit.curUnitState == UnitState.IDLE)
+                        unitAnimController.CrouchPoseTONewPose(UnitPose.MOD_WALK);
+                    else if (unit.curUnitState == UnitState.COMBAT || unit.curUnitState == UnitState.CHEESE)
+                        unitAnimController.CrouchPoseTONewPose(UnitPose.MOD_RUN);
+
+                    unitAnimController.SmoothStanding(collider, crouchColliderHeight);
                     break;
                 #endregion
 
+                    //개발중
                 #region MOD_COVERSTAND(미정)
                 case UnitPose.MOD_COVERSTAND:
                     break;
                 #endregion
 
+                    //개발중
                 #region MOD_COVERCROUCH(미정)
                 case UnitPose.MOD_COVERCROUCH:
                     break;
                 #endregion
 
-                #region MOD_THROW(== curUnitState.COMBAT)
+                    //개발중
+                #region MOD_THROW(== UnitState.COMBAT)
                 case UnitPose.MOD_THROW:
+                    if (unit.IsOnFloor())
+                    {
+                        ////조준하는 동안 이동 애니메이션 제어
+                        //animator.SetFloat("MoveSpeed", enemyVerticalMove);
+                        //animator.SetFloat("TurnRight", enemyHorizontalMove);
+
+                        //Animation Layer 제어
+                        unitAnimController.ControlThrowLayer();
+                    }
+                    break;
+                #endregion
+
+                    //개발중
+                    //Mixamo의 Drunk 시리즈를 사용할 것
+                #region MOD_INSMOKE(== UnitState.INSMOKE)
+                case UnitPose.MOD_INSMOKE:
+                    break;
+                #endregion
+
+                    //개발중
+                    //Mixamo에서 Sleep 관련 애니메이션을 찾을 것
+                #region MOD_SLEEP( == UnitState.SLEEP)
+                case UnitPose.MOD_SLEEP:
                     break;
                 #endregion
 
@@ -134,12 +178,6 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-            }
-            else
-            {
-                animator.SetBool("IsCovering", false);
-                animator.SetFloat("TurnRight", 0);
-                animator.SetFloat("MoveSpeed", 0);
             }
         }
 

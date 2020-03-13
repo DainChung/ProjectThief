@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6500844504602612132}
   - component: {fileID: 6500416842404533926}
   - component: {fileID: 821457172375949950}
+  - component: {fileID: 441853112}
   m_Layer: 0
   m_Name: WeaponSMOKE
   m_TagString: Untagged
@@ -224,7 +225,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.5907719, g: 0.6037736, b: 0.5895336, a: 0.19607843}
+      maxColor: {r: 0.69803923, g: 0.69411767, b: 0.69411767, a: 0.19607843}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -4768,6 +4769,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeValue: 20
+--- !u!135 &441853112
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6408966162214673708}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 7.2
+  m_Center: {x: 1, y: 0, z: 0}
 --- !u!1001 &1470086476
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -50,16 +50,18 @@ namespace Com.MyCompany.MyGame
                     if (Count() <= 2)
                     {
                         if (weaponCode != WeaponCode.CHEESE && weaponCode != WeaponCode.max)
-                        {
                             queue[Count()] = input;
-                        }
-                        else if (weaponCode == WeaponCode.CHEESE)
-                        {
-                            //치즈면 최우선순위로 설정
-                            PushQueueReverse();
-                            queue[0] = input;
-                        }
                     }
+
+                    if (weaponCode == WeaponCode.CHEESE)
+                    {
+                        //치즈면 최우선순위로 설정
+                        PushQueueReverse();
+                        UnityEngine.Debug.Log("Enemy Detect CHEESE");
+                        queue[0] = input;
+                    }
+
+                    DebugQueue();
                 }
             }
 
@@ -80,6 +82,15 @@ namespace Com.MyCompany.MyGame
                 }
 
                 return result;
+            }
+
+            public void DebugQueue()
+            {
+                UnityEngine.Debug.Log("===================Enemy Queue==================");
+                UnityEngine.Debug.Log("0) Code: " + queue[0].code + ", " + queue[0].pos);
+                UnityEngine.Debug.Log("1) Code: " + queue[1].code + ", " + queue[1].pos);
+                UnityEngine.Debug.Log("2) Code: " + queue[2].code + ", " + queue[2].pos);
+                UnityEngine.Debug.Log("================================================");
             }
 
             public int Count()
@@ -121,9 +132,10 @@ namespace Com.MyCompany.MyGame
                 for (int i = queue.Length - 2; i >= 0; i--)
                 {
                     queue[i + 1] = queue[i];
-                    queue[i].code = WeaponCode.max;
-                    queue[i].pos.Set(-1, -1, -1);
                 }
+
+                queue[0].code = WeaponCode.max;
+                queue[0].pos.Set(-1, -1, -1);
             }
         }
 
@@ -153,14 +165,16 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             curLookDir = LookDirState.IDLE;
-            unit.curUnitState = UnitState.IDLE;
         }
 
         void Start()
         {
             unit = GetComponent<Unit>();
-        }
+            unit.curUnitState = UnitState.IDLE;
 
+            unit.animator.SetBool("IsRunMode", false);
+        }
+        
 
         void FixedUpdate()
         {
@@ -188,9 +202,8 @@ namespace Com.MyCompany.MyGame
 
         }
 
-        //curUnitState != (UnitState.IDLE || UnitState.max)
         //특정 타겟(CAN, CHEESE, Player) 위치로 이동
-        //우선순위: CHEESE > Player > CAN
+        //우선순위: CHEESE > Player > CAN > Patrol Spot
         private void ChaseTarget(Transform target)
         {
 
@@ -224,7 +237,6 @@ namespace Com.MyCompany.MyGame
             alertValue = AggroCollections.alertMin;
             queue.Enqueue(code, pos);
         }
-
 
         //미정
         public void DetectPlayer(Vector3 pos, ref UnitState curState)

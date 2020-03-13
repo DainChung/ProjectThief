@@ -8,15 +8,14 @@ namespace Com.MyCompany.MyGame
 {
     public class WeaponThrow : Weapon
     {
-        private WeaponCode code;
         private const float throwPower = 12f;
         private bool lockAggro = false;
 
         public float timeValue;
 
-        public void SetCode(WeaponCode weaponCode)
+        public new void SetCode(WeaponCode code)
         {
-            code = weaponCode;
+            base._code = code;
         }
 
         void Awake()
@@ -41,7 +40,7 @@ namespace Com.MyCompany.MyGame
                 {
                     lockAggro = true;
                     GameObject obj = Instantiate(Resources.Load(FilePaths.weaponPath + "Aggro") as GameObject, transform.position, transform.rotation) as GameObject;
-                    obj.GetComponent<Aggro>().SetCode(code);
+                    obj.GetComponent<Aggro>().SetCode(base._code);
                 }
             }
         }

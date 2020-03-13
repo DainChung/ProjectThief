@@ -53,7 +53,7 @@ namespace Com.MyCompany.MyGame
                     //MOD_WALK -> MOD_RUN
                     if (Input.GetButtonDown("Walk"))
                     {
-                        unitAnimController.WalkPoseToNewPose(UnitPose.MOD_RUN);
+                        unitAnimController.WalkPoseTONewPose(UnitPose.MOD_RUN);
                         player.SetBYCurUnitPose();
                         break;
                     }
@@ -61,14 +61,14 @@ namespace Com.MyCompany.MyGame
                     //MOD_WALK -> MOD_COVERSTAND
                     if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
-                        unitAnimController.WalkPoseToNewPose(UnitPose.MOD_COVERSTAND);
+                        unitAnimController.WalkPoseTONewPose(UnitPose.MOD_COVERSTAND);
                         player.SetBYCurUnitPose();
                         break;
                     }
 
                     //MOD_WALK -> MOD_CROUCH
                     if (Input.GetButtonDown("Crouch"))
-                        unitAnimController.WalkPoseToNewPose(UnitPose.MOD_CROUCH);
+                        unitAnimController.WalkPoseTONewPose(UnitPose.MOD_CROUCH);
 
                     unitAnimController.SmoothCrouching(collider, crouchColliderHeight, player);
 
@@ -80,7 +80,7 @@ namespace Com.MyCompany.MyGame
                     //MOD_RUN -> MOD_WALK
                     if (Input.GetButtonDown("Walk"))
                     {
-                        unitAnimController.RunPoseToNewPose(UnitPose.MOD_WALK);
+                        unitAnimController.RunPoseTONewPose(UnitPose.MOD_WALK);
                         player.SetBYCurUnitPose();
                         break;
                     }
@@ -88,14 +88,14 @@ namespace Com.MyCompany.MyGame
                     //MOD_RUN -> MOD_COVERSTAND
                     if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
-                        unitAnimController.RunPoseToNewPose(UnitPose.MOD_COVERSTAND);
+                        unitAnimController.RunPoseTONewPose(UnitPose.MOD_COVERSTAND);
                         player.SetBYCurUnitPose();
                         break;
                     }
 
                     //MOD_RUN -> MOD_CROUCH
                     if (Input.GetButtonDown("Crouch"))
-                        unitAnimController.RunPoseToNewPose(UnitPose.MOD_CROUCH);
+                        unitAnimController.RunPoseTONewPose(UnitPose.MOD_CROUCH);
 
                     unitAnimController.SmoothCrouching(collider, crouchColliderHeight, player);
                     break;
@@ -106,14 +106,14 @@ namespace Com.MyCompany.MyGame
                     //MOD_CROUCH -> MOD_COVERCROUCH
                     if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
-                        unitAnimController.CrouchPoseToNewPose(UnitPose.MOD_COVERCROUCH);
+                        unitAnimController.CrouchPoseTONewPose(UnitPose.MOD_COVERCROUCH);
                         player.SetBYCurUnitPose();
                         break;
                     }
 
                     //MOD_CROUCH -> MOD_RUN
                     if (Input.GetButtonDown("Crouch"))
-                        unitAnimController.CrouchPoseToNewPose(UnitPose.MOD_RUN);
+                        unitAnimController.CrouchPoseTONewPose(UnitPose.MOD_RUN);
 
                     unitAnimController.SmoothStanding(collider, standColliderHeight, player);
                     break;
@@ -124,7 +124,7 @@ namespace Com.MyCompany.MyGame
                     //MOD_COVERSTAND -> MOD_RUN
                     if (Input.GetButtonDown("Covering"))
                     {
-                        unitAnimController.CoverStandingPoseToNewPose(UnitPose.MOD_RUN);
+                        unitAnimController.CoverStandingPoseTONewPose(UnitPose.MOD_RUN);
                         player.SetBYCurUnitPose();
 
                         break;
@@ -132,7 +132,7 @@ namespace Com.MyCompany.MyGame
 
                     //MOD_COVERSTAND -> MOD_COVERCROUCH
                     if (Input.GetButtonDown("Crouch"))
-                        unitAnimController.CoverStandingPoseToNewPose(UnitPose.MOD_COVERCROUCH);
+                        unitAnimController.CoverStandingPoseTONewPose(UnitPose.MOD_COVERCROUCH);
 
                     unitAnimController.SmoothCrouching(collider, crouchColliderHeight, player);
                     break;
@@ -143,14 +143,14 @@ namespace Com.MyCompany.MyGame
                     //MOD_COVERCROUCH -> MOD_CROUCH
                     if (Input.GetButtonDown("Covering"))
                     {
-                        unitAnimController.CoverCrouchPoseToNewPose(UnitPose.MOD_CROUCH);
+                        unitAnimController.CoverCrouchPoseTONewPose(UnitPose.MOD_CROUCH);
                         player.SetBYCurUnitPose();
                         break;
                     }
 
                     //MOD_COVERCROUCH -> MOD_COVERSTAND
                     if (Input.GetButtonDown("Crouch"))
-                        unitAnimController.CoverCrouchPoseToNewPose(UnitPose.MOD_COVERSTAND);
+                        unitAnimController.CoverCrouchPoseTONewPose(UnitPose.MOD_COVERSTAND);
 
                     unitAnimController.SmoothStanding(collider, standColliderHeight, player);
                     break;
@@ -235,12 +235,6 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-            }
-            else
-            {
-                animator.SetBool("IsCovering", false);
-                animator.SetFloat("TurnRight", 0);
-                animator.SetFloat("MoveSpeed", 0);
             }
         }
 

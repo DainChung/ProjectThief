@@ -2,8 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+using Com.MyCompany.MyGame.Collections;
+
+namespace Com.MyCompany.MyGame
 {
-    protected Rigidbody rb;
-    protected float time;
+    public class Weapon : MonoBehaviour
+    {
+        protected Rigidbody rb;
+        protected float time;
+        protected WeaponCode _code;
+
+        protected void SetCode(WeaponCode input)
+        {
+            _code = input;
+        }
+    }
 }

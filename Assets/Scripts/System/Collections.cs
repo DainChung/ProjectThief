@@ -22,12 +22,12 @@ namespace Com.MyCompany.MyGame.Collections
     public enum UnitPose
     {
         MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, MOD_THROW,
-        MOD_THROWEND, MOD_FALL, max
+        MOD_THROWEND, MOD_FALL, MOD_INSMOKE, MOD_SLEEP, max
     }
     //적 캐릭터 상태에 관한 정보
     public enum UnitState
     {
-        IDLE = 0, ALERT, COMBAT, CHEESE, max
+        IDLE = 0, ALERT, COMBAT, CHEESE, INSMOKE, SLEEP, max
     }
     //플레이어 캐릭터가 바라보는 방향
     public enum LookDirState
@@ -63,10 +63,16 @@ namespace Com.MyCompany.MyGame.Collections
         #region Weapons
         //연막탄 위치 벡터
         private static Vector3 _WeaponSmokeVector3 = new Vector3(0, 1.2f, 0);
+        /// <summary>
+        /// Vector3(0, 1.2f, 0)
+        /// </summary>
         public static Vector3 weaponSmokeVec { get { return _WeaponSmokeVector3; } }
 
         //연막탄 방향
         private static Quaternion _WeaponSmokeQuat = new Quaternion(-0.7f, 0, 0, 0.7f);
+        /// <summary>
+        /// Quaternion(-0.7f, 0, 0, 0.7f)
+        /// </summary>
         public static Quaternion weaponSmokeQuat { get { return _WeaponSmokeQuat; } }
         #endregion
     }
@@ -84,17 +90,31 @@ namespace Com.MyCompany.MyGame.Collections
         private static float _aggroWalk = 0.05f;
         private static float _aggroCrouch = 0.01f;
 
-        //1.0f 이상이면 curUnitState = ALERT
         private static float _alertMin = 1.0f;
-        //2.0f 이상이면 curUnitState = COMBAT
         private static float _combatMin = 2.0f;
 
-
+        /// <summary>
+        /// aggroRun = 0.1f
+        /// </summary>
         public static float aggroRun { get { return _aggroRun; } }
+        /// <summary>
+        /// aggroWalk = 0.05f
+        /// </summary>
         public static float aggroWalk { get { return _aggroWalk; } }
+        /// <summary>
+        /// aggroCrouch = 0.01f
+        /// </summary>
         public static float aggroCrouch { get { return _aggroCrouch; } }
 
+        /// <summary>
+        /// alertMin = 1.0f
+        /// 1.0f 이상이면 curUnitState = ALERT
+        /// </summary>
         public static float alertMin { get { return _alertMin; } }
+        /// <summary>
+        /// combatMin = 2.0f
+        /// 2.0f 이상이면 curUnitState = COMBAT
+        /// </summary>
         public static float combatMin { get { return _combatMin; } }
     }
 
@@ -107,12 +127,40 @@ namespace Com.MyCompany.MyGame.Collections
         private static int _coverCrouch = 3;
         private static int _throw = 4;
         private static int _throwMove = 5;
+        private static int _inSmoke = 6;
+        private static int _sleep = 7;
 
+        /// <summary>
+        /// Standing = 0
+        /// </summary>
         public static int Standing { get { return _standing; } }
+        /// <summary>
+        /// Crouch = 1
+        /// </summary>
         public static int Crouch { get { return _crouch; } }
+        /// <summary>
+        /// CoverStanding = 2
+        /// </summary>
         public static int CoverStanding { get { return _coverStanding; } }
+        /// <summary>
+        /// CoverCrouch = 3
+        /// </summary>
         public static int CoverCrouch { get { return _coverCrouch; } }
+        /// <summary>
+        /// Throw = 4
+        /// </summary>
         public static int Throw { get { return _throw; } }
+        /// <summary>
+        /// ThrowMove = 5
+        /// </summary>
         public static int ThrowMove { get { return _throwMove; } }
+        /// <summary>
+        /// InSmoke = 6
+        /// </summary>
+        public static int InSmoke { get { return _inSmoke; } }
+        /// <summary>
+        /// Sleep = 7
+        /// </summary>
+        public static int Sleep { get { return _sleep; } }
     }
 }

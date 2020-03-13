@@ -32,7 +32,7 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
-        public void WalkPoseToNewPose(UnitPose newPose)
+        public void WalkPoseTONewPose(UnitPose newPose)
         {
             switch (newPose)
             {
@@ -61,7 +61,7 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public void RunPoseToNewPose(UnitPose newPose)
+        public void RunPoseTONewPose(UnitPose newPose)
         {
             switch (newPose)
             {
@@ -90,7 +90,7 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public void CrouchPoseToNewPose(UnitPose newPose)
+        public void CrouchPoseTONewPose(UnitPose newPose)
         {
             switch (newPose)
             {
@@ -106,14 +106,25 @@ namespace Com.MyCompany.MyGame
                 case UnitPose.MOD_RUN:
                     //_unit.curUnitPose 값은 SmoothStanding()에서 변경
                     if (_animator.GetLayerWeight(AnimationLayers.Crouch) == 1)
+                    {
                         _animator.SetBool("IsCrouchMode", false);
+                        _animator.SetBool("IsRunMode", true);
+                    }
+                    break;
+                case UnitPose.MOD_WALK:
+                    //_unit.curUnitPose 값은 SmoothStanding()에서 변경
+                    if (_animator.GetLayerWeight(AnimationLayers.Crouch) == 1)
+                    {
+                        _animator.SetBool("IsCrouchMode", false);
+                        _animator.SetBool("IsRunMode", false);
+                    }
                     break;
                 default:
                     break;
             }
         }
 
-        public void CoverStandingPoseToNewPose(UnitPose newPose)
+        public void CoverStandingPoseTONewPose(UnitPose newPose)
         {
             switch (newPose)
             {
@@ -135,7 +146,7 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public void CoverCrouchPoseToNewPose(UnitPose newPose)
+        public void CoverCrouchPoseTONewPose(UnitPose newPose)
         {
             switch (newPose)
             {
@@ -157,6 +168,14 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// Enemy가 연막탄에 당했을 때, Enemy 전용
+        /// </summary>
+        public void AnyPoseTOInSmokePose()
+        {
+
         }
         
         //자연스러운 Standing -> Crouch, Player 전용
@@ -279,8 +298,10 @@ namespace Com.MyCompany.MyGame
                     }
                     else
                     {
-                        _unit.curUnitPose = UnitPose.MOD_RUN;
-                        _animator.SetBool("IsRunMode", true);
+                        if(_animator.GetBool("IsRunMode"))
+                            _unit.curUnitPose = UnitPose.MOD_RUN;
+                        else
+                            _unit.curUnitPose = UnitPose.MOD_WALK;
                     }
                 }
 
