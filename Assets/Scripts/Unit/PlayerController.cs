@@ -207,9 +207,7 @@ namespace Com.MyCompany.MyGame
         private float aggro;
 
         private Unit unit;
-
         private CameraWork cam;
-
         private Inventory pInventory = new Inventory();
 
         #endregion
@@ -320,13 +318,13 @@ namespace Com.MyCompany.MyGame
                             ControlCover();
                             break;
                         case UnitPose.MOD_THROW:
-                            ControlMoveThrow();
+                            ControlThrowMove();
                             ControlAttack();
-                            SetAggro();
+                            SetBYCurUnitPose();
                             break;
                         case UnitPose.MOD_THROWEND:
                             ControlAttack();
-                            SetAggro();
+                            SetBYCurUnitPose();
                             break;
                         default:
                             break;
@@ -406,7 +404,7 @@ namespace Com.MyCompany.MyGame
             else if (animator.GetBool("ThrowItem"))
             {
                 unit.curUnitPose = UnitPose.MOD_THROWEND;
-                SetAggro();
+                SetBYCurUnitPose();
                 animator.SetLayerWeight(4, animator.GetLayerWeight(4) - Time.deltaTime);
             }
 
@@ -416,7 +414,7 @@ namespace Com.MyCompany.MyGame
                 curLookDirState = LookDirState.IDLE;
   
                 unit.ResetThrowAnimation();
-                SetAggro();
+                SetBYCurUnitPose();
             }
         }
 
@@ -445,7 +443,7 @@ namespace Com.MyCompany.MyGame
             }
         }
         //조준 상태일 때의 조작
-        private void ControlMoveThrow()
+        private void ControlThrowMove()
         {
             //플레이어 캐릭터 이동
             if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
@@ -480,7 +478,7 @@ namespace Com.MyCompany.MyGame
                 //일반적인 상황 OR 벽 우측 끝에서 좌측으로 이동 OR 벽 좌측 끝에서 우측으로 이동
                 else
                 {
-                    destiPos = -transform.right * Input.GetAxis("Horizontal") * unit.coverSpeed;
+                    destiPos = -transform.right * Input.GetAxis("Horizontal") * playerSpeed;
 
                     rb.AddForce(destiPos);
 
@@ -545,28 +543,34 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
-        //Player의 Aggro를 변경할 때 사용
-        public void SetAggro()
+        //Player의 Aggro, Speed를 변경할 때 사용
+        public void SetBYCurUnitPose()
         {
             switch (unit.curUnitPose)
             {
                 case UnitPose.MOD_WALK:
                     aggro = AggroCollections.aggroWalk;
+                    playerSpeed = unit.walkSpeed;
                     break;
                 case UnitPose.MOD_RUN:
                     aggro = AggroCollections.aggroRun;
+                    playerSpeed = unit.speed;
                     break;
                 case UnitPose.MOD_CROUCH:
                     aggro = AggroCollections.aggroCrouch;
+                    playerSpeed = unit.walkSpeed;
                     break;
                 case UnitPose.MOD_COVERSTAND:
                     aggro = AggroCollections.aggroWalk;
+                    playerSpeed = unit.coverSpeed;
                     break;
                 case UnitPose.MOD_COVERCROUCH:
                     aggro = AggroCollections.aggroCrouch;
+                    playerSpeed = unit.coverSpeed;
                     break;
                 case UnitPose.MOD_THROW:
                     aggro = AggroCollections.aggroWalk;
+                    playerSpeed = unit.walkSpeed;
                     break;
                 default:
                     break;

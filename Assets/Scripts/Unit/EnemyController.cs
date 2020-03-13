@@ -134,11 +134,10 @@ namespace Com.MyCompany.MyGame
         private DetectedWeaponQueue queue = new DetectedWeaponQueue();
 
         private LookDirState curLookDir;
-        private UnitState curState;
 
         private Unit unit;
 
-        private float alert = 0.0f;
+        private float alertValue = 0.0f;
 
         #endregion
 
@@ -154,7 +153,7 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             curLookDir = LookDirState.IDLE;
-            curState = UnitState.IDLE;
+            unit.curUnitState = UnitState.IDLE;
         }
 
         void Start()
@@ -170,15 +169,59 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Private Methods
+
+        //curUnitState == UnitState.IDLE
+        private void Patrol()
+        {
+
+        }
+
+        //curUnitState == UnitState.ALERT
+        private void Alert()
+        {
+
+        }
+
+        //curUnitState == UnitState.COMBAT
+        private void Combat()
+        {
+
+        }
+
+        //curUnitState != (UnitState.IDLE || UnitState.max)
+        //특정 타겟(CAN, CHEESE, Player) 위치로 이동
+        //우선순위: CHEESE > Player > CAN
+        private void ChaseTarget(Transform target)
+        {
+
+        }
+
+        //alertValue에 따라 curUnitState를 변경
+        private void AlertManager()
+        {
+            //curUnitState = UnitState.IDLE
+            if (alertValue < AggroCollections.alertMin)
+                unit.curUnitState = UnitState.IDLE;
+            //curUnitState = UnitState.ALERT
+            else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
+                unit.curUnitState = UnitState.ALERT;
+            //curUnitState = UnitState.COMBAT
+            else
+                unit.curUnitState = UnitState.COMBAT;
+        }
+
         #endregion
 
         #region Public Methods
 
         public void DetectWeapon(WeaponCode code, Vector3 pos)
         {
-            curState = UnitState.ALERT;
+            if (code != WeaponCode.CHEESE && code != WeaponCode.max)
+                unit.curUnitState = UnitState.ALERT;
+            else if (code == WeaponCode.CHEESE)
+                unit.curUnitState = UnitState.CHEESE;
 
-            alert = AggroCollections.alertMin;
+            alertValue = AggroCollections.alertMin;
             queue.Enqueue(code, pos);
         }
 

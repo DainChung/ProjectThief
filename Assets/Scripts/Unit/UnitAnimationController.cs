@@ -15,11 +15,6 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region Public Fields
-
-
-        #endregion
-
         public UnitAnimationController(Unit unit, Animator animator)
         {
             _unit = unit;
@@ -131,7 +126,8 @@ namespace Com.MyCompany.MyGame
                     _unit.curUnitPose = newPose;
                     break;
                 case UnitPose.MOD_COVERCROUCH:
-                    if(_animator.GetLayerWeight(AnimationLayers.CoverCrouch) == 0)
+                    //_unit.curUnitPose 값은 SmoothCrouching()에서 변경
+                    if (_animator.GetLayerWeight(AnimationLayers.CoverCrouch) == 0)
                         _animator.SetBool("IsCrouchMode", true);
                     break;
                 default:
@@ -143,9 +139,20 @@ namespace Com.MyCompany.MyGame
         {
             switch (newPose)
             {
-                case UnitPose.MOD_RUN:
+                case UnitPose.MOD_CROUCH:
+                    _animator.SetBool("IsCovering", false);
+                    //벽에 붙이기
+                    _unit.StartCoroutine(_unit.SetCoverPosition(false));
+                    _animator.SetLayerWeight(1, 1);
+                    _animator.SetLayerWeight(2, 0);
+                    _animator.SetLayerWeight(3, 0);
+
+                    _unit.curUnitPose = newPose;
                     break;
                 case UnitPose.MOD_COVERSTAND:
+                    //_unit.curUnitPose 값은 SmoothStanding()에서 변경
+                    if (_animator.GetLayerWeight(AnimationLayers.CoverCrouch) == 1)
+                        _animator.SetBool("IsCrouchMode", false);
                     break;
                 default:
                     break;
@@ -172,7 +179,7 @@ namespace Com.MyCompany.MyGame
                         _unit.curUnitPose = UnitPose.MOD_COVERCROUCH;
                     else
                         _unit.curUnitPose = UnitPose.MOD_CROUCH;
-                    player.SetAggro();
+                    player.SetBYCurUnitPose();
                 }
 
                 _animator.SetLayerWeight(AnimationLayers.Crouch, layerWeight);
@@ -222,8 +229,6 @@ namespace Com.MyCompany.MyGame
 
             if (layerWeight > 0 && !_animator.GetBool("IsCrouchMode"))
             {
-                _animator.SetBool("IsRunMode", true);
-
                 collider.height = standColliderHeight;
                 collider.center = new Vector3(0, standColliderHeight / 2, collider.center.z);
 
@@ -231,11 +236,25 @@ namespace Com.MyCompany.MyGame
                 if (layerWeight <= 0)
                 {
                     layerWeight = 0;
-                    _unit.curUnitPose = UnitPose.MOD_RUN;
-                    player.SetAggro();
+                    if (_animator.GetBool("IsCovering"))
+                    {
+                        _unit.curUnitPose = UnitPose.MOD_COVERSTAND;
+                        _animator.SetBool("IsRunMode", false);
+                    }
+                    else
+                    {
+                        _unit.curUnitPose = UnitPose.MOD_RUN;
+                        _animator.SetBool("IsRunMode", true);
+                    }
+                    player.SetBYCurUnitPose();
                 }
 
                 _animator.SetLayerWeight(AnimationLayers.Crouch, layerWeight);
+                if (_animator.GetBool("IsCovering"))
+                {
+                    _animator.SetLayerWeight(AnimationLayers.CoverStanding, 1 - layerWeight);
+                    _animator.SetLayerWeight(AnimationLayers.CoverCrouch, layerWeight);
+                }
             }
         }
 
@@ -246,8 +265,6 @@ namespace Com.MyCompany.MyGame
 
             if (layerWeight > 0 && !_animator.GetBool("IsCrouchMode"))
             {
-                _animator.SetBool("IsRunMode", true);
-
                 collider.height = standColliderHeight;
                 collider.center = new Vector3(0, standColliderHeight / 2, collider.center.z);
 
@@ -255,13 +272,41 @@ namespace Com.MyCompany.MyGame
                 if (layerWeight <= 0)
                 {
                     layerWeight = 0;
-                    _unit.curUnitPose = UnitPose.MOD_RUN;
+                    if (_animator.GetBool("IsCovering"))
+                    {
+                        _unit.curUnitPose = UnitPose.MOD_COVERSTAND;
+                        _animator.SetBool("IsRunMode", false);
+                    }
+                    else
+                    {
+                        _unit.curUnitPose = UnitPose.MOD_RUN;
+                        _animator.SetBool("IsRunMode", true);
+                    }
                 }
 
                 _animator.SetLayerWeight(AnimationLayers.Crouch, layerWeight);
+                if (_animator.GetBool("IsCovering"))
+                {
+                    _animator.SetLayerWeight(AnimationLayers.CoverStanding, 1 - layerWeight);
+                    _animator.SetLayerWeight(AnimationLayers.CoverCrouch, layerWeight);
+                }
             }
         }
 
+        //Throw, ThrowMove 애니메이션 레이어 제어
+        public void ControlThrowLayer()
+        {
+            if (_animator.GetFloat("TurnRight") == 0 && _animator.GetFloat("MoveSpeed") == 0)
+            {
+                _animator.SetLayerWeight(AnimationLayers.Throw, 1);
+                _animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
+            }
+            else
+            {
+                _animator.SetLayerWeight(AnimationLayers.Throw, 0);
+                _animator.SetLayerWeight(AnimationLayers.ThrowMove, 1);
+            }
+        }
 
         #endregion
     }

@@ -11,22 +11,14 @@ namespace Com.MyCompany.MyGame
     {
         #region Private Fields
 
-        private float animCrouchLayerWeight = 0f;
-
         private PlayerController player;
         private Animator animator;
         private Unit unit;
-
         private UnitAnimationController unitAnimController;
-
         private CapsuleCollider collider;
 
         const float crouchColliderHeight = 64f;
         const float standColliderHeight = 90f;
-
-        #endregion
-
-        #region Public Fields
 
         #endregion
 
@@ -62,7 +54,7 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Walk"))
                     {
                         unitAnimController.WalkPoseToNewPose(UnitPose.MOD_RUN);
-                        player.SetAggro();
+                        player.SetBYCurUnitPose();
                         break;
                     }
 
@@ -70,7 +62,7 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
                         unitAnimController.WalkPoseToNewPose(UnitPose.MOD_COVERSTAND);
-                        player.SetAggro();
+                        player.SetBYCurUnitPose();
                         break;
                     }
 
@@ -89,7 +81,7 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Walk"))
                     {
                         unitAnimController.RunPoseToNewPose(UnitPose.MOD_WALK);
-                        player.SetAggro();
+                        player.SetBYCurUnitPose();
                         break;
                     }
 
@@ -97,8 +89,7 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
                         unitAnimController.RunPoseToNewPose(UnitPose.MOD_COVERSTAND);
-                        player.SetAggro();
-
+                        player.SetBYCurUnitPose();
                         break;
                     }
 
@@ -116,8 +107,7 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Covering") && unit.IsWallClose())
                     {
                         unitAnimController.CrouchPoseToNewPose(UnitPose.MOD_COVERCROUCH);
-                        player.SetAggro();
-
+                        player.SetBYCurUnitPose();
                         break;
                     }
 
@@ -135,7 +125,7 @@ namespace Com.MyCompany.MyGame
                     if (Input.GetButtonDown("Covering"))
                     {
                         unitAnimController.CoverStandingPoseToNewPose(UnitPose.MOD_RUN);
-                        player.SetAggro();
+                        player.SetBYCurUnitPose();
 
                         break;
                     }
@@ -153,48 +143,16 @@ namespace Com.MyCompany.MyGame
                     //MOD_COVERCROUCH -> MOD_CROUCH
                     if (Input.GetButtonDown("Covering"))
                     {
-                        animator.SetBool("IsCovering", false);
-                        //벽에 붙이기
-                        StartCoroutine(unit.SetCoverPosition(false));
-                        animator.SetLayerWeight(1, 1);
-                        animator.SetLayerWeight(2, 0);
-                        animator.SetLayerWeight(3, 0);
-
-                        unit.curUnitPose = UnitPose.MOD_CROUCH;
-                        player.SetAggro();
-
+                        unitAnimController.CoverCrouchPoseToNewPose(UnitPose.MOD_CROUCH);
+                        player.SetBYCurUnitPose();
                         break;
                     }
 
                     //MOD_COVERCROUCH -> MOD_COVERSTAND
                     if (Input.GetButtonDown("Crouch"))
-                    {
-                        if (animator.GetLayerWeight(1) == 0 || animator.GetLayerWeight(1) == 1)
-                        {
-                            animator.SetLayerWeight(1, animCrouchLayerWeight);
-                            animator.SetBool("IsCrouchMode", false);
-                        }
-                    }
+                        unitAnimController.CoverCrouchPoseToNewPose(UnitPose.MOD_COVERSTAND);
 
-                    if (animator.GetLayerWeight(1) > 0 && !animator.GetBool("IsCrouchMode"))
-                    {
-                        transform.GetComponent<CapsuleCollider>().height = standColliderHeight;
-                        transform.GetComponent<CapsuleCollider>().center = new Vector3(0, standColliderHeight / 2, transform.GetComponent<CapsuleCollider>().center.z);
-
-                        animCrouchLayerWeight -= (Time.deltaTime * 3f);
-                        animCrouchLayerWeight = Mathf.Clamp01(animCrouchLayerWeight);
-                        if (animCrouchLayerWeight == 0)
-                        {
-                            unit.curUnitPose = UnitPose.MOD_COVERSTAND;
-                            player.SetAggro();
-                        }
-
-                        animator.SetLayerWeight(1, animCrouchLayerWeight);
-                        animator.SetLayerWeight(2, 1 - animCrouchLayerWeight);
-                        animator.SetLayerWeight(3, animCrouchLayerWeight);
-
-                        break;
-                    }
+                    unitAnimController.SmoothStanding(collider, standColliderHeight, player);
                     break;
                 #endregion
 
@@ -216,16 +174,7 @@ namespace Com.MyCompany.MyGame
                             animator.SetFloat("TurnRight", 0);
 
                         //Animation Layer 제어
-                        if (animator.GetFloat("TurnRight") == 0 && animator.GetFloat("MoveSpeed") == 0)
-                        {
-                            animator.SetLayerWeight(4, 1);
-                            animator.SetLayerWeight(5, 0);
-                        }
-                        else
-                        {
-                            animator.SetLayerWeight(4, 0);
-                            animator.SetLayerWeight(5, 1);
-                        }
+                        unitAnimController.ControlThrowLayer();
                     }
                     break;
                 #endregion
@@ -286,51 +235,6 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-
-                //#region Control Move Animation
-
-                ////WALK, RUN, CROUCH
-                //if (unit.curUnitPose == UnitPose.MOD_WALK || unit.curUnitPose == UnitPose.MOD_RUN || unit.curUnitPose == UnitPose.MOD_CROUCH)
-                //{
-                //    if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
-                //    {
-                //        if (Input.GetButton("Vertical"))
-                //        {
-                //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
-                //        }
-                //        else if (Input.GetButton("Horizontal"))
-                //        {
-                //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-                //        }
-                //        else
-                //        {
-                //            animator.SetFloat("TurnRight", 0);
-                //            animator.SetFloat("MoveSpeed", 0);
-                //        }
-                //    }
-                //}
-                //#endregion
-
-                //#region Control Cover Move Animation
-
-                //if (unit.IsWallClose())
-                //{
-                //    //COVERCROUCH, COVERSTAND
-                //    if (unit.curUnitPose == UnitPose.MOD_COVERCROUCH || unit.curUnitPose == UnitPose.MOD_COVERSTAND)
-                //    {
-                //        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-
-                //        // 양수면 오른쪽, 음수면 왼쪽
-                //        animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
-
-                //        if (animator.GetFloat("TurnRight") > 0)
-                //            animator.SetBool("LookRight", true);
-                //        else if (animator.GetFloat("TurnRight") < 0)
-                //            animator.SetBool("LookRight", false);
-                //    }
-                //}
-
-                //#endregion
             }
             else
             {

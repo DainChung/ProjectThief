@@ -465,11 +465,11 @@ namespace Com.MyCompany.MyGame
             //플레이어 캐릭터 속도 & 회전 & 애니메이션 관리
             unitSpeed = walkSpeed;
 
-            animator.SetLayerWeight(4, 1);
+            animator.SetLayerWeight(AnimationLayers.Throw, 1);
             animator.SetFloat("ThrowAnimSpeed", 0.01f);
             if (swManager.secThrowAnimSW >= 1)
             {
-                animator.Play("Throw", 4, 0);
+                animator.Play("Throw", AnimationLayers.Throw, 0);
                 swManager.throwAnimSW.Restart();
             }
             animator.SetFloat("ThrowAnimSpeed", 0);
@@ -484,8 +484,8 @@ namespace Com.MyCompany.MyGame
         public void AttackPhaseThrow(Vector3 throwPos, WeaponCode weapon, ref float unitSpeed)
         {
             animator.SetBool("IsThrowMode", false);
-            animator.SetLayerWeight(4, 1);
-            animator.SetLayerWeight(5, 0);
+            animator.SetLayerWeight(AnimationLayers.Throw, 1);
+            animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
             animator.SetFloat("ThrowAnimSpeed", 1);
 
             InstantiateWeapon(weapon, throwPos, throwRot);
@@ -513,10 +513,10 @@ namespace Com.MyCompany.MyGame
 
             swManager.throwAnimSW.Restart();
 
-            animator.Play("Throw", 4, 0.0f);
+            animator.Play("Throw", AnimationLayers.Throw, 0.0f);
             animator.SetFloat("ThrowAnimSpeed", 0);
-            animator.SetLayerWeight(4, 0);
-            animator.SetLayerWeight(5, 0);
+            animator.SetLayerWeight(AnimationLayers.Throw, 0);
+            animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
             animator.SetBool("ThrowItem", false);
         }
 
@@ -559,8 +559,8 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsFalling", true);
             curUnitPose = UnitPose.MOD_FALL;
 
-            animator.SetLayerWeight(4, 0);
-            animator.SetLayerWeight(5, 0);
+            animator.SetLayerWeight(AnimationLayers.Throw, 0);
+            animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
             throwLine.HideLines();
         }
 
