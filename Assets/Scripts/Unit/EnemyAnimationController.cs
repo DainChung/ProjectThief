@@ -130,12 +130,15 @@ namespace Com.MyCompany.MyGame
                 {
                     //개발 중
                     #region Control Basic Move Animation
-                    //case UnitPose.MOD_WALK:
-                    //case UnitPose.MOD_RUN:
-                    //case UnitPose.MOD_CROUCH:
+                    case UnitPose.MOD_WALK:
+                        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
+                            animator.SetFloat("MoveSpeed", enemy.moveSpeed);
+                        break;
+                    case UnitPose.MOD_RUN:
+                    case UnitPose.MOD_CROUCH:
 
-                    //    if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
-                    //    {
+                        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
+                        {
                     //        if (Input.GetButton("Vertical"))
                     //        {
                     //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
@@ -149,12 +152,12 @@ namespace Com.MyCompany.MyGame
                     //            animator.SetFloat("TurnRight", 0);
                     //            animator.SetFloat("MoveSpeed", 0);
                     //        }
-                    //    }
+                        }
 
-                    //    break;
+                        break;
                     #endregion
 
-                    //개발 중
+                    //개발 중(미정)
                     #region Control Cover Move Animation
                     //case UnitPose.MOD_COVERSTAND:
                     //case UnitPose.MOD_COVERCROUCH:

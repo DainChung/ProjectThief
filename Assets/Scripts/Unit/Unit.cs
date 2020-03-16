@@ -226,7 +226,7 @@ namespace Com.MyCompany.MyGame
         public bool readyToThrowItem { get { return _readyToThrowItem; } }
         public bool doubleThrowLock { get { return _doubleThrowLock; } }
 
-        public UnitState curUnitState { get { return _curUnitState; } set { curUnitState = value; } }
+        public UnitState curUnitState { get { return _curUnitState; } set { _curUnitState = value; } }
 
         [HideInInspector]
         public UnitPose curUnitPose = UnitPose.MOD_RUN;

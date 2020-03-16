@@ -13,9 +13,10 @@ namespace Com.MyCompany.MyGame.Collections
         GOLD = 0, CAN, CHEESE, SMOKE, max
     }
 
+    //Enemy가 추적할 때 사용하기도 함
     public enum WeaponCode
     {
-        HAND = 0, CAN, CHEESE, SMOKE, max
+        HAND = 0, CAN, CHEESE, SMOKE, PLAYER, max
     }
 
     //Animation Layer에 관한 정보
@@ -60,7 +61,7 @@ namespace Com.MyCompany.MyGame.Collections
         private static int[] _itemMaxAmount = { 5, 3, 2 };
         public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
 
-        #region Weapons
+        #region Weapons Init Values
         //연막탄 위치 벡터
         private static Vector3 _WeaponSmokeVector3 = new Vector3(0, 1.2f, 0);
         /// <summary>
@@ -75,13 +76,33 @@ namespace Com.MyCompany.MyGame.Collections
         /// </summary>
         public static Quaternion weaponSmokeQuat { get { return _WeaponSmokeQuat; } }
         #endregion
+
+        #region Basic Init Vectors Values
+
+        private static Vector3 initPosition = new Vector3(-1, -999, -1);
+        public static Vector3 InitPosition { get { return initPosition; } }
+
+        #endregion
+
+        #region DelayTime Values
+
+        //Milli Sec
+        private static long[] _enemyDetectedDelayMax = { 0, 3000, 0, 3500, 2000, -1};
+        public static long[] enemyDetectedDelayMax { get { return _enemyDetectedDelayMax; } }
+        //Milli Sec
+        private static long[] _enemyDetectedStayMax = { 0, 1500, 5000, 1500, 0, -1};
+        public static long[] enemyDetectedStayMax { get { return _enemyDetectedStayMax; } }
+
+        #endregion
     }
 
     public static class FilePaths
     {
         private static string _weaponPath = "Weapons/Weapon";
-
         public static string weaponPath { get { return _weaponPath; } }
+
+        private static string _AISystemPath = "AISystem/";
+        public static string AISystemPath { get { return _AISystemPath; } }
     }
 
     public static class AggroCollections

@@ -11,7 +11,7 @@ namespace Com.MyCompany.MyGame
     {
         #region Sub Struct
 
-        struct DetectedWeapon
+        struct DetectedTarget
         {
             public WeaponCode code;
             public Vector3 pos;
@@ -22,14 +22,18 @@ namespace Com.MyCompany.MyGame
         #region Sub Classes
 
         //우선순위 : 치즈 > 캔 = 연막
-        private class DetectedWeaponQueue
+        //치즈 먹고 수면 상태 빠지면 Queue를 비워야?
+        private class DetectedTargetQueue
         {
-            //어그로 끈 Weapon을 저장하는 배열, 최대 3개까지만 기억
-            private DetectedWeapon[] queue = new DetectedWeapon[3];
+            public bool FindCheese { get { return (queue[0].code == WeaponCode.CHEESE); } }
+            public bool FindPlayer { get { return (queue[0].code == WeaponCode.PLAYER); } }
 
-            public DetectedWeaponQueue()
+            //어그로 끈 Weapon을 저장하는 배열, 최대 3개까지만 기억
+            private DetectedTarget[] queue = new DetectedTarget[3];
+
+            public DetectedTargetQueue()
             {
-                DetectedWeapon init;
+                DetectedTarget init;
                 init.code = WeaponCode.max;
                 init.pos = new Vector3(-1,-1,-1);
 
@@ -40,7 +44,7 @@ namespace Com.MyCompany.MyGame
 
             public void Enqueue(WeaponCode weaponCode, Vector3 position)
             {
-                DetectedWeapon input;
+                DetectedTarget input;
                 input.code = weaponCode;
                 input.pos = position;
 
@@ -53,22 +57,28 @@ namespace Com.MyCompany.MyGame
                             queue[Count()] = input;
                     }
 
-                    if (weaponCode == WeaponCode.CHEESE)
+                    if (weaponCode == WeaponCode.PLAYER)
                     {
-                        //치즈면 최우선순위로 설정
+                        //Player면 최우선 순위 2번째로 설정
                         PushQueueReverse();
-                        UnityEngine.Debug.Log("Enemy Detect CHEESE");
                         queue[0] = input;
                     }
 
-                    DebugQueue();
+                    if (weaponCode == WeaponCode.CHEESE)
+                    {
+                        //치즈면 최우선순위로 설정(PLAYER보다 중요)
+                        PushQueueReverse();
+                        queue[0] = input;
+                    }
+
+                    //DebugQueue();
                 }
             }
 
             //queue[0]부터 차례대로 리턴
-            public DetectedWeapon Dequeue()
+            public DetectedTarget Dequeue()
             {
-                DetectedWeapon result;
+                DetectedTarget result;
 
                 if (Count() > 0)
                 {
@@ -107,7 +117,7 @@ namespace Com.MyCompany.MyGame
             }
 
             //중복된 내용이면 true, 아니면 false
-            private bool IsItDuplicate(DetectedWeapon input)
+            private bool IsItDuplicate(DetectedTarget input)
             {
                 for (int i = 0; i < queue.Length; i++)
                 {
@@ -143,19 +153,26 @@ namespace Com.MyCompany.MyGame
 
         #region Private Fields
 
-        private DetectedWeaponQueue queue = new DetectedWeaponQueue();
+        private DetectedTargetQueue queue = new DetectedTargetQueue();
 
         private LookDirState curLookDir;
 
         private Unit unit;
+        private Rigidbody rb;
 
         private float alertValue = 0.0f;
+        private DetectedTarget curTarget;
+        private bool doesReachToTarget = false;
+
+        private Stopwatch stayDelay = new Stopwatch();
+        private bool checkStayDelay { get { return stayDelay.ElapsedMilliseconds >= ValueCollections.enemyDetectedStayMax[(int)curTarget.code]; } }
 
         #endregion
 
         #region Public Fields
 
         public Transform throwPos;
+        public float moveSpeed { get { return (rb.velocity != Vector3.zero) ? 1.0f : 0.0f; } }
 
         #endregion
 
@@ -165,6 +182,10 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             curLookDir = LookDirState.IDLE;
+
+            InitCurTarget();
+            stayDelay.Start();
+            stayDelay.Stop();
         }
 
         void Start()
@@ -173,16 +194,49 @@ namespace Com.MyCompany.MyGame
             unit.curUnitState = UnitState.IDLE;
 
             unit.animator.SetBool("IsRunMode", false);
+
+            rb = GetComponent<Rigidbody>();
         }
         
 
         void FixedUpdate()
         {
+            //AI();
+            ChaseTarget();
+        }
 
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Target"))
+            {
+                doesReachToTarget = true;
+                Destroy(other.gameObject);
+            }
         }
         #endregion
 
         #region Private Methods
+
+        private void AI()
+        {
+            switch (unit.curUnitState)
+            {
+                case UnitState.IDLE:
+                    break;
+                case UnitState.ALERT:
+                    break;
+                case UnitState.COMBAT:
+                    break;
+                case UnitState.CHEESE:
+                    break;
+                case UnitState.INSMOKE:
+                    break;
+                case UnitState.SLEEP:
+                    break;
+                default:
+                    break;
+            }
+        }
 
         //curUnitState == UnitState.IDLE
         private void Patrol()
@@ -204,9 +258,81 @@ namespace Com.MyCompany.MyGame
 
         //특정 타겟(CAN, CHEESE, Player) 위치로 이동
         //우선순위: CHEESE > Player > CAN > Patrol Spot
-        private void ChaseTarget(Transform target)
+        private void ChaseTarget()
         {
+            //특이 사항 없음
+            if (queue.Count() == 0)
+            {
 
+            }
+            else
+            { 
+                //현재 추적하고 있는 타겟이 없을 때만 queue에서 정보를 받아온다.
+                if (curTarget.code == WeaponCode.max)
+                    SetCurTarget();
+            }
+
+            switch (curTarget.code)
+            {
+                case WeaponCode.CAN:
+                case WeaponCode.SMOKE:
+                    if (queue.FindPlayer || queue.FindCheese)
+                        SetCurTarget();
+                    else
+                        Move();
+                    break;
+                case WeaponCode.PLAYER:
+                    if (queue.FindCheese)
+                        SetCurTarget();
+                    else
+                        Move();
+                    break;
+                case WeaponCode.CHEESE:
+                    Move();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void Move()
+        {
+            if (curTarget.code != WeaponCode.max && !doesReachToTarget)
+            {
+                LookDir(curTarget.pos);
+                rb.velocity = transform.forward * unit.walkSpeed * 0.2f; // 0.2f는 임시로 추가한 계수
+                rb.velocity *= 0.9f;    //미끄러짐 방지 => 이걸 위로 올려도 되지 않나
+            }
+            else if (doesReachToTarget)
+            {
+                if(!stayDelay.IsRunning)
+                    stayDelay.Restart();
+
+                if (checkStayDelay)
+                {
+                    InitCurTarget();
+                    doesReachToTarget = false;
+                }
+            }
+        }
+
+        private void SetCurTarget()
+        {
+            curTarget = queue.Dequeue();
+            Instantiate(Resources.Load(FilePaths.AISystemPath + "Target") as GameObject, curTarget.pos, transform.rotation);
+        }
+
+        private void InitCurTarget()
+        {
+            curTarget.code = WeaponCode.max;
+            curTarget.pos = ValueCollections.InitPosition;
+            stayDelay.Stop();
+        }
+
+        private void LookDir(Vector3 lookDir)
+        {
+            lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
+            transform.LookAt(lookDir, Vector3.up);
         }
 
         //alertValue에 따라 curUnitState를 변경
@@ -227,21 +353,28 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
-        public void DetectWeapon(WeaponCode code, Vector3 pos)
+        public void Detect(WeaponCode code, Vector3 pos)
         {
-            if (code != WeaponCode.CHEESE && code != WeaponCode.max)
-                unit.curUnitState = UnitState.ALERT;
-            else if (code == WeaponCode.CHEESE)
-                unit.curUnitState = UnitState.CHEESE;
-
-            alertValue = AggroCollections.alertMin;
+            switch (code)
+            {
+                case WeaponCode.CAN:
+                case WeaponCode.SMOKE:
+                    unit.curUnitState = UnitState.ALERT;
+                    alertValue = AggroCollections.alertMin;
+                    break;
+                case WeaponCode.PLAYER:
+                    unit.curUnitState = UnitState.COMBAT;
+                    alertValue = AggroCollections.combatMin;
+                    break;
+                case WeaponCode.CHEESE:
+                    unit.curUnitState = UnitState.CHEESE;
+                    alertValue = AggroCollections.combatMin;
+                    break;
+                default:
+                    break;
+            }
+                        
             queue.Enqueue(code, pos);
-        }
-
-        //미정
-        public void DetectPlayer(Vector3 pos, ref UnitState curState)
-        {
-            curState = UnitState.COMBAT;
         }
 
         #endregion
