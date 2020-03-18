@@ -183,7 +183,6 @@ namespace Com.MyCompany.MyGame
         {
             curLookDir = LookDirState.IDLE;
 
-            InitCurTarget();
             stayDelay.Start();
             stayDelay.Stop();
         }
@@ -196,6 +195,7 @@ namespace Com.MyCompany.MyGame
             unit.animator.SetBool("IsRunMode", false);
 
             rb = GetComponent<Rigidbody>();
+            InitCurTarget();
         }
         
 
@@ -207,10 +207,17 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Target"))
+            try
             {
-                doesReachToTarget = true;
-                Destroy(other.gameObject);
+                if (other.CompareTag("Target"))
+                {
+                    doesReachToTarget = true;
+                    Destroy(other.gameObject);
+                }
+            }
+            catch (System.Exception)
+            {
+
             }
         }
         #endregion
@@ -300,12 +307,14 @@ namespace Com.MyCompany.MyGame
             if (curTarget.code != WeaponCode.max && !doesReachToTarget)
             {
                 LookDir(curTarget.pos);
-                rb.velocity = transform.forward * unit.walkSpeed * 0.2f; // 0.2f는 임시로 추가한 계수
+                rb.velocity = transform.forward * unit.walkSpeed * 0.4f; // 0.4f는 임시로 추가한 계수
                 rb.velocity *= 0.9f;    //미끄러짐 방지 => 이걸 위로 올려도 되지 않나
             }
             else if (doesReachToTarget)
             {
-                if(!stayDelay.IsRunning)
+                rb.velocity = Vector3.zero;
+                //UnityEngine.Debug.Log("MOVE() moveSpeed: " + moveSpeed + ", SADF: " + rb.velocity);
+                if (!stayDelay.IsRunning)
                     stayDelay.Restart();
 
                 if (checkStayDelay)

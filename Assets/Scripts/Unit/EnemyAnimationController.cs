@@ -16,7 +16,7 @@ namespace Com.MyCompany.MyGame
         private UnitAnimationController unitAnimController;
         private CapsuleCollider collider;
 
-        const float crouchColliderHeight = 64f;
+        const float crouchColliderHeight = 1.0f;
         const float standColliderHeight = 90f;
 
         #endregion
@@ -132,26 +132,30 @@ namespace Com.MyCompany.MyGame
                     #region Control Basic Move Animation
                     case UnitPose.MOD_WALK:
                         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
+                        {
                             animator.SetFloat("MoveSpeed", enemy.moveSpeed);
+                            //Debug.Log("animator:" + animator.GetFloat("MoveSpeed") + ", enemyController: " + enemy.moveSpeed);
+                        }
                         break;
                     case UnitPose.MOD_RUN:
                     case UnitPose.MOD_CROUCH:
 
                         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
                         {
-                    //        if (Input.GetButton("Vertical"))
-                    //        {
-                    //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
-                    //        }
-                    //        else if (Input.GetButton("Horizontal"))
-                    //        {
-                    //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-                    //        }
-                    //        else
-                    //        {
-                    //            animator.SetFloat("TurnRight", 0);
-                    //            animator.SetFloat("MoveSpeed", 0);
-                    //        }
+                            animator.SetFloat("MoveSpeed", enemy.moveSpeed);
+                            //        if (Input.GetButton("Vertical"))
+                            //        {
+                            //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
+                            //        }
+                            //        else if (Input.GetButton("Horizontal"))
+                            //        {
+                            //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
+                            //        }
+                            //        else
+                            //        {
+                            //            animator.SetFloat("TurnRight", 0);
+                            //            animator.SetFloat("MoveSpeed", 0);
+                            //        }
                         }
 
                         break;
