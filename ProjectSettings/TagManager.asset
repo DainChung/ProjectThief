@@ -12,6 +12,7 @@ TagManager:
   - EndArea
   - WallRightEnd
   - WeaponCan
+  - Target
   layers:
   - Default
   - TransparentFX
@@ -26,8 +27,8 @@ TagManager:
   - Enemy
   - Player
   - Throw
-  - 
-  - 
+  - EnemyAttack
+  - PlayerAttack
   - 
   - 
   - 

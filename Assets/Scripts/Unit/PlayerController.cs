@@ -388,6 +388,32 @@ namespace Com.MyCompany.MyGame
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
+        //암살
+        //비전투 상태에서만 가능
+        private void AttackAssassinate()
+        {
+            switch (unit.curUnitState)
+            {
+                case UnitState.IDLE:
+                case UnitState.INSMOKE:
+                case UnitState.ALERT:
+
+                    if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
+                    {
+                        if (Input.GetButton("Assassinate"))// && Enemy가 암살 범위 내에 있음)
+                        {
+                            UnityEngine.Debug.Log("Assassin");
+                            unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
+                            unit.EnableAssassinate(true);
+                        }
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
         private void AttackThrow()
         {
@@ -513,15 +539,19 @@ namespace Com.MyCompany.MyGame
             {
                 //비무장, 아무것도 할 수 없음
                 case WeaponCode.HAND:
+                    AttackAssassinate();
                     break;
                 case WeaponCode.CAN:
+                    AttackAssassinate();
                     AttackThrow();
                     break;
                 case WeaponCode.CHEESE:
+                    AttackAssassinate();
                     AttackThrow();
                     break;
                 //플레이어 위치에서 사용
                 case WeaponCode.SMOKE:
+                    AttackAssassinate();
                     if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
                     {
                         unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);

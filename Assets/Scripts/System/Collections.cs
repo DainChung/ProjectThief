@@ -184,4 +184,71 @@ namespace Com.MyCompany.MyGame.Collections
         /// </summary>
         public static int Sleep { get { return _sleep; } }
     }
+
+    //물리 레이어
+    public static class PhysicsLayers
+    {
+        private static int _Default = 0;
+        private static int _TransparentFX = 1;
+        private static int _IgnoreRaycast = 2;
+        private static int _Water = 4;
+        private static int _UI = 5;
+        private static int _Lighting = 8;
+        private static int _Structure = 9;
+        private static int _Enemy = 10;
+        private static int _Player = 11;
+        private static int _Throw = 12;
+        private static int _EnemyAttack = 13;
+        private static int _PlayerAttack = 14;
+        //private static int _Enemy = 7;
+
+        /// <summary>
+        /// Default = 0
+        /// </summary>
+        public static int Default { get { return _Default; } }
+        /// <summary>
+        /// TransparentFX = 1
+        /// </summary>
+        public static int TransparentFX { get { return _TransparentFX; } }
+        /// <summary>
+        /// IgnoreRaycast = 2
+        /// </summary>
+        public static int IgnoreRaycast { get { return _IgnoreRaycast; } }
+        /// <summary>
+        /// Water = 4
+        /// </summary>
+        public static int Water { get { return _Water; } }
+        /// <summary>
+        /// UI = 5
+        /// </summary>
+        public static int UI { get { return _UI; } }
+        /// <summary>
+        /// Lighting = 8
+        /// </summary>
+        public static int Lighting { get { return _Lighting; } }
+        /// <summary>
+        /// Structure = 9
+        /// </summary>
+        public static int Structure { get { return _Structure; } }
+        /// <summary>
+        /// Enemy = 10
+        /// </summary>
+        public static int Enemy { get { return _Enemy; } }
+        /// <summary>
+        /// Player = 11
+        /// </summary>
+        public static int Player { get { return _Player; } }
+        /// <summary>
+        /// Throw = 12
+        /// </summary>
+        public static int Throw { get { return _Throw; } }
+        /// <summary>
+        /// EnemyAttack = 13
+        /// </summary>
+        public static int EnemyAttack { get { return _EnemyAttack; } }
+        /// <summary>
+        /// PlayerAttack = 14
+        /// </summary>
+        public static int PlayerAttack { get { return _PlayerAttack; } }
+    }
 }

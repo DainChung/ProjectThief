@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using UnityEngine.AI;
+
 using Com.MyCompany.MyGame.Collections;
 
 namespace Com.MyCompany.MyGame
@@ -160,19 +162,20 @@ namespace Com.MyCompany.MyGame
         private Unit unit;
         private Rigidbody rb;
 
-        private float alertValue = 0.0f;
         private DetectedTarget curTarget;
         private bool doesReachToTarget = false;
 
         private Stopwatch stayDelay = new Stopwatch();
         private bool checkStayDelay { get { return stayDelay.ElapsedMilliseconds >= ValueCollections.enemyDetectedStayMax[(int)curTarget.code]; } }
 
+        private NavMeshAgent agent;
+
         #endregion
 
         #region Public Fields
 
         public Transform throwPos;
-        public float moveSpeed { get { return (rb.velocity != Vector3.zero) ? 1.0f : 0.0f; } }
+        public float moveSpeed { get { return (agent.velocity != Vector3.zero) ? 1.0f : 0.0f; } }
 
         #endregion
 
@@ -196,28 +199,22 @@ namespace Com.MyCompany.MyGame
 
             rb = GetComponent<Rigidbody>();
             InitCurTarget();
+
+            agent = GetComponent<NavMeshAgent>();
         }
         
 
         void FixedUpdate()
         {
-            //AI();
             ChaseTarget();
         }
 
         void OnTriggerEnter(Collider other)
         {
-            try
+            if (other.CompareTag("Target"))
             {
-                if (other.CompareTag("Target"))
-                {
-                    doesReachToTarget = true;
-                    Destroy(other.gameObject);
-                }
-            }
-            catch (System.Exception)
-            {
-
+                doesReachToTarget = true;
+                Destroy(other.gameObject);
             }
         }
         #endregion
@@ -305,15 +302,9 @@ namespace Com.MyCompany.MyGame
         private void Move()
         {
             if (curTarget.code != WeaponCode.max && !doesReachToTarget)
-            {
-                LookDir(curTarget.pos);
-                rb.velocity = transform.forward * unit.walkSpeed * 0.4f; // 0.4f는 임시로 추가한 계수
-                rb.velocity *= 0.9f;    //미끄러짐 방지 => 이걸 위로 올려도 되지 않나
-            }
+                agent.SetDestination(curTarget.pos);
             else if (doesReachToTarget)
             {
-                rb.velocity = Vector3.zero;
-                //UnityEngine.Debug.Log("MOVE() moveSpeed: " + moveSpeed + ", SADF: " + rb.velocity);
                 if (!stayDelay.IsRunning)
                     stayDelay.Restart();
 
@@ -338,26 +329,6 @@ namespace Com.MyCompany.MyGame
             stayDelay.Stop();
         }
 
-        private void LookDir(Vector3 lookDir)
-        {
-            lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
-            transform.LookAt(lookDir, Vector3.up);
-        }
-
-        //alertValue에 따라 curUnitState를 변경
-        private void AlertManager()
-        {
-            //curUnitState = UnitState.IDLE
-            if (alertValue < AggroCollections.alertMin)
-                unit.curUnitState = UnitState.IDLE;
-            //curUnitState = UnitState.ALERT
-            else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
-                unit.curUnitState = UnitState.ALERT;
-            //curUnitState = UnitState.COMBAT
-            else
-                unit.curUnitState = UnitState.COMBAT;
-        }
-
         #endregion
 
         #region Public Methods
@@ -368,16 +339,16 @@ namespace Com.MyCompany.MyGame
             {
                 case WeaponCode.CAN:
                 case WeaponCode.SMOKE:
-                    unit.curUnitState = UnitState.ALERT;
-                    alertValue = AggroCollections.alertMin;
+                    unit.curUnitState = UnitState.IDLE;
+                    unit.alertValue = AggroCollections.alertMin;
                     break;
                 case WeaponCode.PLAYER:
                     unit.curUnitState = UnitState.COMBAT;
-                    alertValue = AggroCollections.combatMin;
+                    unit.alertValue = AggroCollections.combatMin;
                     break;
                 case WeaponCode.CHEESE:
                     unit.curUnitState = UnitState.CHEESE;
-                    alertValue = AggroCollections.combatMin;
+                    unit.alertValue = AggroCollections.combatMin;
                     break;
                 default:
                     break;

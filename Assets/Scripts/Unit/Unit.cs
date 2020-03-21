@@ -215,6 +215,7 @@ namespace Com.MyCompany.MyGame
 
         #region Public Fields
 
+        //UnitStat구조체를 만들것
         public float speed { get { return _speed; } set { _speed = value; } }
         public float walkSpeed { get { return 0.41f * _speed; } }
         public float coverSpeed { get { return 0.31f * speed; } }
@@ -237,6 +238,12 @@ namespace Com.MyCompany.MyGame
         public ThrowLineRenderer throwLine;
         public StopwatchManager swManager = new StopwatchManager();
 
+        public float alertValue = 0.0f;
+
+        //공격 판정에 필요한 콜라이더
+        public AttackCollider defaultAttack;
+        public AttackCollider assassinate;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -252,6 +259,9 @@ namespace Com.MyCompany.MyGame
             throwLine = new ThrowLineRenderer(throwDestiPos, transform.GetComponent<LineRenderer>());
             throwLine.HideLines();
             swManager.InitStopwatch();
+
+            defaultAttack.InitAttackCollider(1);
+            assassinate.InitAttackCollider(-1);
         }
 
         // Update is called once per frame
@@ -297,7 +307,6 @@ namespace Com.MyCompany.MyGame
                 unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
             }
         }
-
         void OnTriggerStay(Collider other)
         {
             if (other.CompareTag("Floor"))
@@ -309,7 +318,6 @@ namespace Com.MyCompany.MyGame
                 unitAnimHelper.wallTransform = other.transform;
             }
         }
-
         void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Floor"))
@@ -333,6 +341,19 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
+        //alertValue에 따라 curUnitState를 변경
+        private void AlertManager()
+        {
+            //curUnitState = UnitState.IDLE
+            if (alertValue < AggroCollections.alertMin)
+                curUnitState = UnitState.IDLE;
+            //curUnitState = UnitState.ALERT
+            else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
+                curUnitState = UnitState.ALERT;
+            //curUnitState = UnitState.COMBAT
+            else
+                curUnitState = UnitState.COMBAT;
+        }
 
         #endregion
 
@@ -340,13 +361,32 @@ namespace Com.MyCompany.MyGame
 
         public void HitHealth(int damage)
         {
-            if (damage >= _health)
-                _health = 0;
+            //일반 공격(damage >= 0)
+            if (damage >= 0)
+            {
+                if (damage >= _health)
+                {
+                    _health = 0;
+                    //일반 사망 애니메이션 재생 OR 트리거
+                    //사망 판정
+                }
+                else
+                {
+                    _health -= damage;
+                    //피격 애니메이션 재생 OR 트리거
+                    //피격 애니메이션 재생 도중 조작 불가
+                }
+            }
+            //암살(damage < 0)
             else
-                _health -= damage;
+            {
+                _health = 0;
+                //암살 사망 애니메이션 재생 OR 트리거
+                //사망 판정
+            }
         }
 
-            #region 엄폐 시 특별한 이동 제어
+            #region 엄폐 시 벽으로 밀착
         public IEnumerator SetCoverPosition(bool isCovering)
         {
             Vector3 wallPos = WallTransform().position;
@@ -561,7 +601,17 @@ namespace Com.MyCompany.MyGame
         {
             return unitAnimHelper.wallTransform;
         }
-            #endregion
+        #endregion
+
+        //공격 판정 콜라이더 제어
+        public void EnableDefaultAttack(bool enable)
+        {
+            defaultAttack.EnableCollider(enable);
+        }
+        public void EnableAssassinate(bool enable)
+        {
+            assassinate.EnableCollider(enable);
+        }
 
         //아래 함수들을 Unit에서 호출하도록 변경할 것
         //캐릭터가 추락 중일 때

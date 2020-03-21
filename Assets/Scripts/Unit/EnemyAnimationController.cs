@@ -16,7 +16,7 @@ namespace Com.MyCompany.MyGame
         private UnitAnimationController unitAnimController;
         private CapsuleCollider collider;
 
-        const float crouchColliderHeight = 1.0f;
+        const float crouchColliderHeight = 1.5f;
         const float standColliderHeight = 90f;
 
         #endregion
