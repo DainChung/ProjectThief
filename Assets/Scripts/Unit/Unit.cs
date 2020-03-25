@@ -210,7 +210,7 @@ namespace Com.MyCompany.MyGame
         //Player => Enemy에게 얼마나 들켰는지에 대한 정보
         //Enemy => 주변을 경계하는 정도
         private UnitState _curUnitState = UnitState.IDLE;
-
+        
         #endregion
 
         #region Public Fields
@@ -222,7 +222,7 @@ namespace Com.MyCompany.MyGame
         public int health { get { return _health; } }
         public float jumpPower { get { return _jumpPower; } }
 
-        public bool lockControl { get{ return _lockControl; } }
+        public bool lockControl { get{ return _lockControl; } set { _lockControl = value; } }
 
         public bool readyToThrowItem { get { return _readyToThrowItem; } }
         public bool doubleThrowLock { get { return _doubleThrowLock; } }
@@ -238,6 +238,7 @@ namespace Com.MyCompany.MyGame
         public ThrowLineRenderer throwLine;
         public StopwatchManager swManager = new StopwatchManager();
 
+        [HideInInspector]
         public float alertValue = 0.0f;
 
         //공격 판정에 필요한 콜라이더
@@ -267,6 +268,7 @@ namespace Com.MyCompany.MyGame
         // Update is called once per frame
         void FixedUpdate()
         {
+
             //추락, 착륙시 변수 제어
             if (IsOnFloor())
             {
@@ -606,11 +608,17 @@ namespace Com.MyCompany.MyGame
         //공격 판정 콜라이더 제어
         public void EnableDefaultAttack(bool enable)
         {
-            defaultAttack.EnableCollider(enable);
+            defaultAttack.enableCollider = enable;
         }
         public void EnableAssassinate(bool enable)
         {
-            assassinate.EnableCollider(enable);
+            float val = (enable ? 1.0f : 0.0f);
+
+            animator.SetLayerWeight(AnimationLayers.Assassinate, val);
+            animator.SetFloat("AssassinateAnimSpeed", val);
+            if (!enable)
+                animator.Play("Assassinate", AnimationLayers.Assassinate);
+            assassinate.enableCollider = enable;
         }
 
         //아래 함수들을 Unit에서 호출하도록 변경할 것

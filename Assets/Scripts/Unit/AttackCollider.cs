@@ -11,6 +11,8 @@ namespace Com.MyCompany.MyGame
         private int _damage;
         private SphereCollider collider;
 
+        public bool enableCollider { get { return collider.enabled; } set { collider.enabled = value; } }
+        
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy
@@ -27,10 +29,6 @@ namespace Com.MyCompany.MyGame
             _damage = damage;
             collider = GetComponent<SphereCollider>();
             collider.enabled = false;
-        }
-        public void EnableCollider(bool enable)
-        {
-            collider.enabled = enable;
         }
     }
 }

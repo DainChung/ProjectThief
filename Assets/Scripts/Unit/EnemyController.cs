@@ -217,6 +217,26 @@ namespace Com.MyCompany.MyGame
                 Destroy(other.gameObject);
             }
         }
+
+        //연구용, 천천히 할 것
+        /*
+        void OnBecameInvisible()
+        {
+            UnityEngine.Debug.Log("???");
+            unit.animator.speed = 0;
+        }
+
+        void OnBecameVisible()
+        {
+            unit.animator.speed = 1;
+        }
+
+        void OnWillRenderObjects()
+        {
+            UnityEngine.Debug.Log("SADfsadgsadg");
+        }
+        */
+
         #endregion
 
         #region Private Methods

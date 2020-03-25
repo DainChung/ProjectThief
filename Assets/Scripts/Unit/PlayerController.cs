@@ -192,7 +192,7 @@ namespace Com.MyCompany.MyGame
         private PlayerAnimationController playerAnimController;
         #endregion
 
-            #region 무기
+            #region 무기 및 공격
         private WeaponCode curWeapon = WeaponCode.HAND;
 
         //조준 후 발사되지 않는 경우 발사하도록 제어
@@ -201,7 +201,11 @@ namespace Com.MyCompany.MyGame
         private bool doubleThrowLock = false;
 
         private Vector3 throwRotEuler = Vector3.zero;
-        #endregion
+
+        private bool assassinateTrigger = false;
+        private bool canAssassinate = false;
+        private Vector3 assassinateTargetPos = Vector3.zero;
+            #endregion
 
             #region 어그로 관련 변수
         //높을수록 적캐릭터에게 쉽게 들킨다.
@@ -313,6 +317,7 @@ namespace Com.MyCompany.MyGame
                             break;
                         case UnitPose.MOD_CROUCH:
                             ControlBase();
+                            ControlAttack();
                             break;
                         case UnitPose.MOD_COVERSTAND:
                             ControlCover();
@@ -338,11 +343,10 @@ namespace Com.MyCompany.MyGame
                     #endregion
                 }
 
+                LookDir();
             }
 
             //UnityEngine.Debug.Log("Aggro: " + aggro);
-
-            LookDir();
             //플레이어가 의도하지 않은 회전 방지           
             rb.angularVelocity = Vector3.zero;
         }
@@ -400,18 +404,85 @@ namespace Com.MyCompany.MyGame
 
                     if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
                     {
-                        if (Input.GetButton("Assassinate"))// && Enemy가 암살 범위 내에 있음)
+                        #region Player 캐릭터 주변의 Enemy 확인
+                        RaycastHit[] hits = Physics.SphereCastAll(unit.assassinate.transform.position, ValueCollections.canAssassinateDist, transform.forward, 0.1f, 1 << PhysicsLayers.Enemy);
+
+                        foreach (RaycastHit obj in hits)
                         {
-                            UnityEngine.Debug.Log("Assassin");
-                            unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
-                            unit.EnableAssassinate(true);
+                            Ray ray = new Ray();
+                            ray.origin = unit.assassinate.transform.position - transform.forward * 0.5f;
+                            ray.direction = obj.transform.position - transform.position;
+
+                            //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
+                            if (Physics.Raycast(ray, ValueCollections.canAssassinateDist, 1 << PhysicsLayers.Structure))
+                                canAssassinate = false;
+                            else
+                            {
+                                //가장 가까운 Enemy를 타겟팅
+                                if (assassinateTargetPos == Vector3.zero)
+                                    assassinateTargetPos = obj.transform.position;
+                                else
+                                {
+                                    if(Vector3.Distance(transform.position, obj.transform.position) < Vector3.Distance(transform.position, assassinateTargetPos))
+                                        assassinateTargetPos = obj.transform.position;
+                                }
+                                canAssassinate = true;
+                            }
                         }
+
+                        //가까운 거리에 Enemy 없음
+                        if (hits.Length == 0)
+                        {
+                            assassinateTargetPos = Vector3.zero;
+                            canAssassinate = false;
+                        }
+
+                        MyDebug.Log("암살: "+canAssassinate);
+
+                        #endregion
+
+                        if (Input.GetButton("Assassinate") && canAssassinate)
+                        {
+                            UnityEngine.Debug.Log("암살");
+                            StartCoroutine(AssassinateMove());
+                        }
+
                     }
 
                     break;
                 default:
                     break;
             }
+        }
+
+        private IEnumerator AssassinateMove()
+        {
+            unit.lockControl = true;
+            unit.assassinate.enableCollider = true;
+
+            bool bfIsRunMode = animator.GetBool("IsRunMode");
+            animator.SetBool("IsRunMode", false);
+            animator.SetFloat("MoveSpeed", 1.0f);
+
+            transform.LookAt(assassinateTargetPos, Vector3.up);
+
+            //일정 거리 이내가 될 때까지
+            while (unit.assassinate.enableCollider)
+            {
+                rb.AddForce(transform.forward * unit.walkSpeed);
+                rb.velocity *= 0.9f;
+                yield return null;
+            }
+            animator.SetBool("IsRunMode", bfIsRunMode);
+            animator.SetFloat("MoveSpeed", 0);
+            animator.Play("Idle 0-0", AnimationLayers.Standing, 0);
+
+            canAssassinate = false;
+            unit.EnableAssassinate(true);
+            unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
+
+            unit.lockControl = false;
+            yield break;
         }
 
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
@@ -543,19 +614,24 @@ namespace Com.MyCompany.MyGame
                     break;
                 case WeaponCode.CAN:
                     AttackAssassinate();
-                    AttackThrow();
+                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
+                        AttackThrow();
                     break;
                 case WeaponCode.CHEESE:
                     AttackAssassinate();
-                    AttackThrow();
+                    if(unit.curUnitPose != UnitPose.MOD_CROUCH)
+                        AttackThrow();
                     break;
                 //플레이어 위치에서 사용
                 case WeaponCode.SMOKE:
                     AttackAssassinate();
-                    if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
+                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
                     {
-                        unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
-                        pInventory.Remove((int)curWeapon);
+                        if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
+                        {
+                            unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
+                            pInventory.Remove((int)curWeapon);
+                        }
                     }
                     break;
                 default:

@@ -28,7 +28,7 @@ namespace Com.MyCompany.MyGame.Collections
     //적 캐릭터 상태에 관한 정보
     public enum UnitState
     {
-        IDLE = 0, ALERT, COMBAT, CHEESE, INSMOKE, SLEEP, max
+        IDLE = 0, ALERT, COMBAT, CHEESE, INSMOKE, SLEEP, ASSASSINATE, max
     }
     //플레이어 캐릭터가 바라보는 방향
     public enum LookDirState
@@ -94,6 +94,16 @@ namespace Com.MyCompany.MyGame.Collections
         public static long[] enemyDetectedStayMax { get { return _enemyDetectedStayMax; } }
 
         #endregion
+
+        #region Distance Values
+
+        private static float _assassinateAnimDist = 0.86f;
+        public static float assassinateAnimDist { get { return _assassinateAnimDist; } }
+
+        private static float _canAssassinateDist = 2.5f;
+        public static float canAssassinateDist { get { return _canAssassinateDist; } }
+
+        #endregion
     }
 
     public static class FilePaths
@@ -149,7 +159,8 @@ namespace Com.MyCompany.MyGame.Collections
         private static int _throw = 4;
         private static int _throwMove = 5;
         private static int _inSmoke = 6;
-        private static int _sleep = 7;
+        //Player만 사용
+        private static int _assassinate = 7;
 
         /// <summary>
         /// Standing = 0
@@ -180,9 +191,10 @@ namespace Com.MyCompany.MyGame.Collections
         /// </summary>
         public static int InSmoke { get { return _inSmoke; } }
         /// <summary>
-        /// Sleep = 7
+        /// Assassinate = 7
+        /// Player만 사용 가능
         /// </summary>
-        public static int Sleep { get { return _sleep; } }
+        public static int Assassinate { get { return _assassinate; } }
     }
 
     //물리 레이어
@@ -250,5 +262,14 @@ namespace Com.MyCompany.MyGame.Collections
         /// PlayerAttack = 14
         /// </summary>
         public static int PlayerAttack { get { return _PlayerAttack; } }
+    }
+
+    //디버그용 
+    public static class MyDebug
+    {
+        public static void Log(object msg)
+        {
+            UnityEngine.Debug.Log(msg);
+        }
     }
 }
