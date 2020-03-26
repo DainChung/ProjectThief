@@ -79,8 +79,8 @@ namespace Com.MyCompany.MyGame.Collections
 
         #region Basic Init Vectors Values
 
-        private static Vector3 initPosition = new Vector3(-1, -999, -1);
-        public static Vector3 InitPosition { get { return initPosition; } }
+        private static Vector3 _initPos = new Vector3(9999f, 9999f, 9999f);
+        public static Vector3 initPos { get { return _initPos; } }
 
         #endregion
 
@@ -100,7 +100,7 @@ namespace Com.MyCompany.MyGame.Collections
         private static float _assassinateAnimDist = 0.86f;
         public static float assassinateAnimDist { get { return _assassinateAnimDist; } }
 
-        private static float _canAssassinateDist = 2.5f;
+        private static float _canAssassinateDist = 3.0f;
         public static float canAssassinateDist { get { return _canAssassinateDist; } }
 
         #endregion

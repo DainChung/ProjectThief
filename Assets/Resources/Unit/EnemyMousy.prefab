@@ -1828,6 +1828,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   throwPos: {fileID: 5781894586358001035}
+  seenByCamera: 0
 --- !u!114 &6150556912168944686
 MonoBehaviour:
   m_ObjectHideFlags: 0

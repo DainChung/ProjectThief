@@ -203,8 +203,6 @@ namespace Com.MyCompany.MyGame
         private Vector3 throwRotEuler = Vector3.zero;
 
         private bool assassinateTrigger = false;
-        private bool canAssassinate = false;
-        private Vector3 assassinateTargetPos = Vector3.zero;
             #endregion
 
             #region 어그로 관련 변수
@@ -222,6 +220,7 @@ namespace Com.MyCompany.MyGame
         #region Public Fields
 
         public Transform throwPos;
+        public CheckCameraCollider checkCameraCollider;
 
         #endregion
 
@@ -404,50 +403,16 @@ namespace Com.MyCompany.MyGame
 
                     if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
                     {
-                        #region Player 캐릭터 주변의 Enemy 확인
-                        RaycastHit[] hits = Physics.SphereCastAll(unit.assassinate.transform.position, ValueCollections.canAssassinateDist, transform.forward, 0.1f, 1 << PhysicsLayers.Enemy);
-
-                        foreach (RaycastHit obj in hits)
-                        {
-                            Ray ray = new Ray();
-                            ray.origin = unit.assassinate.transform.position - transform.forward * 0.5f;
-                            ray.direction = obj.transform.position - transform.position;
-
-                            //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
-                            if (Physics.Raycast(ray, ValueCollections.canAssassinateDist, 1 << PhysicsLayers.Structure))
-                                canAssassinate = false;
-                            else
-                            {
-                                //가장 가까운 Enemy를 타겟팅
-                                if (assassinateTargetPos == Vector3.zero)
-                                    assassinateTargetPos = obj.transform.position;
-                                else
-                                {
-                                    if(Vector3.Distance(transform.position, obj.transform.position) < Vector3.Distance(transform.position, assassinateTargetPos))
-                                        assassinateTargetPos = obj.transform.position;
-                                }
-                                canAssassinate = true;
-                            }
-                        }
-
-                        //가까운 거리에 Enemy 없음
-                        if (hits.Length == 0)
-                        {
-                            assassinateTargetPos = Vector3.zero;
-                            canAssassinate = false;
-                        }
-
-                        MyDebug.Log("암살: "+canAssassinate);
-
-                        #endregion
-
-                        if (Input.GetButton("Assassinate") && canAssassinate)
+                        MyDebug.Log("암살 쿨타임 됨");
+                        if (Input.GetButton("Assassinate") && checkCameraCollider.canAssassinate)
                         {
                             UnityEngine.Debug.Log("암살");
                             StartCoroutine(AssassinateMove());
                         }
 
                     }
+                    else
+                        checkCameraCollider.InitAssassinateTargetPos();
 
                     break;
                 default:
@@ -464,7 +429,7 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsRunMode", false);
             animator.SetFloat("MoveSpeed", 1.0f);
 
-            transform.LookAt(assassinateTargetPos, Vector3.up);
+            transform.LookAt(checkCameraCollider.assassinateTargetPos);
 
             //일정 거리 이내가 될 때까지
             while (unit.assassinate.enableCollider)
@@ -477,7 +442,8 @@ namespace Com.MyCompany.MyGame
             animator.SetFloat("MoveSpeed", 0);
             animator.Play("Idle 0-0", AnimationLayers.Standing, 0);
 
-            canAssassinate = false;
+            checkCameraCollider.InitCanAssassinate();
+            checkCameraCollider.InitAssassinateTargetPos();
             unit.EnableAssassinate(true);
             unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
 

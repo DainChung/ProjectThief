@@ -66,6 +66,7 @@
      <Compile Include="Assets\Scripts\Server\DEMOPlayerNameInputField.cs" />
      <Compile Include="Assets\Scripts\Server\Launcher.cs" />
      <Compile Include="Assets\Scripts\System\CameraWork.cs" />
+     <Compile Include="Assets\Scripts\System\CheckCameraCollider.cs" />
      <Compile Include="Assets\Scripts\System\Collections.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />

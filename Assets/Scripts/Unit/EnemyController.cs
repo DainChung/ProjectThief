@@ -177,6 +177,9 @@ namespace Com.MyCompany.MyGame
         public Transform throwPos;
         public float moveSpeed { get { return (agent.velocity != Vector3.zero) ? 1.0f : 0.0f; } }
 
+        [HideInInspector]
+        public bool seenByCamera = false;
+
         #endregion
 
 
@@ -217,25 +220,6 @@ namespace Com.MyCompany.MyGame
                 Destroy(other.gameObject);
             }
         }
-
-        //연구용, 천천히 할 것
-        /*
-        void OnBecameInvisible()
-        {
-            UnityEngine.Debug.Log("???");
-            unit.animator.speed = 0;
-        }
-
-        void OnBecameVisible()
-        {
-            unit.animator.speed = 1;
-        }
-
-        void OnWillRenderObjects()
-        {
-            UnityEngine.Debug.Log("SADfsadgsadg");
-        }
-        */
 
         #endregion
 
@@ -345,7 +329,7 @@ namespace Com.MyCompany.MyGame
         private void InitCurTarget()
         {
             curTarget.code = WeaponCode.max;
-            curTarget.pos = ValueCollections.InitPosition;
+            curTarget.pos = ValueCollections.initPos;
             stayDelay.Stop();
         }
 
