@@ -67,35 +67,34 @@ namespace Com.MyCompany.MyGame
             rayOrigin = transform.position + height;
             RaycastHit[] hits = Physics.SphereCastAll(rayOrigin, ValueCollections.canAssassinateDist, -transform.up, 0.1f, 1 << PhysicsLayers.Enemy);
 
-            foreach (RaycastHit obj in hits)
-            {
-                RaycastHit hit = new RaycastHit();
-
-                if (obj.transform.GetComponent<EnemyController>().seenByCamera)
-                {
-                    _canAssassinate = true;
-                    _assassinateTargetPos = obj.transform.position;
-                }
-
-                Debug.DrawRay(rayOrigin, -transform.up * 3, Color.white, 1.0f);
-                //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
-                if (Physics.Raycast(rayOrigin, -transform.up * ValueCollections.canAssassinateDist, out hit))
-                {
-                    Debug.Log(LayerMask.LayerToName(hit.transform.gameObject.layer));
-
-                    if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
-                    {
-                        _canAssassinate = false;
-                        InitAssassinateTargetPos();
-                    }
-                }
-            }
-
             //가까운 거리에 Enemy 없음
             if (hits.Length == 0)
             {
                 _assassinateTargetPos = ValueCollections.initPos;
                 _canAssassinate = false;
+            }
+            else
+            {
+                foreach (RaycastHit obj in hits)
+                {
+                    RaycastHit hit = new RaycastHit();
+
+                    _canAssassinate = obj.transform.GetComponent<EnemyController>().seenByCamera;
+                    _assassinateTargetPos = obj.transform.position;
+
+                    Debug.DrawRay(rayOrigin, -transform.up * ValueCollections.canAssassinateDist, Color.white, 1.0f);
+                    //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
+                    if (Physics.Raycast(rayOrigin, -transform.up * ValueCollections.canAssassinateDist, out hit))
+                    {
+                        Debug.Log(LayerMask.LayerToName(hit.transform.gameObject.layer));
+
+                        if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
+                        {
+                            _canAssassinate = false;
+                            InitAssassinateTargetPos();
+                        }
+                    }
+                }
             }
 
             if (_canAssassinate)

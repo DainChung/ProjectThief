@@ -92,6 +92,9 @@ namespace Com.MyCompany.MyGame.Collections
         //Milli Sec
         private static long[] _enemyDetectedStayMax = { 0, 1500, 5000, 1500, 0, -1};
         public static long[] enemyDetectedStayMax { get { return _enemyDetectedStayMax; } }
+        //Milli Sec
+        private static float _deadBodyRemainTime = 30.0f;
+        public static float deadBodyRemainTime { get { return _deadBodyRemainTime; } }
 
         #endregion
 

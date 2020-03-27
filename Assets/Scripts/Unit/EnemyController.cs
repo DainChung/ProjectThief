@@ -209,7 +209,10 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            ChaseTarget();
+            if (unit.lockControl)
+            {
+                ChaseTarget();
+            }
         }
 
         void OnTriggerEnter(Collider other)

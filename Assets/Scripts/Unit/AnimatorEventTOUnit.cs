@@ -15,5 +15,11 @@ namespace Com.MyCompany.MyGame
             unit.EnableAssassinate(false);
             unit.lockControl = false;
         }
+
+        public void Dead()
+        {
+            unit.animator.speed = 0;
+            unit.Dead();
+        }
     }
 }

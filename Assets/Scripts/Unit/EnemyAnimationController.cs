@@ -29,8 +29,9 @@ namespace Com.MyCompany.MyGame
             enemy = GetComponent<EnemyController>();
             animator = unit.animator;
 
-            unitAnimController = new UnitAnimationController(unit, animator);
             collider = GetComponent<CapsuleCollider>();
+
+            unitAnimController = unit.unitAnimController;
         }
 
         void FixedUpdate()

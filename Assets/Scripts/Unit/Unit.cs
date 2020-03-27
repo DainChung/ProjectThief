@@ -210,7 +210,7 @@ namespace Com.MyCompany.MyGame
         //Player => Enemy에게 얼마나 들켰는지에 대한 정보
         //Enemy => 주변을 경계하는 정도
         private UnitState _curUnitState = UnitState.IDLE;
-        
+
         #endregion
 
         #region Public Fields
@@ -245,6 +245,8 @@ namespace Com.MyCompany.MyGame
         public AttackCollider defaultAttack;
         public AttackCollider assassinate;
 
+        public UnitAnimationController unitAnimController;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -253,8 +255,10 @@ namespace Com.MyCompany.MyGame
             _health = 1;
             _speed = 35.0f;
             _jumpPower = 10f;
+
+            unitAnimController = new UnitAnimationController(this, animator);
         }
-        // Start is called before the first frame update
+
         void Start()
         {
             throwLine = new ThrowLineRenderer(throwDestiPos, transform.GetComponent<LineRenderer>());
@@ -265,7 +269,6 @@ namespace Com.MyCompany.MyGame
             assassinate.InitAttackCollider(-1);
         }
 
-        // Update is called once per frame
         void FixedUpdate()
         {
 
@@ -357,34 +360,56 @@ namespace Com.MyCompany.MyGame
                 curUnitState = UnitState.COMBAT;
         }
 
+        private IEnumerator DelayPlayDeadAnim(int damage)
+        {
+            Stopwatch delay = new Stopwatch();
+            delay.Start();
+            while (delay.ElapsedMilliseconds <= 100)
+                yield return null;
+            delay.Stop();
+            unitAnimController.PlayDeadAnim(damage);
+            yield break;
+        }
+
         #endregion
 
         #region Public Methods
 
+        public void Dead()
+        {
+            _lockControl = true;
+            GetComponent<CapsuleCollider>().enabled = false;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().useGravity = false;
+            Destroy(gameObject, ValueCollections.deadBodyRemainTime);
+        }
+
         public void HitHealth(int damage)
         {
-            //일반 공격(damage >= 0)
-            if (damage >= 0)
+            //일반 공격(damage > 0)
+            if (damage > 0)
             {
                 if (damage >= _health)
                 {
                     _health = 0;
-                    //일반 사망 애니메이션 재생 OR 트리거
-                    //사망 판정
+                    StartCoroutine(DelayPlayDeadAnim(damage));
                 }
                 else
                 {
                     _health -= damage;
                     //피격 애니메이션 재생 OR 트리거
                     //피격 애니메이션 재생 도중 조작 불가
+                    //피격 시 전투 상태로 전환
+                    //alertValue = AggroCollections.combatMin;
+                    //AlertManager();
+                    //_lockControl = true;
                 }
             }
             //암살(damage < 0)
             else
             {
                 _health = 0;
-                //암살 사망 애니메이션 재생 OR 트리거
-                //사망 판정
+                StartCoroutine(DelayPlayDeadAnim(damage));
             }
         }
 

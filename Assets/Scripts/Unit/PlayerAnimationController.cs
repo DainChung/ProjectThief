@@ -31,7 +31,7 @@ namespace Com.MyCompany.MyGame
             player = GetComponent<PlayerController>();
             animator = unit.animator;
 
-            unitAnimController = new UnitAnimationController(unit, animator);
+            unitAnimController = unit.unitAnimController;
             collider = GetComponent<CapsuleCollider>();
         }
 

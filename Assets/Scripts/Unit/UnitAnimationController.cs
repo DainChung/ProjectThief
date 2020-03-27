@@ -329,6 +329,24 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        //Standing Layer 빼고 모두 비활성화
+        public void TurnOffAllLayers()
+        {
+            _animator.SetLayerWeight(AnimationLayers.Crouch, 0);
+            _animator.SetLayerWeight(AnimationLayers.CoverStanding, 0);
+            _animator.SetLayerWeight(AnimationLayers.CoverCrouch, 0);
+            _animator.SetLayerWeight(AnimationLayers.Throw, 0);
+            _animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
+            _animator.SetLayerWeight(AnimationLayers.InSmoke, 0);
+        }
+
+        public void PlayDeadAnim(int damage)
+        {
+            TurnOffAllLayers();
+            //damage < 0이면 암살로 인한 사망, damage > 0이면 일반공격으로 사망
+            _animator.SetInteger("DeadAnim", damage);
+        }
+
         #endregion
     }
 }
