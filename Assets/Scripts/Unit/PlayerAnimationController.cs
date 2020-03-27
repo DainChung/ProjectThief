@@ -14,11 +14,20 @@ namespace Com.MyCompany.MyGame
         private PlayerController player;
         private Animator animator;
         private Unit unit;
-        private UnitAnimationController unitAnimController;
         private CapsuleCollider collider;
 
         const float crouchColliderHeight = 64f;
         const float standColliderHeight = 90f;
+
+        #endregion
+
+        #region Public Fields
+
+        [HideInInspector]
+        public UnitAnimationController unitAnimController;
+
+        [HideInInspector]
+        public bool lockAnim = false;
 
         #endregion
 
@@ -37,7 +46,8 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            ControlPlayerAnimation();
+            if (!unit.lockControl)
+                ControlPlayerAnimation();
         }
 
         #endregion
@@ -231,6 +241,10 @@ namespace Com.MyCompany.MyGame
 
                         break;
                     #endregion
+
+                    case UnitPose.MOD_ATTACK:
+                        animator.SetFloat("MoveSpeed", 0);
+                        break;
 
                     default:
                         break;

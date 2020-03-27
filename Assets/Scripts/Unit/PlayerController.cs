@@ -195,14 +195,7 @@ namespace Com.MyCompany.MyGame
             #region 무기 및 공격
         private WeaponCode curWeapon = WeaponCode.HAND;
 
-        //조준 후 발사되지 않는 경우 발사하도록 제어
-        private bool readyToThrowItem = false;
-        //동시에 두번 발사 되는 현상 방지
-        private bool doubleThrowLock = false;
-
         private Vector3 throwRotEuler = Vector3.zero;
-
-        private bool assassinateTrigger = false;
             #endregion
 
             #region 어그로 관련 변수
@@ -221,6 +214,8 @@ namespace Com.MyCompany.MyGame
 
         public Transform throwPos;
         public CheckCameraCollider checkCameraCollider;
+        [HideInInspector]
+        public LookDirState curlookDir { set { curLookDirState = value; } }
 
         #endregion
 
@@ -236,7 +231,6 @@ namespace Com.MyCompany.MyGame
             pInventory.Add(Item.SMOKE, 2);
         }
 
-        // Start is called before the first frame update
         void Start()
         {
             unit = GetComponent<Unit>();
@@ -333,6 +327,9 @@ namespace Com.MyCompany.MyGame
                             ControlAttack();
                             SetBYCurUnitPose();
                             break;
+                        case UnitPose.MOD_ATTACK:
+                            ControlAttack();
+                            break;
                         default:
                             break;
                     }
@@ -382,6 +379,7 @@ namespace Com.MyCompany.MyGame
                     lookDir = transform.position + mainCameraTransform.forward;
                     break;
                 default:
+                    lookDir = transform.position + transform.forward;
                     break;
             }
 
@@ -391,8 +389,23 @@ namespace Com.MyCompany.MyGame
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
-        //암살
-        //비전투 상태에서만 가능
+        /// <summary>
+        /// 일반 공격
+        /// </summary>
+        private void AttackDefault()
+        {
+            if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    MyDebug.Log("AttackDefault");
+                    unit.AttackDefault(ref rb);
+                    curLookDirState = LookDirState.max;
+                }
+        }
+
+        /// <summary>
+        /// 암살, 비전투 상태에서만 가능
+        /// </summary>
         private void AttackAssassinate()
         {
             switch (unit.curUnitState)
@@ -402,15 +415,8 @@ namespace Com.MyCompany.MyGame
                 case UnitState.ALERT:
 
                     if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
-                    {
-                        MyDebug.Log("암살 쿨타임 됨");
                         if (Input.GetButton("Assassinate") && checkCameraCollider.canAssassinate)
-                        {
-                            UnityEngine.Debug.Log("암살");
                             StartCoroutine(AssassinateMove());
-                        }
-
-                    }
                     else
                         checkCameraCollider.InitAssassinateTargetPos();
 
@@ -419,7 +425,6 @@ namespace Com.MyCompany.MyGame
                     break;
             }
         }
-
         private IEnumerator AssassinateMove()
         {
             unit.lockControl = true;
@@ -445,7 +450,6 @@ namespace Com.MyCompany.MyGame
             checkCameraCollider.InitCanAssassinate();
             checkCameraCollider.InitAssassinateTargetPos();
             unit.EnableAssassinate(true);
-            unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
 
             unit.lockControl = false;
             yield break;
@@ -576,6 +580,7 @@ namespace Com.MyCompany.MyGame
             {
                 //비무장, 아무것도 할 수 없음
                 case WeaponCode.HAND:
+                    AttackDefault();
                     AttackAssassinate();
                     break;
                 case WeaponCode.CAN:

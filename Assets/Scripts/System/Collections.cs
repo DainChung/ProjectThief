@@ -23,7 +23,7 @@ namespace Com.MyCompany.MyGame.Collections
     public enum UnitPose
     {
         MOD_WALK = 0, MOD_RUN, MOD_CROUCH, MOD_COVERSTAND, MOD_COVERCROUCH, MOD_THROW,
-        MOD_THROWEND, MOD_FALL, MOD_INSMOKE, MOD_SLEEP, max
+        MOD_THROWEND, MOD_FALL, MOD_INSMOKE, MOD_SLEEP, MOD_ATTACK, max
     }
     //적 캐릭터 상태에 관한 정보
     public enum UnitState
@@ -92,9 +92,12 @@ namespace Com.MyCompany.MyGame.Collections
         //Milli Sec
         private static long[] _enemyDetectedStayMax = { 0, 1500, 5000, 1500, 0, -1};
         public static long[] enemyDetectedStayMax { get { return _enemyDetectedStayMax; } }
-        //Milli Sec
+        //Sec
         private static float _deadBodyRemainTime = 30.0f;
         public static float deadBodyRemainTime { get { return _deadBodyRemainTime; } }
+        //Sec
+        private static int _attackCountDelay = 2;
+        public static int attackCountDelay { get { return _attackCountDelay; } } 
 
         #endregion
 

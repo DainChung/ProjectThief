@@ -329,7 +329,9 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        //Standing Layer 빼고 모두 비활성화
+        /// <summary>
+        /// Standing Layer 빼고 모두 비활성화, MOD_RUN으로 변경
+        /// </summary>
         public void TurnOffAllLayers()
         {
             _animator.SetLayerWeight(AnimationLayers.Crouch, 0);
@@ -338,6 +340,15 @@ namespace Com.MyCompany.MyGame
             _animator.SetLayerWeight(AnimationLayers.Throw, 0);
             _animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
             _animator.SetLayerWeight(AnimationLayers.InSmoke, 0);
+
+            _animator.SetBool("IsRunMode", true);
+            _animator.SetBool("IsCovering", false);
+            _animator.SetBool("IsCrouchMode", false);
+            _animator.SetBool("IsThrowMode", false);
+            _animator.SetBool("ReadyAssassinateAnim", false);
+            _animator.SetBool("ThrowItem", false);
+
+            _unit.curUnitPose = UnitPose.MOD_RUN;
         }
 
         public void PlayDeadAnim(int damage)

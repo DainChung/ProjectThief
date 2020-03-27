@@ -59,7 +59,6 @@ namespace Com.MyCompany.MyGame
         }
         #endregion
 
-
         #region Private Methods
 
         private void CheckEnemies()
@@ -86,8 +85,6 @@ namespace Com.MyCompany.MyGame
                     //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
                     if (Physics.Raycast(rayOrigin, -transform.up * ValueCollections.canAssassinateDist, out hit))
                     {
-                        Debug.Log(LayerMask.LayerToName(hit.transform.gameObject.layer));
-
                         if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
                         {
                             _canAssassinate = false;
@@ -96,9 +93,6 @@ namespace Com.MyCompany.MyGame
                     }
                 }
             }
-
-            if (_canAssassinate)
-                MyDebug.Log("암살 가능");
         }
 
         #endregion
