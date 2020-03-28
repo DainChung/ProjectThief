@@ -22,6 +22,8 @@ namespace Com.MyCompany.MyGame
 
         #region Public Fields
 
+        public Unit unit;
+
         public bool canAssassinate { get { return _canAssassinate; } }
         public Vector3 assassinateTargetPos { get { return _assassinateTargetPos; } }
 
@@ -38,7 +40,9 @@ namespace Com.MyCompany.MyGame
             //메인카메라 따라서 회전
             transform.rotation = Quaternion.Euler(-90f, mainCam.transform.rotation.eulerAngles.y, 0);
 
-            CheckEnemies();
+            //땅에 붙어있을 때만 작동
+            if(unit.IsOnFloor())
+                CheckEnemies();
         }
 
         void OnTriggerEnter(Collider other)

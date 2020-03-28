@@ -301,15 +301,15 @@ namespace Com.MyCompany.MyGame
                     switch (unit.curUnitPose)
                     {
                         case UnitPose.MOD_WALK:
-                            ControlBase();
+                            ControlMove();
                             ControlAttack();
                             break;
                         case UnitPose.MOD_RUN:
-                            ControlBase();
+                            ControlMove();
                             ControlAttack();
                             break;
                         case UnitPose.MOD_CROUCH:
-                            ControlBase();
+                            ControlMove();
                             ControlAttack();
                             break;
                         case UnitPose.MOD_COVERSTAND:
@@ -395,12 +395,15 @@ namespace Com.MyCompany.MyGame
         private void AttackDefault()
         {
             if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
+            {
                 if (Input.GetButtonDown("Fire1"))
                 {
-                    MyDebug.Log("AttackDefault");
+                    if(checkCameraCollider.assassinateTargetPos != ValueCollections.initPos)
+                        transform.LookAt(checkCameraCollider.assassinateTargetPos);
                     unit.AttackDefault(ref rb);
                     curLookDirState = LookDirState.max;
                 }
+            }
         }
 
         /// <summary>
@@ -488,8 +491,8 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        //일반적인 상태에서의 조작
-        private void ControlBase()
+        //일반적인 움직임 조작
+        private void ControlMove()
         {
             curLookDirState = LookDirState.IDLE;
 

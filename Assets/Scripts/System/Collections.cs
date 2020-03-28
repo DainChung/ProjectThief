@@ -218,7 +218,8 @@ namespace Com.MyCompany.MyGame.Collections
         private static int _Throw = 12;
         private static int _EnemyAttack = 13;
         private static int _PlayerAttack = 14;
-        //private static int _Enemy = 7;
+        private static int _EnemyRadar = 15;
+        private static int _PlayerRadar = 16;
 
         /// <summary>
         /// Default = 0
@@ -268,6 +269,14 @@ namespace Com.MyCompany.MyGame.Collections
         /// PlayerAttack = 14
         /// </summary>
         public static int PlayerAttack { get { return _PlayerAttack; } }
+        /// <summary>
+        /// EnemyAttack = 15
+        /// </summary>
+        public static int EnemyRadar { get { return _EnemyRadar; } }
+        /// <summary>
+        /// PlayerAttack = 16
+        /// </summary>
+        public static int PlayerRadar { get { return _PlayerRadar; } }
     }
 
     //디버그용 

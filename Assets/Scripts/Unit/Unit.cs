@@ -124,7 +124,7 @@ namespace Com.MyCompany.MyGame
 
             public void InitStopwatch()
             {
-                attackDelayTime[0] = 300;
+                attackDelayTime[0] = 200;
                 attackDelayTime[1] = 2000;
                 attackDelayTime[2] = 3000;
                 attackDelayTime[3] = 4000;
@@ -156,6 +156,11 @@ namespace Com.MyCompany.MyGame
             public void ResetAttackStopwatch(int index)
             {
                 attackSW[index].Reset();
+            }
+
+            public bool IsRunningAttackStopwatch(int index)
+            {
+                return attackSW[index].IsRunning;
             }
 
             public void AttackDelayManager()
@@ -271,7 +276,7 @@ namespace Com.MyCompany.MyGame
         #region MonoBehaviour Callbacks
         void Awake()
         {
-            _health = 1;
+            _health = 11;
             _speed = 35.0f;
             _jumpPower = 10f;
 
@@ -419,7 +424,7 @@ namespace Com.MyCompany.MyGame
                 {
                     _health -= damage;
 
-                    animator.SetTrigger("HitReaction");
+                    animator.Play("HitReaction", AnimationLayers.Standing);
                     alertValue = AggroCollections.combatMin;
                     AlertManager();
                     _lockControl = true;
@@ -440,6 +445,7 @@ namespace Com.MyCompany.MyGame
 
             if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName("Attack " + attackCount.ToString()))
             {
+                
                 //애니메이션 제어
                 unitAnimController.TurnOffAllLayers();
 
@@ -448,7 +454,7 @@ namespace Com.MyCompany.MyGame
                 else
                     attackCount++;
 
-                animator.speed = 2;
+                animator.speed = 2.5f;
                 animator.Play("Attack " + attackCount.ToString(), AnimationLayers.Standing);
                 animator.SetInteger("AttackCount", attackCount);
                 animator.SetBool("IsAttack", true);
@@ -458,9 +464,11 @@ namespace Com.MyCompany.MyGame
                 EnableDefaultAttack(true);
 
                 //위치 제어
-                rb.AddForce(transform.forward * walkSpeed);
-                rb.velocity *= 0.9f;
+                rb.AddForce(transform.forward * 2, ForceMode.Impulse);
             }
+            //간헐적으로 attackSW[0]가 영구적으로 중지되는 버그 방지
+            else if (!swManager.IsRunningAttackStopwatch(0))
+                swManager.RestartAttackStopwatch(0);
         }
 
             #region 엄폐 시 벽으로 밀착

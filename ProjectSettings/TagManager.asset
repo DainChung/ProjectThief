@@ -29,8 +29,8 @@ TagManager:
   - Throw
   - EnemyAttack
   - PlayerAttack
-  - 
-  - 
+  - EnemyRadar
+  - PlayerRadar
   - 
   - 
   - 
