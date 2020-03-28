@@ -14,7 +14,7 @@ namespace Com.MyCompany.MyGame
         private bool _canAssassinate = false;
         private Vector3 _assassinateTargetPos = ValueCollections.initPos;
 
-        private Vector3 height = new Vector3(0, 0.1f, 0);
+        private Vector3 height = new Vector3(0, -1, 0);
         private Vector3 rayOrigin;
         private Vector3 rayDesti;
 
@@ -79,7 +79,6 @@ namespace Com.MyCompany.MyGame
                 {
                     RaycastHit hit = new RaycastHit();
                     rayDesti = -rayOrigin + obj.transform.position;
-                    rayDesti.Set(rayDesti.x, 0, rayDesti.z);
 
                     _canAssassinate = obj.transform.GetComponent<EnemyController>().seenByCamera;
                     _assassinateTargetPos = obj.transform.position;
