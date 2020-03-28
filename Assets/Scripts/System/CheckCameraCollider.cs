@@ -16,6 +16,7 @@ namespace Com.MyCompany.MyGame
 
         private Vector3 height = new Vector3(0, 0.1f, 0);
         private Vector3 rayOrigin;
+        private Vector3 rayDesti;
 
         #endregion
 
@@ -77,13 +78,15 @@ namespace Com.MyCompany.MyGame
                 foreach (RaycastHit obj in hits)
                 {
                     RaycastHit hit = new RaycastHit();
+                    rayDesti = -rayOrigin + obj.transform.position;
+                    rayDesti.Set(rayDesti.x, 0, rayDesti.z);
 
                     _canAssassinate = obj.transform.GetComponent<EnemyController>().seenByCamera;
                     _assassinateTargetPos = obj.transform.position;
 
-                    Debug.DrawRay(rayOrigin, -transform.up * ValueCollections.canAssassinateDist, Color.white, 1.0f);
+                    Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
                     //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
-                    if (Physics.Raycast(rayOrigin, -transform.up * ValueCollections.canAssassinateDist, out hit))
+                    if (Physics.Raycast(rayOrigin, rayDesti, out hit))
                     {
                         if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
                         {
