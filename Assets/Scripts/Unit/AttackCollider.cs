@@ -18,7 +18,7 @@ namespace Com.MyCompany.MyGame
             if (other.gameObject.layer == PhysicsLayers.Enemy
                 || other.gameObject.layer == PhysicsLayers.Player)
             {
-                other.transform.GetComponent<Unit>().HitHealth(_damage);
+                other.transform.GetComponent<Unit>().HitHealth(_damage, transform.position);
                 collider.enabled = false;
                 Debug.Log(LayerMask.LayerToName(other.gameObject.layer) + " 피격, 데미지: " + _damage);
             }

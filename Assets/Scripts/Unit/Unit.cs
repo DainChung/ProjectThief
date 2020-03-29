@@ -276,7 +276,7 @@ namespace Com.MyCompany.MyGame
         #region MonoBehaviour Callbacks
         void Awake()
         {
-            _health = 11;
+            _health = 3;
             _speed = 35.0f;
             _jumpPower = 10f;
 
@@ -410,7 +410,7 @@ namespace Com.MyCompany.MyGame
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }
 
-        public void HitHealth(int damage)
+        public void HitHealth(int damage, Vector3 pos)
         {
             //일반 공격(damage > 0)
             if (damage > 0)
@@ -424,6 +424,7 @@ namespace Com.MyCompany.MyGame
                 {
                     _health -= damage;
 
+                    transform.LookAt(pos);
                     animator.Play("HitReaction", AnimationLayers.Standing);
                     alertValue = AggroCollections.combatMin;
                     AlertManager();
@@ -445,7 +446,11 @@ namespace Com.MyCompany.MyGame
 
             if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName("Attack " + attackCount.ToString()))
             {
-                
+                if (animator.speed == 2.5f)
+                {
+                    animator.speed = 1;
+                    swManager.RestartAttackStopwatch(0);
+                }
                 //애니메이션 제어
                 unitAnimController.TurnOffAllLayers();
 
