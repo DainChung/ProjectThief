@@ -28,7 +28,7 @@ namespace Com.MyCompany.MyGame
         private class DetectedTargetQueue
         {
             public bool FindCheese { get { return (queue[0].code == WeaponCode.CHEESE); } }
-            public bool FindPlayer { get { return (queue[0].code == WeaponCode.PLAYER); } }
+            public bool FindPlayer { get { return (queue[0].code == WeaponCode.PLAYER) || (queue[0].code == WeaponCode.PLAYERTRACK); } }
 
             //어그로 끈 Weapon을 저장하는 배열, 최대 3개까지만 기억
             private DetectedTarget[] queue = new DetectedTarget[3];
@@ -57,6 +57,13 @@ namespace Com.MyCompany.MyGame
                     {
                         if (weaponCode != WeaponCode.CHEESE && weaponCode != WeaponCode.max)
                             queue[Count()] = input;
+                    }
+
+                    if (weaponCode == WeaponCode.PLAYERTRACK)
+                    {
+                        //PlayerTrack이면 최우선 순위 3번째로 설정
+                        PushQueueReverse();
+                        queue[0] = input;
                     }
 
                     if (weaponCode == WeaponCode.PLAYER)
@@ -209,9 +216,10 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            if (unit.lockControl)
+            if (!unit.lockControl)
             {
-                ChaseTarget();
+                if(unit.health > 0)
+                    ChaseTarget();
             }
         }
 
@@ -271,12 +279,8 @@ namespace Com.MyCompany.MyGame
         //우선순위: CHEESE > Player > CAN > Patrol Spot
         private void ChaseTarget()
         {
-            //특이 사항 없음
-            if (queue.Count() == 0)
-            {
-
-            }
-            else
+            //queue에 뭔가 있을 때
+            if (queue.Count() > 0)
             { 
                 //현재 추적하고 있는 타겟이 없을 때만 queue에서 정보를 받아온다.
                 if (curTarget.code == WeaponCode.max)
@@ -292,11 +296,12 @@ namespace Com.MyCompany.MyGame
                     else
                         Move();
                     break;
+                case WeaponCode.PLAYERTRACK:
                 case WeaponCode.PLAYER:
                     if (queue.FindCheese)
                         SetCurTarget();
-                   // else
-                        //Move();
+                    else
+                        Move();
                     break;
                 case WeaponCode.CHEESE:
                     Move();
@@ -325,6 +330,7 @@ namespace Com.MyCompany.MyGame
 
         private void SetCurTarget()
         {
+            MyDebug.Log("SetTarget");
             curTarget = queue.Dequeue();
             Instantiate(Resources.Load(FilePaths.AISystemPath + "Target") as GameObject, curTarget.pos, transform.rotation);
         }
@@ -346,20 +352,29 @@ namespace Com.MyCompany.MyGame
             {
                 case WeaponCode.CAN:
                 case WeaponCode.SMOKE:
-                    unit.curUnitState = UnitState.IDLE;
-                    unit.alertValue = AggroCollections.alertMin;
+                case WeaponCode.PLAYERTRACK:
+                    agent.speed = 2.5f;
+                    unit.curUnitState = UnitState.ALERT;
+                    if(unit.alertValue < AggroCollections.alertMin)
+                        unit.alertValue = AggroCollections.alertMin;
                     break;
                 case WeaponCode.PLAYER:
+                    agent.speed = 7.0f;
                     unit.curUnitState = UnitState.COMBAT;
-                    unit.alertValue = AggroCollections.combatMin;
+                    if (unit.alertValue < AggroCollections.combatMin)
+                        unit.alertValue = AggroCollections.combatMin;
                     break;
                 case WeaponCode.CHEESE:
+                    agent.speed = 8.0f;
                     unit.curUnitState = UnitState.CHEESE;
-                    unit.alertValue = AggroCollections.combatMin;
+                    if (unit.alertValue < AggroCollections.combatMin)
+                        unit.alertValue = AggroCollections.combatMin;
                     break;
                 default:
                     break;
             }
+
+            MyDebug.Log(agent.speed);
                         
             queue.Enqueue(code, pos);
         }

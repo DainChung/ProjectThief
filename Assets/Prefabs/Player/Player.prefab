@@ -483,6 +483,7 @@ MonoBehaviour:
   alertValue: 0
   defaultAttack: {fileID: 1614998785}
   assassinate: {fileID: 2016505108}
+  IsDetecting: 0
 --- !u!54 &1711946303659950610
 Rigidbody:
   m_ObjectHideFlags: 0

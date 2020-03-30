@@ -16,7 +16,7 @@ namespace Com.MyCompany.MyGame.Collections
     //Enemy가 추적할 때 사용하기도 함
     public enum WeaponCode
     {
-        HAND = 0, CAN, CHEESE, SMOKE, PLAYER, max
+        HAND = 0, CAN, CHEESE, SMOKE, PLAYER, PLAYERTRACK, max
     }
 
     //Animation Layer에 관한 정보

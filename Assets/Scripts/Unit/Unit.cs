@@ -271,9 +271,6 @@ namespace Com.MyCompany.MyGame
 
         public UnitAnimationController unitAnimController;
 
-        [HideInInspector]
-        public bool IsDetecting = false;
-
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -390,7 +387,7 @@ namespace Com.MyCompany.MyGame
             else
                 alertValue = AggroCollections.combatMin + 1;
 
-            MyDebug.Log(alertValue);
+            //MyDebug.Log(alertValue);
         }
 
         private IEnumerator DelayPlayDeadAnim(int damage)
@@ -461,10 +458,8 @@ namespace Com.MyCompany.MyGame
                 //애니메이션 제어
                 unitAnimController.TurnOffAllLayers();
 
-                if (attackCount > 0)
-                    attackCount = 0;
-                else
-                    attackCount++;
+                if (attackCount > 0)    attackCount = 0;
+                else    attackCount++;
 
                 animator.speed = 2.5f;
                 animator.Play("Attack " + attackCount.ToString(), AnimationLayers.Standing);
@@ -740,14 +735,20 @@ namespace Com.MyCompany.MyGame
 
         public void AddToAlertValue(float amount)
         {
-            alertValue += amount;
-            AlertManager();
+            if (_health > 0)
+            {
+                alertValue += amount;
+                AlertManager();
+            }
         }
 
         public void SetAlertValue(float amount)
         {
-            alertValue = amount;
-            AlertManager();
+            if (_health > 0)
+            {
+                alertValue = amount;
+                AlertManager();
+            }
         }
 
 
