@@ -123,9 +123,9 @@ namespace Com.MyCompany.MyGame.Collections
 
     public static class AggroCollections
     {
-        private static float _aggroRun = 0.1f;
-        private static float _aggroWalk = 0.05f;
-        private static float _aggroCrouch = 0.01f;
+        private static float _aggroRun = 0.01f;
+        private static float _aggroWalk = 0.005f;
+        private static float _aggroCrouch = 0.001f;
 
         private static float _alertMin = 1.0f;
         private static float _combatMin = 2.0f;

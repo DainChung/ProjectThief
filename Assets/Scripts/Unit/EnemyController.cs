@@ -295,8 +295,8 @@ namespace Com.MyCompany.MyGame
                 case WeaponCode.PLAYER:
                     if (queue.FindCheese)
                         SetCurTarget();
-                    else
-                        Move();
+                   // else
+                        //Move();
                     break;
                 case WeaponCode.CHEESE:
                     Move();

@@ -87,15 +87,12 @@ namespace Com.MyCompany.MyGame
                     _canAssassinate = obj.transform.GetComponent<EnemyController>().seenByCamera;
                     _assassinateTargetPos = obj.transform.position;
 
-                    Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
+                    //Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
                     //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
-                    if (Physics.Raycast(rayOrigin, rayDesti, out hit))
+                    if (Physics.Raycast(rayOrigin, rayDesti, out hit) && hit.transform.gameObject.layer == PhysicsLayers.Structure)
                     {
-                        if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
-                        {
-                            _canAssassinate = false;
-                            InitAssassinateTargetPos();
-                        }
+                        _canAssassinate = false;
+                        InitAssassinateTargetPos();
                     }
                 }
             }

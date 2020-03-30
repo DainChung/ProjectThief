@@ -217,6 +217,8 @@ namespace Com.MyCompany.MyGame
         [HideInInspector]
         public LookDirState curlookDir { set { curLookDirState = value; } }
 
+        public float aggroVal { get { return aggroValue; } }
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -398,6 +400,7 @@ namespace Com.MyCompany.MyGame
             {
                 if (Input.GetButtonDown("Fire1"))
                 {
+                    playerSpeed = unit.speed;
                     if(checkCameraCollider.assassinateTargetPos != ValueCollections.initPos)
                         transform.LookAt(checkCameraCollider.assassinateTargetPos);
                     unit.AttackDefault(ref rb);

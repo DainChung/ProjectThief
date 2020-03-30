@@ -271,6 +271,9 @@ namespace Com.MyCompany.MyGame
 
         public UnitAnimationController unitAnimController;
 
+        [HideInInspector]
+        public bool IsDetecting = false;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -382,8 +385,12 @@ namespace Com.MyCompany.MyGame
             else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
                 curUnitState = UnitState.ALERT;
             //curUnitState = UnitState.COMBAT
-            else
+            else if (alertValue < AggroCollections.combatMin + 1)
                 curUnitState = UnitState.COMBAT;
+            else
+                alertValue = AggroCollections.combatMin + 1;
+
+            MyDebug.Log(alertValue);
         }
 
         private IEnumerator DelayPlayDeadAnim(int damage)
@@ -730,6 +737,19 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsFalling", false);
             curUnitPose = UnitPose.MOD_RUN;
         }
+
+        public void AddToAlertValue(float amount)
+        {
+            alertValue += amount;
+            AlertManager();
+        }
+
+        public void SetAlertValue(float amount)
+        {
+            alertValue = amount;
+            AlertManager();
+        }
+
 
         #endregion
     }
