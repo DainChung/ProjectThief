@@ -234,6 +234,7 @@ namespace Com.MyCompany.MyGame
         //Player => Enemy에게 얼마나 들켰는지에 대한 정보
         //Enemy => 주변을 경계하는 정도
         private UnitState _curUnitState = UnitState.IDLE;
+        private LookDirState _curLookDir = LookDirState.IDLE;
 
         #endregion
 
@@ -255,6 +256,9 @@ namespace Com.MyCompany.MyGame
 
         [HideInInspector]
         public UnitPose curUnitPose = UnitPose.MOD_RUN;
+
+        [HideInInspector]
+        public LookDirState curLookDir { get { return _curLookDir; } set { _curLookDir = value; } }
 
         public Animator animator;
         public Transform throwDestiPos;
@@ -371,24 +375,6 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Private Methods
-
-        //alertValue에 따라 curUnitState를 변경
-        private void AlertManager()
-        {
-            //curUnitState = UnitState.IDLE
-            if (alertValue < AggroCollections.alertMin)
-                curUnitState = UnitState.IDLE;
-            //curUnitState = UnitState.ALERT
-            else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
-                curUnitState = UnitState.ALERT;
-            //curUnitState = UnitState.COMBAT
-            else if (alertValue < AggroCollections.combatMin + 1)
-                curUnitState = UnitState.COMBAT;
-            else
-                alertValue = AggroCollections.combatMin + 1;
-
-            //MyDebug.Log(alertValue);
-        }
 
         private IEnumerator DelayPlayDeadAnim(int damage)
         {
@@ -578,10 +564,10 @@ namespace Com.MyCompany.MyGame
             #region 던지기 동작 및 기능 제어
 
         //캐릭터가 아이템을 던지기 전에 조준하는 함수
-        public void AttackPhaseAiming(Vector3 throwPos, Vector3 throwRotEuler, ref float unitSpeed, ref LookDirState lookDir)
+        public void AttackPhaseAiming(Vector3 throwPos, Vector3 throwRotEuler, ref float unitSpeed)
         {
             animator.SetBool("IsThrowMode", true);
-            lookDir = LookDirState.THROW;
+            _curLookDir = LookDirState.THROW;
             curUnitPose = UnitPose.MOD_THROW;
 
             //발사각 결정
@@ -749,6 +735,24 @@ namespace Com.MyCompany.MyGame
                 alertValue = amount;
                 AlertManager();
             }
+        }
+
+        //alertValue에 따라 curUnitState를 변경
+        public void AlertManager()
+        {
+            //curUnitState = UnitState.IDLE
+            if (alertValue < AggroCollections.alertMin)
+                curUnitState = UnitState.IDLE;
+            //curUnitState = UnitState.ALERT
+            else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
+                curUnitState = UnitState.ALERT;
+            //curUnitState = UnitState.COMBAT
+            else if (alertValue < AggroCollections.combatMin + 1)
+                curUnitState = UnitState.COMBAT;
+            else
+                alertValue = AggroCollections.combatMin + 1;
+
+            //MyDebug.Log(alertValue);
         }
 
 

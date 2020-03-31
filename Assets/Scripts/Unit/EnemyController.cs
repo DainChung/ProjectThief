@@ -59,25 +59,17 @@ namespace Com.MyCompany.MyGame
                             queue[Count()] = input;
                     }
 
-                    if (weaponCode == WeaponCode.PLAYERTRACK)
+                    //PlayerTrack, Player, Cheese면 해당 타겟만 추적한다.
+                    switch (weaponCode)
                     {
-                        //PlayerTrack이면 최우선 순위 3번째로 설정
-                        PushQueueReverse();
-                        queue[0] = input;
-                    }
-
-                    if (weaponCode == WeaponCode.PLAYER)
-                    {
-                        //Player면 최우선 순위 2번째로 설정
-                        PushQueueReverse();
-                        queue[0] = input;
-                    }
-
-                    if (weaponCode == WeaponCode.CHEESE)
-                    {
-                        //치즈면 최우선순위로 설정(PLAYER보다 중요)
-                        PushQueueReverse();
-                        queue[0] = input;
+                        case WeaponCode.PLAYERTRACK:
+                        case WeaponCode.PLAYER:
+                        case WeaponCode.CHEESE:
+                            Clear();
+                            queue[0] = input;
+                            break;
+                        default:
+                            break;
                     }
 
                     //DebugQueue();
@@ -156,6 +148,15 @@ namespace Com.MyCompany.MyGame
                 queue[0].code = WeaponCode.max;
                 queue[0].pos.Set(-1, -1, -1);
             }
+            private void Clear()
+            {
+                queue[0].code = WeaponCode.max;
+                queue[0].pos.Set(-1, -1, -1);
+                queue[1].code = WeaponCode.max;
+                queue[1].pos.Set(-1, -1, -1);
+                queue[2].code = WeaponCode.max;
+                queue[2].pos.Set(-1, -1, -1);
+            }
         }
 
         #endregion
@@ -164,28 +165,31 @@ namespace Com.MyCompany.MyGame
 
         private DetectedTargetQueue queue = new DetectedTargetQueue();
 
-        private LookDirState curLookDir;
-
         private Unit unit;
         private Rigidbody rb;
 
         private DetectedTarget curTarget;
-        private bool doesReachToTarget = false;
+        private bool _doesReachToTarget = false;
 
         private Stopwatch stayDelay = new Stopwatch();
         private bool checkStayDelay { get { return stayDelay.ElapsedMilliseconds >= ValueCollections.enemyDetectedStayMax[(int)curTarget.code]; } }
 
         private NavMeshAgent agent;
 
+        private Vector3 playerPosition = ValueCollections.initPos;
+
         #endregion
 
         #region Public Fields
 
         public Transform throwPos;
-        public float moveSpeed { get { return (agent.velocity != Vector3.zero) ? 1.0f : 0.0f; } }
+        public float moveSpeed { get { return (agent.velocity == Vector3.zero) ? 0.0f : 1.0f; } }
+        public bool doesReachToTarget { set { _doesReachToTarget = value; } }
 
         [HideInInspector]
         public bool seenByCamera = false;
+
+        public EnemyRadarManager radarMng;
 
         #endregion
 
@@ -194,8 +198,6 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
-            curLookDir = LookDirState.IDLE;
-
             stayDelay.Start();
             stayDelay.Stop();
         }
@@ -204,6 +206,7 @@ namespace Com.MyCompany.MyGame
         {
             unit = GetComponent<Unit>();
             unit.curUnitState = UnitState.IDLE;
+            unit.curLookDir = LookDirState.IDLE;
 
             unit.animator.SetBool("IsRunMode", false);
 
@@ -211,6 +214,7 @@ namespace Com.MyCompany.MyGame
             InitCurTarget();
 
             agent = GetComponent<NavMeshAgent>();
+            radarMng.enabled = true;
         }
         
 
@@ -219,7 +223,7 @@ namespace Com.MyCompany.MyGame
             if (!unit.lockControl)
             {
                 if(unit.health > 0)
-                    ChaseTarget();
+                    ChaseTargetBYQueue();
             }
         }
 
@@ -227,7 +231,16 @@ namespace Com.MyCompany.MyGame
         {
             if (other.CompareTag("Target"))
             {
-                doesReachToTarget = true;
+                _doesReachToTarget = true;
+                Destroy(other.gameObject);
+            }
+        }
+
+        void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Target"))
+            {
+                _doesReachToTarget = true;
                 Destroy(other.gameObject);
             }
         }
@@ -235,6 +248,20 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Private Methods
+
+        private void LookDir()
+        {
+            switch (unit.curLookDir)
+            {
+                case LookDirState.FINDPLAYER:
+                    playerPosition = GameObject.FindWithTag("Player").transform.position;
+                    transform.LookAt(playerPosition);
+                    break;
+                default:
+                    playerPosition = ValueCollections.initPos;
+                    break;
+            }
+        }
 
         private void AI()
         {
@@ -277,7 +304,7 @@ namespace Com.MyCompany.MyGame
 
         //특정 타겟(CAN, CHEESE, Player) 위치로 이동
         //우선순위: CHEESE > Player > CAN > Patrol Spot
-        private void ChaseTarget()
+        private void ChaseTargetBYQueue()
         {
             //queue에 뭔가 있을 때
             if (queue.Count() > 0)
@@ -286,6 +313,8 @@ namespace Com.MyCompany.MyGame
                 if (curTarget.code == WeaponCode.max)
                     SetCurTarget();
             }
+
+            LookDir();
 
             switch (curTarget.code)
             {
@@ -297,13 +326,19 @@ namespace Com.MyCompany.MyGame
                         Move();
                     break;
                 case WeaponCode.PLAYERTRACK:
+                    if (queue.FindCheese)
+                        SetCurTarget();
+                    else
+                        MovePlayerTrack();
+                    break;
                 case WeaponCode.PLAYER:
                     if (queue.FindCheese)
                         SetCurTarget();
                     else
-                        Move();
+                        MoveToPlayer();
                     break;
                 case WeaponCode.CHEESE:
+                    unit.curLookDir = LookDirState.IDLE;
                     Move();
                     break;
                 default:
@@ -313,9 +348,9 @@ namespace Com.MyCompany.MyGame
 
         private void Move()
         {
-            if (curTarget.code != WeaponCode.max && !doesReachToTarget)
+            if (curTarget.code != WeaponCode.max && !_doesReachToTarget)
                 agent.SetDestination(curTarget.pos);
-            else if (doesReachToTarget)
+            else if (_doesReachToTarget)
             {
                 if (!stayDelay.IsRunning)
                     stayDelay.Restart();
@@ -323,8 +358,31 @@ namespace Com.MyCompany.MyGame
                 if (checkStayDelay)
                 {
                     InitCurTarget();
-                    doesReachToTarget = false;
+                    _doesReachToTarget = false;
                 }
+            }
+        }
+        private void MovePlayerTrack()
+        {
+            if (!_doesReachToTarget)
+                agent.SetDestination(playerPosition);
+            else
+            {
+                _doesReachToTarget = false;
+                InitCurTarget();
+                MyDebug.Log("정지");
+            }
+        }
+        private void MoveToPlayer()
+        {
+            if (!_doesReachToTarget)
+                agent.SetDestination(playerPosition);
+            else
+            {
+                _doesReachToTarget = false;
+                InitCurTarget();
+                playerPosition = ValueCollections.initPos;
+                MyDebug.Log("정지");
             }
         }
 
@@ -342,6 +400,32 @@ namespace Com.MyCompany.MyGame
             stayDelay.Stop();
         }
 
+        private void EnemyAlertManager()
+        {
+            unit.AlertManager();
+
+            switch (unit.curUnitState)
+            {
+                case UnitState.IDLE:
+                    agent.speed = 4.0f;
+                    radarMng.EnableEnemyRadar(true);
+                    break;
+                case UnitState.ALERT:
+                    agent.speed = 2.5f;
+                    radarMng.EnableEnemyRadar(true);
+                    StartCoroutine(radarMng.Sample(playerPosition));
+                    break;
+                case UnitState.COMBAT:
+                    agent.speed = 7.0f;
+                    radarMng.EnableEnemyRadar(false);
+                    break;
+                default:
+                    break;
+            }
+
+            MyDebug.Log(unit.curUnitState);
+        }
+
         #endregion
 
         #region Public Methods
@@ -353,20 +437,14 @@ namespace Com.MyCompany.MyGame
                 case WeaponCode.CAN:
                 case WeaponCode.SMOKE:
                 case WeaponCode.PLAYERTRACK:
-                    agent.speed = 2.5f;
-                    unit.curUnitState = UnitState.ALERT;
                     if(unit.alertValue < AggroCollections.alertMin)
                         unit.alertValue = AggroCollections.alertMin;
                     break;
                 case WeaponCode.PLAYER:
-                    agent.speed = 7.0f;
-                    unit.curUnitState = UnitState.COMBAT;
                     if (unit.alertValue < AggroCollections.combatMin)
                         unit.alertValue = AggroCollections.combatMin;
                     break;
                 case WeaponCode.CHEESE:
-                    agent.speed = 8.0f;
-                    unit.curUnitState = UnitState.CHEESE;
                     if (unit.alertValue < AggroCollections.combatMin)
                         unit.alertValue = AggroCollections.combatMin;
                     break;
@@ -374,9 +452,23 @@ namespace Com.MyCompany.MyGame
                     break;
             }
 
-            MyDebug.Log(agent.speed);
+            EnemyAlertManager();
+            MyDebug.Log("EnemySpeed: "+agent.speed);
                         
             queue.Enqueue(code, pos);
+        }
+        public bool IsCombatState()
+        {
+            return (unit.curUnitState == UnitState.COMBAT);
+        }
+        public bool IsAlertValueSmallerThen(float value)
+        {
+            return unit.alertValue < value;
+        }
+        public void SetAlertValue(float value)
+        {
+            unit.alertValue = value;
+            EnemyAlertManager();
         }
 
         #endregion

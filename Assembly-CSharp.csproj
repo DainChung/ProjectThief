@@ -76,6 +76,7 @@
      <Compile Include="Assets\Scripts\Unit\EnemyAnimationController.cs" />
      <Compile Include="Assets\Scripts\Unit\EnemyController.cs" />
      <Compile Include="Assets\Scripts\Unit\EnemyRadar.cs" />
+     <Compile Include="Assets\Scripts\Unit\EnemyRadarManager.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerAnimationController.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Unit\Unit.cs" />

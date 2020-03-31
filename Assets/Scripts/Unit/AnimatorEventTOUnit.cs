@@ -27,8 +27,7 @@ namespace Com.MyCompany.MyGame
             unit.swManager.attackCountDelay.Restart();
             unit.curUnitPose = UnitPose.MOD_RUN;
 
-            if (unit.transform.CompareTag("Player"))
-                unit.transform.GetComponent<PlayerController>().curlookDir = LookDirState.IDLE;
+            unit.transform.GetComponent<Unit>().curLookDir = LookDirState.IDLE;
         }
 
         public void Dead()

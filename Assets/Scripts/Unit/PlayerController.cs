@@ -175,8 +175,6 @@ namespace Com.MyCompany.MyGame
 
         #region Private Fields
 
-        private LookDirState curLookDirState = LookDirState.IDLE;
-
             #region 기본 이동 및 물리
         private float playerSpeed;
         private Transform mainCameraTransform;
@@ -214,8 +212,6 @@ namespace Com.MyCompany.MyGame
 
         public Transform throwPos;
         public CheckCameraCollider checkCameraCollider;
-        [HideInInspector]
-        public LookDirState curlookDir { set { curLookDirState = value; } }
 
         public float aggroVal { get { return aggroValue; } }
 
@@ -369,7 +365,7 @@ namespace Com.MyCompany.MyGame
         //플레이어 캐릭터가 특정 방향을 바라보게 하는 함수
         void LookDir()
         {
-            switch (curLookDirState)
+            switch (unit.curLookDir)
             {
                 case LookDirState.IDLE:
                     SetLookDir(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
@@ -404,7 +400,7 @@ namespace Com.MyCompany.MyGame
                     if(checkCameraCollider.assassinateTargetPos != ValueCollections.initPos)
                         transform.LookAt(checkCameraCollider.assassinateTargetPos);
                     unit.AttackDefault(ref rb);
-                    curLookDirState = LookDirState.max;
+                    unit.curLookDir = LookDirState.max;
                 }
             }
         }
@@ -468,7 +464,7 @@ namespace Com.MyCompany.MyGame
             {
                 //조준
                 if (Input.GetButton("Fire1") && pInventory.CheckWeapon(curWeapon))
-                    unit.AttackPhaseAiming(throwPos.position, mainCameraTransform.rotation.eulerAngles, ref playerSpeed, ref curLookDirState);
+                    unit.AttackPhaseAiming(throwPos.position, mainCameraTransform.rotation.eulerAngles, ref playerSpeed);
                 //조준한 상태에서 놓으면 투척
                 else if ((Input.GetButtonUp("Fire1") || unit.readyToThrowItem) && unit.doubleThrowLock)
                 {
@@ -487,7 +483,7 @@ namespace Com.MyCompany.MyGame
             //Throw 애니메이션 종료 후
             if (animator.GetLayerWeight(AnimationLayers.Throw) <= 0 && animator.GetBool("ThrowItem"))
             {
-                curLookDirState = LookDirState.IDLE;
+                unit.curLookDir = LookDirState.IDLE;
   
                 unit.ResetThrowAnimation();
                 SetBYCurUnitPose();
@@ -497,7 +493,7 @@ namespace Com.MyCompany.MyGame
         //일반적인 움직임 조작
         private void ControlMove()
         {
-            curLookDirState = LookDirState.IDLE;
+            unit.curLookDir = LookDirState.IDLE;
 
             //플레이어 캐릭터 이동
             if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
@@ -536,7 +532,7 @@ namespace Com.MyCompany.MyGame
         {
             //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
 
-            curLookDirState = LookDirState.COVER;
+            unit.curLookDir = LookDirState.COVER;
 
             //엄폐 상태일 때 가능한 조작 사용
             if (Input.GetButton("Horizontal"))

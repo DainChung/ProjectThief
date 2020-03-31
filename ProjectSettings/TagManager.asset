@@ -32,7 +32,7 @@ TagManager:
   - EnemyRadar
   - PlayerRadar
   - TargetLayer
-  - 
+  - EnemyRadarManager
   - 
   - 
   - 

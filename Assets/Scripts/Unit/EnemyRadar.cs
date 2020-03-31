@@ -8,8 +8,8 @@ namespace Com.MyCompany.MyGame
 {
     public class EnemyRadar : MonoBehaviour
     {
-        //private Vector3 rayOrigin = new Vector3;
         private Vector3 height = new Vector3(0, 0.1f, 0);
+        private bool exitCoroutine = false;
 
         public Unit unit;
         public float radarValue;
@@ -33,22 +33,19 @@ namespace Com.MyCompany.MyGame
                 Vector3 rayOrigin = unit.transform.position - height;
                 Vector3 rayDesti = other.transform.position - rayOrigin;
 
-                Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
+                //Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
                 if (Physics.Raycast(rayOrigin, rayDesti, out hit) && (hit.transform.gameObject.layer == PhysicsLayers.Player))
                 {
+                    //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
+                    exitCoroutine = true;
+
                     unit.AddToAlertValue(other.transform.GetComponent<PlayerController>().aggroVal * radarValue);
 
                     if (unit.alertValue > 0.5f)
-                        unit.transform.LookAt(other.transform.position);
+                        unit.curLookDir = LookDirState.FINDPLAYER;
 
-                    if (Vector3.Distance(unit.transform.position, other.transform.position) > 1.2f)
-                    {
-                        if (unit.curUnitState == UnitState.ALERT)
-                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, other.transform.position);
-                        //다른 방법으로 Player를 추적하도록 해볼것
-                        else if (unit.curUnitState == UnitState.COMBAT)
-                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, other.transform.position);
-                    }
+                    if (unit.curUnitState == UnitState.ALERT)
+                        unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, other.transform.position);
                 }
             }
         }
@@ -59,7 +56,10 @@ namespace Com.MyCompany.MyGame
                 Destroy(gameObject);
 
             if (other.transform.gameObject.layer == PhysicsLayers.Player)
+            {
+                exitCoroutine = false;
                 StartCoroutine(DecreaseAlertValue());
+            }
         }
 
         private IEnumerator DecreaseAlertValue()
@@ -73,11 +73,16 @@ namespace Com.MyCompany.MyGame
                 sw.Start();
 
                 while (sw.ElapsedMilliseconds <= 4000)
+                {
+                    if (exitCoroutine)
+                        yield break;
                     yield return null;
+                }
 
                 sw.Stop();
 
                 unit.SetAlertValue(AggroCollections.combatMin - 0.1f);
+                unit.curLookDir = LookDirState.IDLE;
                 Debug.Log("경계로 전환");
                 yield break;
             }
@@ -89,7 +94,11 @@ namespace Com.MyCompany.MyGame
                 sw.Start();
 
                 while (sw.ElapsedMilliseconds <= 2000)
+                {
+                    if (exitCoroutine)
+                        yield break;
                     yield return null;
+                }
 
                 sw.Stop();
 
@@ -100,6 +109,7 @@ namespace Com.MyCompany.MyGame
                     yield return null;
                 }
 
+                unit.curLookDir = LookDirState.IDLE;
                 Debug.Log("평시상태로 전환");
             }
 

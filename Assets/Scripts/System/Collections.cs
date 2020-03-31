@@ -30,10 +30,10 @@ namespace Com.MyCompany.MyGame.Collections
     {
         IDLE = 0, ALERT, COMBAT, CHEESE, INSMOKE, SLEEP, ASSASSINATE, max
     }
-    //플레이어 캐릭터가 바라보는 방향
+    //캐릭터가 바라보는 방향
     public enum LookDirState
     {
-        IDLE = 0, COVER, THROW, max
+        IDLE = 0, COVER, THROW, FINDPLAYER, max
     }
 
     #endregion
