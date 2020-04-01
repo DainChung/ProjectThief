@@ -74,11 +74,9 @@ namespace Com.MyCompany.MyGame
 
         private IEnumerator DecreaseAlertValue()
         {
-            Debug.Log("놓침");
             //전투 중이면 일정 시간 대기 후 경계상태로 전환
             if (unit.alertValue >= AggroCollections.combatMin)
             {
-                Debug.Log("대기 시작");
                 System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                 sw.Start();
 
@@ -93,7 +91,6 @@ namespace Com.MyCompany.MyGame
 
                 unit.SetAlertValue(AggroCollections.combatMin - 0.1f);
                 unit.curLookDir = LookDirState.IDLE;
-                Debug.Log("경계로 전환");
                 yield break;
             }
             //비전투 상태면
@@ -120,7 +117,6 @@ namespace Com.MyCompany.MyGame
                 }
 
                 unit.curLookDir = LookDirState.IDLE;
-                Debug.Log("평시상태로 전환");
             }
 
             yield break;

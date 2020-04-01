@@ -224,9 +224,9 @@ namespace Com.MyCompany.MyGame
             aggroValue = AggroCollections.aggroRun;
 
             //인벤토리 초기화
-            pInventory.Add(Item.CAN, 5);
-            pInventory.Add(Item.CHEESE, 3);
-            pInventory.Add(Item.SMOKE, 2);
+            pInventory.Add(Item.CAN, 50);
+            pInventory.Add(Item.CHEESE, 30);
+            pInventory.Add(Item.SMOKE, 20);
         }
 
         void Start()

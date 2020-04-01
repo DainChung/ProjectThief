@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.Exceptions;
 
 namespace Com.MyCompany.MyGame
 {

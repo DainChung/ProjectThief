@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.Exceptions;
 
 namespace Com.MyCompany.MyGame
 {
@@ -17,7 +18,7 @@ namespace Com.MyCompany.MyGame
         {
             public WeaponCode code;
             public Transform tr;
-            public Vector3 pos { get { return (tr == null) ? ValueCollections.initPos : tr.position; } }
+            public Vector3 pos;
         }
 
         #endregion
@@ -39,6 +40,7 @@ namespace Com.MyCompany.MyGame
                 DetectedTarget init;
                 init.code = WeaponCode.max;
                 init.tr = null;
+                init.pos = ValueCollections.initPos;
 
                 queue[0] = init;
                 queue[1] = init;
@@ -50,21 +52,39 @@ namespace Com.MyCompany.MyGame
                 DetectedTarget input;
                 input.code = weaponCode;
                 input.tr = tr;
-
+                input.pos = tr.position;
                 //중복된 내용 아님
                 if (!IsItDuplicate(input))
                 {
                     if (Count() <= 2)
                     {
-                        if (weaponCode != WeaponCode.CHEESE && weaponCode != WeaponCode.max)
-                            queue[Count()] = input;
+                        switch (weaponCode)
+                        {
+                            case WeaponCode.CAN:
+                            case WeaponCode.SMOKE:
+                                queue[Count()] = input;
+                                break;
+                            case WeaponCode.PLAYERTRACK:
+                            case WeaponCode.PLAYER:
+                            case WeaponCode.CHEESE:
+                                Clear();
+                                queue[0] = input;
+                                break;
+                            default:
+                                break;
+                        }
                     }
-
-                    //PlayerTrack, Player, Cheese면 해당 타겟만 추적한다.
+                    //우선 순위 CHEESE > PLAYER > PLAYERTRACK > 그 외
                     switch (weaponCode)
                     {
                         case WeaponCode.PLAYERTRACK:
                         case WeaponCode.PLAYER:
+                            if (queue[0].code != WeaponCode.CHEESE)
+                            {
+                                Clear();
+                                queue[0] = input;
+                            }
+                                break;
                         case WeaponCode.CHEESE:
                             Clear();
                             queue[0] = input;
@@ -91,8 +111,8 @@ namespace Com.MyCompany.MyGame
                 {
                     result.code = WeaponCode.max;
                     result.tr = null;
+                    result.pos = ValueCollections.initPos;
                 }
-
                 return result;
             }
 
@@ -137,6 +157,7 @@ namespace Com.MyCompany.MyGame
                     queue[i - 1] = queue[i];
                     queue[i].code = WeaponCode.max;
                     queue[i].tr = null;
+                    queue[i].pos = ValueCollections.initPos;
                 }
             }
             private void PushQueueReverse()
@@ -148,15 +169,38 @@ namespace Com.MyCompany.MyGame
 
                 queue[0].code = WeaponCode.max;
                 queue[0].tr = null;
+                queue[0].pos = ValueCollections.initPos;
             }
             private void Clear()
             {
                 queue[0].code = WeaponCode.max;
                 queue[0].tr = null;
+                queue[0].pos = ValueCollections.initPos;
                 queue[1].code = WeaponCode.max;
                 queue[1].tr = null;
+                queue[1].pos = ValueCollections.initPos;
                 queue[2].code = WeaponCode.max;
                 queue[2].tr = null;
+                queue[2].pos = ValueCollections.initPos;
+            }
+        }
+
+        public class TargetManager
+        {
+            private List<GameObject> targets = new List<GameObject>();
+
+            public void Add(GameObject item)
+            {
+                targets.Add(item);
+            }
+            public void Clear()
+            {
+                for (int i = 0; i < targets.Count; i++)
+                {
+                    if(targets[i] != null)
+                        Destroy(targets[i]);
+                }
+                targets.Clear();
             }
         }
 
@@ -194,6 +238,8 @@ namespace Com.MyCompany.MyGame
         public bool seenByCamera = false;
 
         public EnemyRadarManager radarMng;
+        [HideInInspector]
+        public TargetManager targetMng = new TargetManager();
 
         #endregion
 
@@ -240,7 +286,6 @@ namespace Com.MyCompany.MyGame
                     Destroy(other.transform.gameObject);
             }
         }
-
         void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Target"))
@@ -261,7 +306,7 @@ namespace Com.MyCompany.MyGame
                     transform.LookAt(playerPosition);
                     break;
                 default:
-                    if (curTarget.tr != null)
+                    if (curTarget.pos != ValueCollections.initPos)
                         transform.LookAt(new Vector3(curTarget.pos.x, transform.position.y, curTarget.pos.z));
                     break;
             }
@@ -315,6 +360,7 @@ namespace Com.MyCompany.MyGame
         //우선순위: CHEESE > Player > CAN > Patrol Spot
         private void ChaseTargetBYQueue()
         {
+            //MyDebug.Log("ChaseTargetBYQueue 1: " + curTarget.code + ", " + (curTarget.tr == null));
             //queue에 뭔가 있을 때
             if (queue.Count() > 0)
             {
@@ -342,6 +388,8 @@ namespace Com.MyCompany.MyGame
                     break;
                 case WeaponCode.CHEESE:
                     unit.curLookDir = LookDirState.IDLE;
+                    targetMng.Clear();
+                    player = null;
                     Move();
                     break;
                 default:
@@ -351,48 +399,56 @@ namespace Com.MyCompany.MyGame
 
         private void Move()
         {
-            if (!_doesReachToTarget)
+            try
             {
-                switch (curTarget.code)
+                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.5f);
+                if (!_doesReachToTarget)
                 {
-                    case WeaponCode.PLAYER:
-                    case WeaponCode.PLAYERTRACK:
-                    case WeaponCode.CAN:
-                    case WeaponCode.CHEESE:
-                        isMovingNow = true;
-                        if (radarMng.thereIsStructure)
-                        {
-                            unit.curLookDir = LookDirState.IDLE;
-                            agent.SetDestination(curTarget.pos);
-                        }
-                        else
-                            rb.velocity = transform.forward * unit.speed * 0.1f;
-                        break;
-                    default:
-                        break;
+                    MyDebug.Log("TargetPos: " + curTarget.pos);
+                    isMovingNow = true;
+                    if (radarMng.thereIsStructure)
+                    {
+                        unit.curLookDir = LookDirState.IDLE;
+                        agent.SetDestination(curTarget.pos);
+                    }
+                    else
+                        rb.velocity = transform.forward * unit.speed * 0.1f;
                 }
-            }
-            else if (_doesReachToTarget)
-            {
-                isMovingNow = false;
-                if (!stayDelay.IsRunning)
-                    stayDelay.Restart();
+                else if (_doesReachToTarget)
+                {
+                    isMovingNow = false;
+                    if (!stayDelay.IsRunning)
+                        stayDelay.Restart();
 
-                if (checkStayDelay)
-                {
-                    InitCurTarget();
-                    _doesReachToTarget = false;
+                    if (checkStayDelay)
+                    {
+                        MyDebug.Log("대기완료");
+                        InitCurTarget();
+                        _doesReachToTarget = false;
+                    }
+                    else
+                        MyDebug.Log("대기중");
                 }
+                rb.velocity *= 0.99f;
             }
-            rb.velocity *= 0.99f;
+            catch (AIsCloseToB)
+            {
+                MyDebug.Log("AIsCloseToB");
+                Stop();
+            }
         }
 
         private void SetCurTarget()
         {
+            stayDelay.Reset();
+            stayDelay.Stop();
             curTarget = queue.Dequeue();
             GameObject targetOBJ = Instantiate(Resources.Load(FilePaths.AISystemPath + "Target") as GameObject, curTarget.pos, transform.rotation);
             if (player != null)
+            {
                 targetOBJ.transform.parent = player;
+                targetMng.Add(targetOBJ);
+            }
             targetOBJ.GetComponent<Target>().SetID(transform.GetInstanceID());
         }
 
@@ -400,7 +456,18 @@ namespace Com.MyCompany.MyGame
         {
             curTarget.code = WeaponCode.max;
             curTarget.tr = null;
+            curTarget.pos = ValueCollections.initPos;
+            stayDelay.Reset();
             stayDelay.Stop();
+        }
+
+        private void Stop()
+        {
+            _doesReachToTarget = false;
+            isMovingNow = false;
+            InitCurTarget();
+            unit.curUnitState = UnitState.IDLE;
+            unit.curUnitPose = UnitPose.MOD_WALK;
         }
 
         #endregion
@@ -430,8 +497,6 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-                //MyDebug.Log("EnemySpeed: "+agent.speed);
-
                 queue.Enqueue(code, tr);
                 EnemyAlertManager();
             }
@@ -471,7 +536,7 @@ namespace Com.MyCompany.MyGame
                     break;
             }
 
-            StartCoroutine(radarMng.CheckToTarget(curTarget.pos));
+            if(curTarget.tr != null)    StartCoroutine(radarMng.CheckToTarget(curTarget.pos));
         }
 
         #endregion

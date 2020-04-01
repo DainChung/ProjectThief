@@ -48,16 +48,13 @@ namespace Com.MyCompany.MyGame
         {
             Ray ray = new Ray();
 
-            if (isRight)
-                ray.origin = enemy.transform.position + height + right;
-            else
-                ray.origin = enemy.transform.position + height - right;
+            if (isRight)     ray.origin = enemy.transform.position + height + right;
+            else             ray.origin = enemy.transform.position + height - right;
+
             ray.direction = pos - enemy.transform.position;
-
-            float dist = Vector3.Distance(pos, ray.origin);
-
+            float dist = Vector3.Distance(pos, transform.position);
             RaycastHit[] hits = Physics.RaycastAll(ray, dist);
-            Debug.DrawRay(ray.origin, ray.direction, Color.red, 1.0f);
+            Debug.DrawRay(ray.origin, ray.direction * dist, Color.red, 1.0f);
 
             foreach (RaycastHit hit in hits)
             {
@@ -66,8 +63,8 @@ namespace Com.MyCompany.MyGame
                     //사이에 장애물 있으면 agent.SetDestination()으로 장애물을 우회하도록 한다.
                     if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
                     {
-                        if (isRight) _thereIsStructureR = true;
-                        else _thereIsStructureL = true;
+                        if (isRight)    _thereIsStructureR = true;
+                        else            _thereIsStructureL = true;
                         //코루틴 종료
                         yield break;
                     }
