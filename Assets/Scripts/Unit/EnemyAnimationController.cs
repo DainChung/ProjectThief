@@ -49,10 +49,16 @@ namespace Com.MyCompany.MyGame
             {
                 #region MOD_WALK(== UnitState.IDLE)
                 case UnitPose.MOD_WALK:
-                    if(unit.curUnitState == UnitState.ALERT)
+                    if (unit.curUnitState == UnitState.ALERT)
+                    {
                         unitAnimController.WalkPoseTONewPose(UnitPose.MOD_CROUCH);
+                        enemy.EnemyAlertManager();
+                    }
                     else if (unit.curUnitState == UnitState.COMBAT || unit.curUnitState == UnitState.CHEESE)
+                    {
                         unitAnimController.WalkPoseTONewPose(UnitPose.MOD_RUN);
+                        enemy.EnemyAlertManager();
+                    }
 
                     unitAnimController.SmoothCrouching(collider, crouchColliderHeight);
                     break;
@@ -61,9 +67,15 @@ namespace Com.MyCompany.MyGame
                 #region MOD_RUN(== UnitState.COMBAT || UnitState.CHEESE)
                 case UnitPose.MOD_RUN:
                     if (unit.curUnitState == UnitState.IDLE)
+                    {
                         unitAnimController.RunPoseTONewPose(UnitPose.MOD_WALK);
-                    else if(unit.curUnitState == UnitState.ALERT)
+                        enemy.EnemyAlertManager();
+                    }
+                    else if (unit.curUnitState == UnitState.ALERT)
+                    {
                         unitAnimController.RunPoseTONewPose(UnitPose.MOD_CROUCH);
+                        enemy.EnemyAlertManager();
+                    }
 
                     unitAnimController.SmoothCrouching(collider, crouchColliderHeight);
                     break;
@@ -72,9 +84,15 @@ namespace Com.MyCompany.MyGame
                 #region MOD_CROUCH(== UnitState.ALERT)
                 case UnitPose.MOD_CROUCH:
                     if (unit.curUnitState == UnitState.IDLE)
+                    {
                         unitAnimController.CrouchPoseTONewPose(UnitPose.MOD_WALK);
+                        enemy.EnemyAlertManager();
+                    }
                     else if (unit.curUnitState == UnitState.COMBAT || unit.curUnitState == UnitState.CHEESE)
+                    {
                         unitAnimController.CrouchPoseTONewPose(UnitPose.MOD_RUN);
+                        enemy.EnemyAlertManager();
+                    }
 
                     unitAnimController.SmoothStanding(collider, crouchColliderHeight);
                     break;
@@ -118,6 +136,11 @@ namespace Com.MyCompany.MyGame
                     //Mixamo에서 Sleep 관련 애니메이션을 찾을 것
                 #region MOD_SLEEP( == UnitState.SLEEP)
                 case UnitPose.MOD_SLEEP:
+                    break;
+                #endregion
+
+                #region MOD_ATTACK
+                case UnitPose.MOD_ATTACK:
                     break;
                 #endregion
 
@@ -181,6 +204,12 @@ namespace Com.MyCompany.MyGame
                     //    }
 
                     //    break;
+                    #endregion
+
+                    #region MOD_ATTACK
+                    case UnitPose.MOD_ATTACK:
+                        animator.SetFloat("MoveSpeed", enemy.moveSpeed);
+                        break;
                     #endregion
 
                     default:

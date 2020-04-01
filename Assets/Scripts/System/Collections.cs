@@ -61,6 +61,12 @@ namespace Com.MyCompany.MyGame.Collections
         private static int[] _itemMaxAmount = { 5, 3, 2 };
         public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
 
+        private static int targetChildIndex = 7;
+        /// <summary>
+        /// TargetChildIndex == 7
+        /// </summary>
+        public static int TargetChildIndex { get { return targetChildIndex; } }
+
         #region Weapons Init Values
         //연막탄 위치 벡터
         private static Vector3 _WeaponSmokeVector3 = new Vector3(0, 1.2f, 0);

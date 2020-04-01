@@ -299,20 +299,12 @@ namespace Com.MyCompany.MyGame
                     switch (unit.curUnitPose)
                     {
                         case UnitPose.MOD_WALK:
-                            ControlMove();
-                            ControlAttack();
-                            break;
                         case UnitPose.MOD_RUN:
-                            ControlMove();
-                            ControlAttack();
-                            break;
                         case UnitPose.MOD_CROUCH:
                             ControlMove();
                             ControlAttack();
                             break;
                         case UnitPose.MOD_COVERSTAND:
-                            ControlCover();
-                            break;
                         case UnitPose.MOD_COVERCROUCH:
                             ControlCover();
                             break;
@@ -508,7 +500,7 @@ namespace Com.MyCompany.MyGame
             {
                 if (Input.GetButtonDown("Jump"))
                 {
-                    destiPos = transform.up * unit.speed * unit.jumpPower;
+                    destiPos = transform.up * unit.jumpPower;
 
                     rb.AddForce(destiPos);
                 }
@@ -552,11 +544,7 @@ namespace Com.MyCompany.MyGame
                 {
                     destiPos = -transform.right * Input.GetAxis("Horizontal") * playerSpeed;
 
-                    rb.AddForce(destiPos);
-
-                    //엄폐 직후 이동이 안 되는 오류 시
-                    if (rb.velocity == Vector3.zero)
-                        rb.velocity = destiPos;
+                    rb.velocity = destiPos;
                 }
             }
 

@@ -147,22 +147,18 @@ namespace Com.MyCompany.MyGame
             {
                 attackSW[index].Restart();
             }
-
             public void StopAttackStopwatch(int index)
             {
                 attackSW[index].Stop();
             }
-
             public void ResetAttackStopwatch(int index)
             {
                 attackSW[index].Reset();
             }
-
             public bool IsRunningAttackStopwatch(int index)
             {
                 return attackSW[index].IsRunning;
             }
-
             public void AttackDelayManager()
             {
                 for (int i = 0; i < attackSW.Length; i++)
@@ -174,12 +170,10 @@ namespace Com.MyCompany.MyGame
                     }
                 }
             }
-
             public bool AttackDelayDone(WeaponCode code)
             {
                 return attackSW[(int)(code)].ElapsedMilliseconds >= attackDelayTime[(int)(code)];
             }
-
             public bool AttackCountDelayDone()
             {
                 return secAttackCountDelay >= ValueCollections.attackCountDelay;
@@ -281,8 +275,8 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             _health = 3;
-            _speed = 35.0f;
-            _jumpPower = 10f;
+            _speed = 20;
+            _jumpPower = 400;
 
             unitAnimController = new UnitAnimationController(this, animator);
         }
@@ -707,6 +701,8 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsFalling", true);
             curUnitPose = UnitPose.MOD_FALL;
 
+            animator.speed = 1;
+            _lockControl = false;
             animator.SetLayerWeight(AnimationLayers.Throw, 0);
             animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
             throwLine.HideLines();
@@ -754,7 +750,6 @@ namespace Com.MyCompany.MyGame
 
             //MyDebug.Log(alertValue);
         }
-
 
         #endregion
     }

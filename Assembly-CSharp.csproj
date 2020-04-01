@@ -70,6 +70,7 @@
      <Compile Include="Assets\Scripts\System\Collections.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />
+     <Compile Include="Assets\Scripts\System\Target.cs" />
      <Compile Include="Assets\Scripts\Unit\AnimatorEventTOUnit.cs" />
      <Compile Include="Assets\Scripts\Unit\AssassinateTrigger.cs" />
      <Compile Include="Assets\Scripts\Unit\AttackCollider.cs" />

@@ -18,8 +18,7 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            if(eyes != null)
-                transform.rotation = Quaternion.Euler(-90f, eyes.rotation.eulerAngles.y, 0);
+            transform.rotation = Quaternion.Euler(-90f, eyes.rotation.eulerAngles.y, 0);
         }
 
         void OnTriggerStay(Collider other)
@@ -29,23 +28,34 @@ namespace Com.MyCompany.MyGame
 
             if (other.transform.gameObject.layer == PhysicsLayers.Player)
             {
-                RaycastHit hit;
+                Transform otherTR = other.transform;
+                Vector3 otherPos = otherTR.position;
+
+                RaycastHit[] hits;
                 Vector3 rayOrigin = unit.transform.position - height;
-                Vector3 rayDesti = other.transform.position - rayOrigin;
+                Vector3 rayDesti = otherPos - rayOrigin;
 
                 //Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
-                if (Physics.Raycast(rayOrigin, rayDesti, out hit) && (hit.transform.gameObject.layer == PhysicsLayers.Player))
+                hits = Physics.RaycastAll(rayOrigin, rayDesti);
+                foreach (RaycastHit hit in hits)
                 {
-                    //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
-                    exitCoroutine = true;
+                    if (hit.transform.gameObject.layer == PhysicsLayers.Player)
+                    {
+                        //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
+                        exitCoroutine = true;
 
-                    unit.AddToAlertValue(other.transform.GetComponent<PlayerController>().aggroVal * radarValue);
+                        float distVal = Mathf.Clamp(Vector3.Distance(otherPos, unit.transform.position), 0.1f, 7);
+                        unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
+                        //Debug.Log("Alert: " + unit.alertValue);
 
-                    if (unit.alertValue > 0.5f)
-                        unit.curLookDir = LookDirState.FINDPLAYER;
+                        if (unit.alertValue > 0.5f)
+                            unit.curLookDir = LookDirState.FINDPLAYER;
 
-                    if (unit.curUnitState == UnitState.ALERT)
-                        unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, other.transform.position);
+                        if (unit.curUnitState == UnitState.ALERT)
+                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR);
+                        else if (unit.curUnitState == UnitState.COMBAT)
+                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR);
+                    }
                 }
             }
         }
