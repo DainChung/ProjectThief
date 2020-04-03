@@ -384,16 +384,13 @@ namespace Com.MyCompany.MyGame
         /// </summary>
         private void AttackDefault()
         {
-            if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
+            if (Input.GetButtonDown("Fire1"))
             {
-                if (Input.GetButtonDown("Fire1"))
-                {
-                    playerSpeed = unit.speed;
-                    if(checkCameraCollider.assassinateTargetPos != ValueCollections.initPos)
-                        transform.LookAt(checkCameraCollider.assassinateTargetPos);
-                    unit.AttackDefault(ref rb);
-                    unit.curLookDir = LookDirState.max;
-                }
+                playerSpeed = unit.speed;
+                if (checkCameraCollider.assassinateTargetPos != ValueCollections.initPos)
+                    transform.LookAt(checkCameraCollider.assassinateTargetPos);
+                unit.AttackDefault(ref rb, true);
+                unit.curLookDir = LookDirState.max;
             }
         }
 

@@ -52,7 +52,7 @@ namespace Com.MyCompany.MyGame
                 DetectedTarget input;
                 input.code = weaponCode;
                 input.tr = tr;
-                input.pos = tr.position;
+                input.pos = new Vector3(tr.position.x, tr.position.y, tr.position.z);
                 //중복된 내용 아님
                 if (!IsItDuplicate(input))
                 {
@@ -221,6 +221,7 @@ namespace Com.MyCompany.MyGame
 
         private NavMeshAgent agent;
         private bool isMovingNow = false;
+        private bool canIAttack = false;
 
         private Transform player = null;
         private Vector3 playerPosition { get { return (player == null) ? ValueCollections.initPos : player.position; } }
@@ -354,13 +355,16 @@ namespace Com.MyCompany.MyGame
         private void Combat()
         {
             ChaseTargetBYQueue();
+
+            //Target의 Pos에 접근했을 때 말고 Player와 접근했을때 사용할 수 있도록 할것
+            if (canIAttack)
+                unit.AttackDefault(ref rb, false);
         }
 
         //특정 타겟(CAN, CHEESE, Player) 위치로 이동
         //우선순위: CHEESE > Player > CAN > Patrol Spot
         private void ChaseTargetBYQueue()
         {
-            //MyDebug.Log("ChaseTargetBYQueue 1: " + curTarget.code + ", " + (curTarget.tr == null));
             //queue에 뭔가 있을 때
             if (queue.Count() > 0)
             {
@@ -404,7 +408,6 @@ namespace Com.MyCompany.MyGame
                 ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.5f);
                 if (!_doesReachToTarget)
                 {
-                    MyDebug.Log("TargetPos: " + curTarget.pos);
                     isMovingNow = true;
                     if (radarMng.thereIsStructure)
                     {
@@ -422,18 +425,14 @@ namespace Com.MyCompany.MyGame
 
                     if (checkStayDelay)
                     {
-                        MyDebug.Log("대기완료");
                         InitCurTarget();
                         _doesReachToTarget = false;
                     }
-                    else
-                        MyDebug.Log("대기중");
                 }
                 rb.velocity *= 0.99f;
             }
             catch (AIsCloseToB)
             {
-                MyDebug.Log("AIsCloseToB");
                 Stop();
             }
         }
@@ -465,8 +464,8 @@ namespace Com.MyCompany.MyGame
         {
             _doesReachToTarget = false;
             isMovingNow = false;
+            canIAttack = true;
             InitCurTarget();
-            unit.curUnitState = UnitState.IDLE;
             unit.curUnitPose = UnitPose.MOD_WALK;
         }
 

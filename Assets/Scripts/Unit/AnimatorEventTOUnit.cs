@@ -39,6 +39,7 @@ namespace Com.MyCompany.MyGame
         public void UnlockControl()
         {
             unit.lockControl = false;
+            Debug.Log("UnlockControl");
         }
         public void LockControl()
         {

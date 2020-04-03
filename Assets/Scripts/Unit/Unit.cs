@@ -114,7 +114,7 @@ namespace Com.MyCompany.MyGame
         {
             //무기 딜레이
             private Stopwatch[] attackSW = new Stopwatch[4];
-            private long[] attackDelayTime = new long[4];
+            private long[] attackDelayTime = new long[5];
 
             public Stopwatch throwAnimSW = new Stopwatch();
             public int secThrowAnimSW { get { return throwAnimSW.Elapsed.Seconds; } }
@@ -128,6 +128,7 @@ namespace Com.MyCompany.MyGame
                 attackDelayTime[1] = 2000;
                 attackDelayTime[2] = 3000;
                 attackDelayTime[3] = 4000;
+                attackDelayTime[4] = 700;
 
                 attackSW[0] = new Stopwatch();
                 attackSW[1] = new Stopwatch();
@@ -173,6 +174,13 @@ namespace Com.MyCompany.MyGame
             public bool AttackDelayDone(WeaponCode code)
             {
                 return attackSW[(int)(code)].ElapsedMilliseconds >= attackDelayTime[(int)(code)];
+            }
+            public bool AttackDelayDone(bool isPlayer)
+            {
+                if(isPlayer)
+                    return attackSW[0].ElapsedMilliseconds >= attackDelayTime[0];
+                else
+                    return attackSW[0].ElapsedMilliseconds >= attackDelayTime[4];
             }
             public bool AttackCountDelayDone()
             {
@@ -411,7 +419,14 @@ namespace Com.MyCompany.MyGame
                     transform.LookAt(pos);
                     animator.Play("HitReaction", AnimationLayers.Standing);
                     alertValue = AggroCollections.combatMin;
-                    AlertManager();
+                    try
+                    {
+                        transform.GetComponent<EnemyController>().EnemyAlertManager();
+                    }
+                    catch (NullReferenceException)
+                    {
+                        AlertManager();
+                    }
                     _lockControl = true;
                 }
             }
@@ -421,41 +436,41 @@ namespace Com.MyCompany.MyGame
                 _health = 0;
                 StartCoroutine(DelayPlayDeadAnim(damage));
             }
+
+            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
-        public void AttackDefault(ref Rigidbody rb)
+        public void AttackDefault(ref Rigidbody rb, bool isPlayer)
         {
-            swManager.ResetAttackStopwatch(0);
-            int attackCount = animator.GetInteger("AttackCount");
-
-            if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName("Attack " + attackCount.ToString()))
+            if (swManager.AttackDelayDone(isPlayer))
             {
-                if (animator.speed == 2.5f)
+                MyDebug.Log("Attack");
+                swManager.ResetAttackStopwatch(0);
+                int attackCount = animator.GetInteger("AttackCount");
+
+                if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName("Attack " + attackCount.ToString()))
                 {
-                    animator.speed = 1;
-                    swManager.RestartAttackStopwatch(0);
+                    //애니메이션 제어
+                    unitAnimController.TurnOffAllLayers();
+
+                    if (attackCount > 0) attackCount = 0;
+                    else attackCount++;
+
+                    animator.Play("Attack " + attackCount.ToString(), AnimationLayers.Standing);
+                    animator.SetInteger("AttackCount", attackCount);
+                    animator.SetBool("IsAttack", true);
+                    curUnitPose = UnitPose.MOD_ATTACK;
+
+                    //조작 제어
+                    EnableDefaultAttack(true);
+
+                    //위치 제어
+                    rb.AddForce(transform.forward * 2, ForceMode.Impulse);
                 }
-                //애니메이션 제어
-                unitAnimController.TurnOffAllLayers();
-
-                if (attackCount > 0)    attackCount = 0;
-                else    attackCount++;
-
-                animator.speed = 2.5f;
-                animator.Play("Attack " + attackCount.ToString(), AnimationLayers.Standing);
-                animator.SetInteger("AttackCount", attackCount);
-                animator.SetBool("IsAttack", true);
-                curUnitPose = UnitPose.MOD_ATTACK;
-
-                //조작 제어
-                EnableDefaultAttack(true);
-
-                //위치 제어
-                rb.AddForce(transform.forward * 2, ForceMode.Impulse);
+                //간헐적으로 attackSW[0]가 영구적으로 중지되는 버그 방지
+                else if (!swManager.IsRunningAttackStopwatch(0))
+                    swManager.RestartAttackStopwatch(0);
             }
-            //간헐적으로 attackSW[0]가 영구적으로 중지되는 버그 방지
-            else if (!swManager.IsRunningAttackStopwatch(0))
-                swManager.RestartAttackStopwatch(0);
         }
 
             #region 엄폐 시 벽으로 밀착
@@ -743,12 +758,10 @@ namespace Com.MyCompany.MyGame
             else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
                 curUnitState = UnitState.ALERT;
             //curUnitState = UnitState.COMBAT
-            else if (alertValue < AggroCollections.combatMin + 1)
+            else if (alertValue >= AggroCollections.combatMin && alertValue < AggroCollections.combatMin + 1)
                 curUnitState = UnitState.COMBAT;
             else
                 alertValue = AggroCollections.combatMin + 1;
-
-            //MyDebug.Log(alertValue);
         }
 
         #endregion

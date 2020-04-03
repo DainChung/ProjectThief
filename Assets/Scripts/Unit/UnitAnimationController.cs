@@ -22,6 +22,7 @@ namespace Com.MyCompany.MyGame
 
             _animator.SetBool("IsRunMode", true);
             _animator.SetBool("IsCrouchMode", false);
+            _animator.SetFloat("AttackAnimSpeed", 2.5f);
 
             _animator.SetLayerWeight(AnimationLayers.Crouch, 0);
             _animator.SetLayerWeight(AnimationLayers.CoverStanding, 0);
