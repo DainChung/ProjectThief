@@ -13,9 +13,15 @@ namespace Com.MyCompany.MyGame
 
         private bool _thereIsStructureR = false;
         private bool _thereIsStructureL = false;
+        private Unit unit;
 
         public EnemyController enemy;
         public bool thereIsStructure { get { return (_thereIsStructureR && _thereIsStructureL); } }
+
+        void Start()
+        {
+            unit = enemy.transform.GetComponent<Unit>();
+        }
 
         void OnTriggerStay(Collider other)
         {
@@ -25,7 +31,9 @@ namespace Com.MyCompany.MyGame
                     enemy.SetAlertValue(AggroCollections.combatMin);
                 enemy.doesReachToTarget = true;
                 enemy.IsMovingNow = false;
-                enemy.transform.GetComponent<Unit>().curUnitPose = UnitPose.MOD_ATTACK;
+                unit.curUnitPose = UnitPose.MOD_ATTACK;
+                if(unit.alertValue < AggroCollections.combatMin)
+                    unit.alertValue = AggroCollections.combatMin;
 
                 int index = ValueCollections.TargetChildIndex;
 
@@ -41,7 +49,10 @@ namespace Com.MyCompany.MyGame
         void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Player"))
+            {
                 enemy.doesReachToTarget = false;
+                enemy.CanIAttack = false;
+            }
         }
 
         private IEnumerator CheckToTarget(Vector3 pos, bool isRight)

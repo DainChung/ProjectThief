@@ -48,9 +48,6 @@ namespace Com.MyCompany.MyGame
                         unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
                         //Debug.Log("Alert: " + unit.alertValue);
 
-                        if (unit.alertValue > 0.5f)
-                            unit.curLookDir = LookDirState.FINDPLAYER;
-
                         if (unit.curUnitState == UnitState.ALERT)
                             unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR);
                         else if (unit.curUnitState == UnitState.COMBAT)
@@ -80,7 +77,7 @@ namespace Com.MyCompany.MyGame
                 System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                 sw.Start();
 
-                while (sw.ElapsedMilliseconds <= 4000)
+                while (sw.ElapsedMilliseconds <= 30000)
                 {
                     if (exitCoroutine)
                         yield break;

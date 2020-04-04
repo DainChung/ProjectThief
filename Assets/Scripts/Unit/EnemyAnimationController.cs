@@ -54,7 +54,12 @@ namespace Com.MyCompany.MyGame
                         unitAnimController.WalkPoseTONewPose(UnitPose.MOD_CROUCH);
                         enemy.EnemyAlertManager();
                     }
-                    else if (unit.curUnitState == UnitState.COMBAT || unit.curUnitState == UnitState.CHEESE)
+                    else if (unit.curUnitState == UnitState.COMBAT)
+                    {
+                        unitAnimController.WalkPoseTONewPose(UnitPose.MOD_ATTACK);
+                        enemy.EnemyAlertManager();
+                    }
+                    else if (unit.curUnitState == UnitState.CHEESE)
                     {
                         unitAnimController.WalkPoseTONewPose(UnitPose.MOD_RUN);
                         enemy.EnemyAlertManager();
@@ -64,7 +69,7 @@ namespace Com.MyCompany.MyGame
                     break;
                 #endregion
 
-                #region MOD_RUN(== UnitState.COMBAT || UnitState.CHEESE)
+                #region MOD_RUN(== UnitState.CHEESE)
                 case UnitPose.MOD_RUN:
                     if (unit.curUnitState == UnitState.IDLE)
                     {
@@ -139,8 +144,13 @@ namespace Com.MyCompany.MyGame
                     break;
                 #endregion
 
-                #region MOD_ATTACK
+                #region MOD_ATTACK( == UnitState.COMBAT)
                 case UnitPose.MOD_ATTACK:
+                    if (!animator.GetBool("IsRunMode"))
+                        animator.SetBool("IsRunMode", true);
+
+                    if (unit.curUnitState == UnitState.IDLE)
+                        MyDebug.Log("Go to IDLE");
                     break;
                 #endregion
 

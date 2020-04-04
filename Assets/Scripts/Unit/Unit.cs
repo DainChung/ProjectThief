@@ -112,9 +112,9 @@ namespace Com.MyCompany.MyGame
 
         public class StopwatchManager
         {
-            //무기 딜레이
-            private Stopwatch[] attackSW = new Stopwatch[4];
-            private long[] attackDelayTime = new long[5];
+            //딜레이
+            private List<Stopwatch> sw = new List<Stopwatch>();
+            private List<long> swDelays = new List<long>();
 
             public Stopwatch throwAnimSW = new Stopwatch();
             public int secThrowAnimSW { get { return throwAnimSW.Elapsed.Seconds; } }
@@ -122,65 +122,75 @@ namespace Com.MyCompany.MyGame
             public Stopwatch attackCountDelay = new Stopwatch();
             public int secAttackCountDelay { get { return attackCountDelay.Elapsed.Seconds; } }
 
-            public void InitStopwatch()
+            /// <summary>
+            /// 다수의 StopWatch 사용
+            /// </summary>
+            /// <param name="delayTimes">.Length == swLength + 1</param>
+            /// <param name="swLength"></param>
+            public StopwatchManager(long[] delayTimes, int swLength)
             {
-                attackDelayTime[0] = 200;
-                attackDelayTime[1] = 2000;
-                attackDelayTime[2] = 3000;
-                attackDelayTime[3] = 4000;
-                attackDelayTime[4] = 700;
+                for (int i = 0; i < swLength + 1; i++)
+                {
+                    swDelays.Add(new long());
+                    swDelays[i] = delayTimes[i];
 
-                attackSW[0] = new Stopwatch();
-                attackSW[1] = new Stopwatch();
-                attackSW[2] = new Stopwatch();
-                attackSW[3] = new Stopwatch();
-
-                attackSW[0].Start();
-                attackSW[1].Start();
-                attackSW[2].Start();
-                attackSW[3].Start();
+                    if (i < swLength)
+                    {
+                        sw.Add(new Stopwatch());
+                        sw[i].Start();
+                    }
+                }
 
                 throwAnimSW.Start();
                 attackCountDelay.Start();
             }
 
-            public void RestartAttackStopwatch(int index)
+            public void RestartSW(int index)
             {
-                attackSW[index].Restart();
+                sw[index].Restart();
             }
-            public void StopAttackStopwatch(int index)
+            public void StopSW(int index)
             {
-                attackSW[index].Stop();
+                sw[index].Stop();
             }
-            public void ResetAttackStopwatch(int index)
+            public void ResetSW(int index)
             {
-                attackSW[index].Reset();
+                sw[index].Reset();
             }
-            public bool IsRunningAttackStopwatch(int index)
+            public void ResetStopSW(int index)
             {
-                return attackSW[index].IsRunning;
+                sw[index].Reset();
+                sw[index].Stop();
             }
-            public void AttackDelayManager()
+            public bool IsRunningSW(int index)
             {
-                for (int i = 0; i < attackSW.Length; i++)
+                return sw[index].IsRunning;
+            }
+            public void SWDelayManager()
+            {
+                for (int i = 0; i < sw.Count; i++)
                 {
-                    if (attackSW[i].IsRunning)
+                    if (sw[i].IsRunning)
                     {
-                        if (attackSW[i].Elapsed.Seconds >= attackDelayTime[i])
-                            attackSW[i].Stop();
+                        if (sw[i].Elapsed.Milliseconds >= swDelays[i])
+                            sw[i].Stop();
                     }
                 }
             }
-            public bool AttackDelayDone(WeaponCode code)
+            public bool SWDelayDone(WeaponCode code)
             {
-                return attackSW[(int)(code)].ElapsedMilliseconds >= attackDelayTime[(int)(code)];
+                return sw[(int)(code)].ElapsedMilliseconds >= swDelays[(int)(code)];
             }
-            public bool AttackDelayDone(bool isPlayer)
+            public bool SWDelayDone(int index)
+            {
+                return sw[index].ElapsedMilliseconds >= swDelays[index];
+            }
+            public bool SWDelayDone(bool isPlayer)
             {
                 if(isPlayer)
-                    return attackSW[0].ElapsedMilliseconds >= attackDelayTime[0];
+                    return sw[0].ElapsedMilliseconds >= swDelays[0];
                 else
-                    return attackSW[0].ElapsedMilliseconds >= attackDelayTime[4];
+                    return sw[0].ElapsedMilliseconds >= swDelays[4];
             }
             public bool AttackCountDelayDone()
             {
@@ -232,6 +242,7 @@ namespace Com.MyCompany.MyGame
         private Quaternion throwRot = new Quaternion();
 
         private UnitAnimationHelper unitAnimHelper = new UnitAnimationHelper();
+        private Rigidbody rb;
 
         //Player => Enemy에게 얼마나 들켰는지에 대한 정보
         //Enemy => 주변을 경계하는 정도
@@ -266,7 +277,7 @@ namespace Com.MyCompany.MyGame
         public Transform throwDestiPos;
 
         public ThrowLineRenderer throwLine;
-        public StopwatchManager swManager = new StopwatchManager();
+        public StopwatchManager swManager;
 
         [HideInInspector]
         public float alertValue = 0.0f;
@@ -282,9 +293,12 @@ namespace Com.MyCompany.MyGame
         #region MonoBehaviour Callbacks
         void Awake()
         {
-            _health = 3;
+            _health = 30000;
             _speed = 20;
             _jumpPower = 400;
+
+            long[] delays = { 200, 2000, 3000, 4000, 700};
+            swManager = new StopwatchManager(delays, 4);
 
             unitAnimController = new UnitAnimationController(this, animator);
         }
@@ -293,10 +307,11 @@ namespace Com.MyCompany.MyGame
         {
             throwLine = new ThrowLineRenderer(throwDestiPos, transform.GetComponent<LineRenderer>());
             throwLine.HideLines();
-            swManager.InitStopwatch();
 
             defaultAttack.InitAttackCollider(1);
             assassinate.InitAttackCollider(-1);
+
+            rb = GetComponent<Rigidbody>();
         }
 
         void FixedUpdate()
@@ -419,6 +434,8 @@ namespace Com.MyCompany.MyGame
                     transform.LookAt(pos);
                     animator.Play("HitReaction", AnimationLayers.Standing);
                     alertValue = AggroCollections.combatMin;
+                    rb.AddForce(transform.forward * (-2), ForceMode.Impulse);
+                    
                     try
                     {
                         transform.GetComponent<EnemyController>().EnemyAlertManager();
@@ -440,12 +457,12 @@ namespace Com.MyCompany.MyGame
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
-        public void AttackDefault(ref Rigidbody rb, bool isPlayer)
+        public void AttackDefault(bool isPlayer)
         {
-            if (swManager.AttackDelayDone(isPlayer))
+            if (swManager.SWDelayDone(isPlayer))
             {
                 MyDebug.Log("Attack");
-                swManager.ResetAttackStopwatch(0);
+                swManager.ResetSW(0);
                 int attackCount = animator.GetInteger("AttackCount");
 
                 if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName("Attack " + attackCount.ToString()))
@@ -468,8 +485,8 @@ namespace Com.MyCompany.MyGame
                     rb.AddForce(transform.forward * 2, ForceMode.Impulse);
                 }
                 //간헐적으로 attackSW[0]가 영구적으로 중지되는 버그 방지
-                else if (!swManager.IsRunningAttackStopwatch(0))
-                    swManager.RestartAttackStopwatch(0);
+                else if (!swManager.IsRunningSW(0))
+                    swManager.RestartSW(0);
             }
         }
 
@@ -662,7 +679,7 @@ namespace Com.MyCompany.MyGame
                 else
                     obj.GetComponent<WeaponSmoke>().SetCode(weapon);
             }
-            swManager.RestartAttackStopwatch((int)weapon);
+            swManager.RestartSW((int)weapon);
         }
 
             #endregion

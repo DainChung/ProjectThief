@@ -15,7 +15,7 @@ namespace Com.MyCompany.MyGame
             unit.EnableAssassinate(false);
             unit.lockControl = false;
 
-            unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
+            unit.swManager.RestartSW((int)WeaponCode.HAND);
         }
 
         public void DisableAttackDefault()
@@ -23,7 +23,8 @@ namespace Com.MyCompany.MyGame
             unit.animator.speed = 1;
             unit.EnableDefaultAttack(false);
             unit.animator.SetBool("IsAttack", false);
-            unit.swManager.RestartAttackStopwatch((int)WeaponCode.HAND);
+            unit.animator.Play("Idle 0-0", AnimationLayers.Standing);
+            unit.swManager.RestartSW((int)WeaponCode.HAND);
             unit.swManager.attackCountDelay.Restart();
             unit.curUnitPose = UnitPose.MOD_RUN;
 
@@ -39,7 +40,6 @@ namespace Com.MyCompany.MyGame
         public void UnlockControl()
         {
             unit.lockControl = false;
-            Debug.Log("UnlockControl");
         }
         public void LockControl()
         {

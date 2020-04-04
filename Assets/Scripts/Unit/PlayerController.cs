@@ -389,7 +389,7 @@ namespace Com.MyCompany.MyGame
                 playerSpeed = unit.speed;
                 if (checkCameraCollider.assassinateTargetPos != ValueCollections.initPos)
                     transform.LookAt(checkCameraCollider.assassinateTargetPos);
-                unit.AttackDefault(ref rb, true);
+                unit.AttackDefault(true);
                 unit.curLookDir = LookDirState.max;
             }
         }
@@ -405,7 +405,7 @@ namespace Com.MyCompany.MyGame
                 case UnitState.INSMOKE:
                 case UnitState.ALERT:
 
-                    if (unit.swManager.AttackDelayDone(WeaponCode.HAND))
+                    if (unit.swManager.SWDelayDone(WeaponCode.HAND))
                         if (Input.GetButton("Assassinate") && checkCameraCollider.canAssassinate)
                             StartCoroutine(AssassinateMove());
                     else
@@ -449,7 +449,7 @@ namespace Com.MyCompany.MyGame
         //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
         private void AttackThrow()
         {
-            if (unit.swManager.AttackDelayDone(curWeapon))
+            if (unit.swManager.SWDelayDone(curWeapon))
             {
                 //조준
                 if (Input.GetButton("Fire1") && pInventory.CheckWeapon(curWeapon))
@@ -561,7 +561,7 @@ namespace Com.MyCompany.MyGame
         //공격에 관한 조작
         private void ControlAttack()
         {
-            unit.swManager.AttackDelayManager();
+            unit.swManager.SWDelayManager();
 
             switch (curWeapon)
             {
@@ -585,7 +585,7 @@ namespace Com.MyCompany.MyGame
                     AttackAssassinate();
                     if (unit.curUnitPose != UnitPose.MOD_CROUCH)
                     {
-                        if (Input.GetButtonDown("Fire1") && unit.swManager.AttackDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
+                        if (Input.GetButtonDown("Fire1") && unit.swManager.SWDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
                         {
                             unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
                             pInventory.Remove((int)curWeapon);

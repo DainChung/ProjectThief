@@ -226,6 +226,8 @@ namespace Com.MyCompany.MyGame
         private Transform player = null;
         private Vector3 playerPosition { get { return (player == null) ? ValueCollections.initPos : player.position; } }
 
+        private Unit.StopwatchManager behaveSWManager;
+
         #endregion
 
         #region Public Fields
@@ -234,6 +236,7 @@ namespace Com.MyCompany.MyGame
         public float moveSpeed { get { return isMovingNow ? 1 : 0; } }
         public bool doesReachToTarget { set { _doesReachToTarget = value; } }
         public bool IsMovingNow { set { isMovingNow = value; } }
+        public bool CanIAttack { set { canIAttack = value; } }
 
         [HideInInspector]
         public bool seenByCamera = false;
@@ -258,6 +261,8 @@ namespace Com.MyCompany.MyGame
             unit = GetComponent<Unit>();
             unit.curUnitState = UnitState.IDLE;
             unit.curLookDir = LookDirState.IDLE;
+            long[] delayTimes = { 200, 0 };
+            behaveSWManager = new Unit.StopwatchManager(delayTimes, 1);
 
             unit.animator.SetBool("IsRunMode", false);
 
@@ -299,11 +304,13 @@ namespace Com.MyCompany.MyGame
 
         private void LookDir()
         {
+            if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
+
             switch (unit.curLookDir)
             {
                 case LookDirState.FINDPLAYER:
                     player = GameObject.FindWithTag("Player").transform;
-                    playerPosition.Set(playerPosition.x, transform.position.y, playerPosition.z);
+                    //playerPosition.Set(playerPosition.x, transform.position.y, playerPosition.z);
                     transform.LookAt(playerPosition);
                     break;
                 default:
@@ -354,17 +361,25 @@ namespace Com.MyCompany.MyGame
         //curUnitState == UnitState.COMBAT
         private void Combat()
         {
-            ChaseTargetBYQueue();
-
-            //Target의 Pos에 접근했을 때 말고 Player와 접근했을때 사용할 수 있도록 할것
-            if (canIAttack)
-                unit.AttackDefault(ref rb, false);
+            try
+            {
+                ValidateException.CheckAIsCloseToB(transform.position, playerPosition, 1.5f);
+                ChaseTargetBYQueue();
+            }
+            catch (AIsCloseToB)
+            {
+                LookDir();
+                Stop();
+                unit.AttackDefault(false);
+            }
         }
 
         //특정 타겟(CAN, CHEESE, Player) 위치로 이동
         //우선순위: CHEESE > Player > CAN > Patrol Spot
         private void ChaseTargetBYQueue()
         {
+            LookDir();
+
             //queue에 뭔가 있을 때
             if (queue.Count() > 0)
             {
@@ -372,7 +387,6 @@ namespace Com.MyCompany.MyGame
                 if (curTarget.code == WeaponCode.max)
                     SetCurTarget();
             }
-            LookDir();
 
             switch (curTarget.code)
             {
@@ -405,7 +419,9 @@ namespace Com.MyCompany.MyGame
         {
             try
             {
-                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.5f);
+                if (unit.curUnitState == UnitState.COMBAT)
+                    ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 1.5f);
+
                 if (!_doesReachToTarget)
                 {
                     isMovingNow = true;
@@ -466,7 +482,6 @@ namespace Com.MyCompany.MyGame
             isMovingNow = false;
             canIAttack = true;
             InitCurTarget();
-            unit.curUnitPose = UnitPose.MOD_WALK;
         }
 
         #endregion

@@ -37,6 +37,7 @@ namespace Com.MyCompany.MyGame
         {
             switch (newPose)
             {
+                case UnitPose.MOD_ATTACK:
                 case UnitPose.MOD_RUN:
                     _animator.SetBool("IsRunMode", true);
                     _unit.curUnitPose = newPose;
