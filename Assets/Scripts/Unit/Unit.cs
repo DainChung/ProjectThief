@@ -440,7 +440,7 @@ namespace Com.MyCompany.MyGame
             GetComponent<Rigidbody>().useGravity = false;
 
             if (transform.CompareTag("Player"))
-                MyDebug.Log("Manager 스크립트의 PressRetryMemu 이벤트를 호출한다.");
+                GameObject.FindGameObjectWithTag("Manager").GetComponent<StageManager>().ShowResultMenu(false);
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }

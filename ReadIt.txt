@@ -1,6 +1,9 @@
 //*****	[Character Models with Materials and Textures]	*****
 [0] All Animation and Character Model Files (with Materials & Textures) in Assets\Models are from
 https://www.mixamo.com/
+
+[1] UI Textures from
+https://www.kenney.nl/
 *************************	end	*************************//
 
 //*****	[Models with Materials and Textures]		*****

@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/TestScene.unity
+- path: "C:/Users/Dian/Downloads/\uBC31\uC5C5\uD3F4\uB354/\uAC1C\uBC1C/\uAC1C\uBC1C\uAD00\uB828\uBC31\uC5C5/Unity/Project-Magic_Ship/Assets/Scenes/Challenge.unity"
   isLoaded: 1
   isActive: 1
   isSubScene: 0
