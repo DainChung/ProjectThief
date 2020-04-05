@@ -290,7 +290,7 @@ namespace Com.MyCompany.MyGame
         #region MonoBehaviour Callbacks
         void Awake()
         {
-            _health = 30000;
+            _health = 3;
             _speed = 20;
             _jumpPower = 400;
 
@@ -316,30 +316,33 @@ namespace Com.MyCompany.MyGame
             if (animator.GetInteger("AttackCount") == 0 && swManager.AttackCountDelayDone())
                 animator.SetInteger("AttackCount", 1);
 
-            //추락, 착륙시 변수 제어
-            if (IsOnFloor())
+            if (_health > 0)
             {
-                try
+                //추락, 착륙시 변수 제어
+                if (IsOnFloor())
                 {
-                    ValidateException.ValidateFreezingUnitAttackException(_lockControl, standingLayerAnimInfo, "Walking");
-                    ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), standingLayerAnimInfo, "HitReaction");
-                    switch (curUnitPose)
+                    try
                     {
-                        case UnitPose.MOD_FALL:
-                            UnitIsOnFloor();
-                            break;
-                        default:
-                            break;
+                        ValidateException.ValidateFreezingUnitAttackException(_lockControl, standingLayerAnimInfo, "Walking");
+                        ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), standingLayerAnimInfo, "HitReaction");
+                        switch (curUnitPose)
+                        {
+                            case UnitPose.MOD_FALL:
+                                UnitIsOnFloor();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    catch (FreezingUnitException)
+                    {
+                        UnFreezeUnit();
                     }
                 }
-                catch (FreezingUnitException)
+                else
                 {
-                    UnFreezeUnit();
+                    Fall();
                 }
-            }
-            else
-            {
-                Fall();
             }
         }
 
@@ -401,11 +404,14 @@ namespace Com.MyCompany.MyGame
 
         private IEnumerator DelayPlayDeadAnim(int damage)
         {
-            Stopwatch delay = new Stopwatch();
-            delay.Start();
-            while (delay.ElapsedMilliseconds <= 100)
-                yield return null;
-            delay.Stop();
+            if (!transform.CompareTag("Player"))
+            {
+                Stopwatch delay = new Stopwatch();
+                delay.Start();
+                while (delay.ElapsedMilliseconds <= 100)
+                    yield return null;
+                delay.Stop();
+            }
             unitAnimController.PlayDeadAnim(damage);
             yield break;
         }
@@ -442,7 +448,7 @@ namespace Com.MyCompany.MyGame
         public void HitHealth(int damage, Vector3 pos)
         {
             //일반 공격(damage > 0)
-            if (IsOnFloor())
+            if (IsOnFloor() && _health > 0)
             {
                 if (damage > 0)
                 {

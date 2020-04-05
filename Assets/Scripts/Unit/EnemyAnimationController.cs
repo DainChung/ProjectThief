@@ -148,9 +148,6 @@ namespace Com.MyCompany.MyGame
                 case UnitPose.MOD_ATTACK:
                     if (!animator.GetBool("IsRunMode"))
                         animator.SetBool("IsRunMode", true);
-
-                    if (unit.curUnitState == UnitState.IDLE)
-                        MyDebug.Log("Go to IDLE");
                     break;
                 #endregion
 
@@ -228,9 +225,6 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        #endregion
-
-        #region Public Methods
         #endregion
     }
 }

@@ -17,7 +17,6 @@ namespace Com.MyCompany.MyGame
 
             unit.swManager.RestartSW((int)WeaponCode.HAND);
         }
-
         public void DisableAttackDefault()
         {
             unit.EnableDefaultAttack(false);
