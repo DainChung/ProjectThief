@@ -8,9 +8,6 @@ namespace Com.MyCompany.MyGame
 {
     public class EnemyRadarManager : MonoBehaviour
     {
-        private Vector3 right = new Vector3(0.5f, 0, 0);
-        private Vector3 height = new Vector3(0, 0.2f, 0);
-
         private bool _thereIsStructureR = false;
         private bool _thereIsStructureL = false;
         private Unit unit;
@@ -25,7 +22,7 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerStay(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Player") && unit.curUnitState != UnitState.CHEESE)
             {
                 if (enemy.IsAlertValueSmallerThen(AggroCollections.combatMin))
                     enemy.SetAlertValue(AggroCollections.combatMin);
@@ -59,13 +56,13 @@ namespace Com.MyCompany.MyGame
         {
             Ray ray = new Ray();
 
-            if (isRight)     ray.origin = enemy.transform.position + height + right;
-            else             ray.origin = enemy.transform.position + height - right;
+            if (isRight)     ray.origin = enemy.transform.position + transform.right;
+            else             ray.origin = enemy.transform.position - transform.right;
 
             ray.direction = pos - enemy.transform.position;
-            float dist = Vector3.Distance(pos, transform.position);
+            float dist = Vector3.Distance(pos, transform.position) + 3f;
             RaycastHit[] hits = Physics.RaycastAll(ray, dist);
-            Debug.DrawRay(ray.origin, ray.direction * dist, Color.red, 1.0f);
+            Debug.DrawRay(ray.origin, ray.direction * dist, Color.red, 10.0f);
 
             foreach (RaycastHit hit in hits)
             {
@@ -76,12 +73,14 @@ namespace Com.MyCompany.MyGame
                     {
                         if (isRight)    _thereIsStructureR = true;
                         else            _thereIsStructureL = true;
+
                         //코루틴 종료
                         yield break;
                     }
                 }
                 catch (System.Exception)
                 {
+                    Debug.Log("RadarManager Exception?");
                     yield break;
                 }
 
@@ -96,7 +95,7 @@ namespace Com.MyCompany.MyGame
         }
         public IEnumerator CheckToTarget(Vector3 pos)
         {
-            pos = pos + height;
+            pos = pos;
 
             StartCoroutine(CheckToTarget(pos, true));
             StartCoroutine(CheckToTarget(pos, false));

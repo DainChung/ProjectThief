@@ -1406,6 +1406,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5781894586840952340, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07590149
+      objectReference: {fileID: 0}
     - target: {fileID: 6056339323146504229, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
       propertyPath: m_Mass
@@ -2165,11 +2170,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WeaponSmoke
-      objectReference: {fileID: 0}
-    - target: {fileID: 6408966162214673708, guid: cb8d51e13d707b148adde513d2479560,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6411764069895392346, guid: cb8d51e13d707b148adde513d2479560,
         type: 3}
@@ -3267,7 +3267,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1492099641, guid: c7ee93629e5f13746aa814898467ceeb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.8
+      value: -1.3
       objectReference: {fileID: 0}
     - target: {fileID: 310301634512657760, guid: c7ee93629e5f13746aa814898467ceeb,
         type: 3}

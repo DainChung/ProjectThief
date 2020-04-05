@@ -13,13 +13,13 @@ GameObject:
   - component: {fileID: 6500416842404533926}
   - component: {fileID: 821457172375949950}
   - component: {fileID: 441853112}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: WeaponSMOKE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6411764069895392346
 Transform:
   m_ObjectHideFlags: 0

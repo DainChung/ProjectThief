@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Diagnostics;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.Exceptions;
 
 /*  Line Renderer 제어하는 스크립트를 Unit.cs로 옮길 것
  *  Stopwatch도 Unit.cs로 옮길 것
@@ -266,21 +267,17 @@ namespace Com.MyCompany.MyGame
         public bool doubleThrowLock { get { return _doubleThrowLock; } }
 
         public UnitState curUnitState { get { return _curUnitState; } set { _curUnitState = value; } }
-
-        [HideInInspector]
-        public UnitPose curUnitPose = UnitPose.MOD_RUN;
-
-        [HideInInspector]
         public LookDirState curLookDir { get { return _curLookDir; } set { _curLookDir = value; } }
+        public AnimatorStateInfo standingLayerAnimInfo{ get { return animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing); }}
+
+        [HideInInspector]   public UnitPose curUnitPose = UnitPose.MOD_RUN;
+        [HideInInspector]   public float alertValue = 0.0f;
 
         public Animator animator;
         public Transform throwDestiPos;
 
         public ThrowLineRenderer throwLine;
         public StopwatchManager swManager;
-
-        [HideInInspector]
-        public float alertValue = 0.0f;
 
         //공격 판정에 필요한 콜라이더
         public AttackCollider defaultAttack;
@@ -322,13 +319,22 @@ namespace Com.MyCompany.MyGame
             //추락, 착륙시 변수 제어
             if (IsOnFloor())
             {
-                switch (curUnitPose)
+                try
                 {
-                    case UnitPose.MOD_FALL:
-                        UnitIsOnFloor();
-                        break;
-                    default:
-                        break;
+                    ValidateException.ValidateFreezingUnitAttackException(_lockControl, standingLayerAnimInfo, "Walking");
+                    ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), standingLayerAnimInfo, "HitReaction");
+                    switch (curUnitPose)
+                    {
+                        case UnitPose.MOD_FALL:
+                            UnitIsOnFloor();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (FreezingUnitException)
+                {
+                    UnFreezeUnit();
                 }
             }
             else
@@ -404,6 +410,18 @@ namespace Com.MyCompany.MyGame
             yield break;
         }
 
+        private void UnFreezeUnit()
+        {
+            lockControl = false;
+            EnableDefaultAttack(false);
+            animator.SetBool("IsAttack", false);
+            animator.Play("Idle 0-0", AnimationLayers.Standing);
+            swManager.RestartSW((int)WeaponCode.HAND);
+            swManager.attackCountDelay.Restart();
+            curUnitPose = UnitPose.MOD_RUN;
+            curLookDir = LookDirState.IDLE;
+        }
+
         #endregion
 
         #region Public Methods
@@ -414,44 +432,53 @@ namespace Com.MyCompany.MyGame
             GetComponent<CapsuleCollider>().enabled = false;
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().useGravity = false;
+
+            if (transform.CompareTag("Player"))
+                MyDebug.Log("Manager 스크립트의 PressRetryMemu 이벤트를 호출한다.");
+
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }
 
         public void HitHealth(int damage, Vector3 pos)
         {
             //일반 공격(damage > 0)
-            if (damage > 0)
+            if (IsOnFloor())
             {
-                if (damage >= _health)
+                if (damage > 0)
+                {
+                    if (damage >= _health)
+                    {
+                        _health = 0;
+                        StartCoroutine(DelayPlayDeadAnim(damage));
+                    }
+                    else
+                    {
+                        _health -= damage;
+
+                        transform.LookAt(pos);
+                        if (!standingLayerAnimInfo.IsName("HitReaction"))
+                            animator.Play("HitReaction", AnimationLayers.Standing);
+                        animator.SetBool("IsHit", true);
+                        alertValue = AggroCollections.combatMin;
+                        rb.AddForce(transform.forward * (-2), ForceMode.Impulse);
+
+                        try
+                        {
+                            transform.GetComponent<EnemyController>().EnemyAlertManager();
+                        }
+                        catch (NullReferenceException)
+                        {
+                            AlertManager();
+                        }
+                        _lockControl = true;
+                    }
+                }
+                //암살(damage < 0)
+                else
                 {
                     _health = 0;
                     StartCoroutine(DelayPlayDeadAnim(damage));
                 }
-                else
-                {
-                    _health -= damage;
-
-                    transform.LookAt(pos);
-                    animator.Play("HitReaction", AnimationLayers.Standing);
-                    alertValue = AggroCollections.combatMin;
-                    rb.AddForce(transform.forward * (-2), ForceMode.Impulse);
-                    
-                    try
-                    {
-                        transform.GetComponent<EnemyController>().EnemyAlertManager();
-                    }
-                    catch (NullReferenceException)
-                    {
-                        AlertManager();
-                    }
-                    _lockControl = true;
-                }
-            }
-            //암살(damage < 0)
-            else
-            {
-                _health = 0;
-                StartCoroutine(DelayPlayDeadAnim(damage));
             }
 
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
@@ -461,7 +488,6 @@ namespace Com.MyCompany.MyGame
         {
             if (swManager.SWDelayDone(isPlayer))
             {
-                MyDebug.Log("Attack");
                 swManager.ResetSW(0);
                 int attackCount = animator.GetInteger("AttackCount");
 
@@ -755,7 +781,6 @@ namespace Com.MyCompany.MyGame
                 AlertManager();
             }
         }
-
         public void SetAlertValue(float amount)
         {
             if (_health > 0)
@@ -764,7 +789,6 @@ namespace Com.MyCompany.MyGame
                 AlertManager();
             }
         }
-
         //alertValue에 따라 curUnitState를 변경
         public void AlertManager()
         {

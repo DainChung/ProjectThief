@@ -34,7 +34,7 @@ namespace Com.MyCompany.MyGame
         //캐릭터가 바라보는 방향
         public enum LookDirState
         {
-            IDLE = 0, COVER, THROW, FINDPLAYER, max
+            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, max
         }
 
         #endregion
@@ -227,6 +227,7 @@ namespace Com.MyCompany.MyGame
             private static int _PlayerAttack = 14;
             private static int _EnemyRadar = 15;
             private static int _PlayerRadar = 16;
+            private static int _Weapon = 17;
 
             /// <summary>
             /// Default = 0
@@ -284,6 +285,10 @@ namespace Com.MyCompany.MyGame
             /// PlayerAttack = 16
             /// </summary>
             public static int PlayerRadar { get { return _PlayerRadar; } }
+            /// <summary>
+            /// Weapon = 17
+            /// </summary>
+            public static int Weapon { get { return _Weapon; } }
         }
 
         //디버그용 
@@ -298,10 +303,17 @@ namespace Com.MyCompany.MyGame
 
     namespace Exceptions
     {
-        [Serializable]
-        public class AIsCloseToB : System.Exception
+        [Serializable]  public class AIsCloseToB : System.Exception
         {
-            public AIsCloseToB(){ }
+            public AIsCloseToB(){}
+        }
+        [Serializable]  public class FreezingUnitException : System.Exception
+        {
+            public FreezingUnitException() { }
+        }
+        [Serializable]  public class AnimationIsPlayingException : System.Exception
+        {
+            public AnimationIsPlayingException() { }
         }
 
         public static class ValidateException
@@ -310,6 +322,26 @@ namespace Com.MyCompany.MyGame
             {
                 if (Vector3.Distance(a, b) <= dist)
                     throw new AIsCloseToB();
+            }
+            public static void ValidateFreezingUnitException(bool boolVal, AnimatorStateInfo animInfo, string animName)
+            {
+                if (animInfo.IsName(animName) && boolVal)
+                    throw new FreezingUnitException();
+            }
+            public static void ValidateFreezingUnitAttackException(bool isLocked, AnimatorStateInfo animInfo, string animName)
+            {
+                if (!animInfo.IsTag("Attack") && isLocked && animName != "Walking")
+                    throw new FreezingUnitException();
+            }
+            public static void ValidateAnimationIsPlayingException(AnimatorStateInfo animInfo, string animName)
+            {
+                if (animInfo.IsName(animName))
+                    throw new AnimationIsPlayingException();
+            }
+            public static void ValidateAnimationIsPlayingException(AnimatorStateInfo animInfo, string animName, bool animBool)
+            {
+                if (!animInfo.IsName(animName) && animBool)
+                    throw new AnimationIsPlayingException();
             }
         }
     }

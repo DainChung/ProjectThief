@@ -26,11 +26,13 @@ namespace Com.MyCompany.MyGame
             if (unit.health <= 0)
                 Destroy(gameObject);
 
-            if (other.transform.gameObject.layer == PhysicsLayers.Player)
+            #region Player인 경우
+            if (other.transform.gameObject.layer == PhysicsLayers.Player && unit.curUnitState != UnitState.CHEESE)
             {
+                if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
+
                 Transform otherTR = other.transform;
                 Vector3 otherPos = otherTR.position;
-
                 RaycastHit[] hits;
                 Vector3 rayOrigin = unit.transform.position - height;
                 Vector3 rayDesti = otherPos - rayOrigin;
@@ -49,14 +51,19 @@ namespace Com.MyCompany.MyGame
                         //Debug.Log("Alert: " + unit.alertValue);
 
                         if (unit.curUnitState == UnitState.ALERT)
-                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR);
+                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
                         else if (unit.curUnitState == UnitState.COMBAT)
-                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR);
+                            unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR, otherPos);
                     }
                 }
             }
-        }
+            #endregion
 
+            #region 연막탄인 경우
+            if (other.gameObject.layer == PhysicsLayers.Weapon)
+                unit.curUnitState = UnitState.INSMOKE;
+            #endregion
+        }
         void OnTriggerExit(Collider other)
         {
             if (unit.health <= 0)

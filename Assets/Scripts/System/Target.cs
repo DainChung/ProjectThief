@@ -14,7 +14,7 @@ namespace Com.MyCompany.MyGame
         //Enemy가 무시하는 경우 Target이 계속 남아있는 현상 방지
         void Start()
         {
-            Destroy(gameObject, 60.0f);
+            Destroy(gameObject, 600.0f);
         }
 
         public void SetID(int id)

@@ -48,6 +48,8 @@ namespace Com.MyCompany.MyGame
         {
             if (!unit.lockControl)
                 ControlPlayerAnimation();
+            else if(unit.curUnitPose == UnitPose.MOD_RUN)
+                animator.SetFloat("MoveSpeed", 0);
         }
 
         #endregion
@@ -188,6 +190,9 @@ namespace Com.MyCompany.MyGame
                     }
                     break;
                 #endregion
+
+                case UnitPose.MOD_ATTACK:
+                    break;
 
                 default:
                     break;

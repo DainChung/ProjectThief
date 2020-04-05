@@ -22,12 +22,19 @@ namespace Com.MyCompany.MyGame
 
             //지속시간 짧음
             Destroy(gameObject, 2.0f);
+
+            StartCoroutine(PlaySound(code));
         }
 
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
-                other.transform.GetComponent<EnemyController>().Detect(code, transform);
+                other.transform.GetComponent<EnemyController>().Detect(code, transform, transform.position);
+        }
+
+        private IEnumerator PlaySound(WeaponCode code)
+        {
+            yield break;
         }
     }
 }

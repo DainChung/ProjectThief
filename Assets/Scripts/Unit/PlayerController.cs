@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.Exceptions;
 
 namespace Com.MyCompany.MyGame
 { 
@@ -404,7 +405,6 @@ namespace Com.MyCompany.MyGame
                 case UnitState.IDLE:
                 case UnitState.INSMOKE:
                 case UnitState.ALERT:
-
                     if (unit.swManager.SWDelayDone(WeaponCode.HAND))
                         if (Input.GetButton("Assassinate") && checkCameraCollider.canAssassinate)
                             StartCoroutine(AssassinateMove());

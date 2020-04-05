@@ -31,7 +31,11 @@ namespace Com.MyCompany.MyGame
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
-                other.transform.GetComponent<EnemyController>().Detect(code, transform);
+            {
+                Vector3 destiPos = Vector3.Normalize(other.transform.position - transform.position);
+                destiPos.Set(destiPos.x, other.transform.position.y, destiPos.z);
+                other.transform.GetComponent<EnemyController>().Detect(code, transform, destiPos);
+            }
         }
     }
 }

@@ -20,7 +20,6 @@ namespace Com.MyCompany.MyGame
 
         public void DisableAttackDefault()
         {
-            unit.animator.speed = 1;
             unit.EnableDefaultAttack(false);
             unit.animator.SetBool("IsAttack", false);
             unit.animator.Play("Idle 0-0", AnimationLayers.Standing);
@@ -39,6 +38,7 @@ namespace Com.MyCompany.MyGame
 
         public void UnlockControl()
         {
+            unit.animator.SetBool("IsHit", false);
             unit.lockControl = false;
         }
         public void LockControl()
