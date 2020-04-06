@@ -20,6 +20,7 @@ namespace Com.MyCompany.MyGame
         private GameObject treasure;
 
         private GameEvent gameEvent;
+        private Transform canvas;
 
         #endregion
 
@@ -32,15 +33,17 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
-            gameEvent = new GameEvent();
-            //gameEvent.showUI += ShowUIHandler;
         }
 
         // Start is called before the first frame update
         void Start()
         {
             player = GameObject.FindGameObjectWithTag("Player");
+            canvas = GameObject.Find("Canvas").transform;
             //treasure = GameObject.FindGameObjectWithTag("Treasure");
+
+            gameEvent = new GameEvent(canvas);
+            //gameEvent.showUI += ShowUIHandler;
 
             //플레이어 캐릭터를 시작 지점으로 옮김
             player.transform.position = start.position;
@@ -73,12 +76,15 @@ namespace Com.MyCompany.MyGame
 
     public class GameEvent
     {
+        private List<Transform> ui = new List<Transform>();
+
         public delegate void ShowUI();
         public event ShowUI showUI;
 
-        public GameEvent()
+        public GameEvent(Transform canvas)
         {
-
+            for (int i = 0; i < canvas.childCount; i++)
+                ui.Add(canvas.GetChild(i));
         }
 
         public void ShowMenu()
@@ -90,5 +96,12 @@ namespace Com.MyCompany.MyGame
         {
             Debug.Log((isClear ? "ShowClearUI" : "ShowDeadUI"));
         }
+    }
+
+    public static class GameUIIndex
+    {
+        private static int _sample = 0;
+
+        public static int Sample { get { return _sample; } }
     }
 }

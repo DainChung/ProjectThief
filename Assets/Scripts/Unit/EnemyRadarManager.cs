@@ -80,7 +80,6 @@ namespace Com.MyCompany.MyGame
                 }
                 catch (System.Exception)
                 {
-                    Debug.Log("RadarManager Exception?");
                     yield break;
                 }
 
@@ -95,8 +94,6 @@ namespace Com.MyCompany.MyGame
         }
         public IEnumerator CheckToTarget(Vector3 pos)
         {
-            pos = pos;
-
             StartCoroutine(CheckToTarget(pos, true));
             StartCoroutine(CheckToTarget(pos, false));
 

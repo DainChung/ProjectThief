@@ -18,11 +18,13 @@ namespace Com.MyCompany.MyGame
         private Vector3 rayOrigin;
         private Vector3 rayDesti;
 
+        private Transform player;
+        private PlayerController playerController;
+        private Unit unit;
+
         #endregion
 
         #region Public Fields
-
-        public Unit unit;
 
         public bool canAssassinate { get { return _canAssassinate; } }
         public Vector3 assassinateTargetPos { get { return _assassinateTargetPos; } }
@@ -32,6 +34,8 @@ namespace Com.MyCompany.MyGame
         #region MonoBehaviour Callbacks
         void Start()
         {
+            playerController = transform.parent.GetComponent<PlayerController>();
+            unit = transform.parent.GetComponent<Unit>();
             mainCam = Camera.main;
         }
 
@@ -55,12 +59,16 @@ namespace Com.MyCompany.MyGame
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
                 other.GetComponent<EnemyController>().seenByCamera = true;
+            if (other.gameObject.layer == PhysicsLayers.Item)
+                other.GetComponent<Item>().SeenByCamera(true);
         }
 
         void OnTriggerExit(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
                 other.GetComponent<EnemyController>().seenByCamera = false;
+            if (other.gameObject.layer == PhysicsLayers.Item)
+                other.GetComponent<Item>().SeenByCamera(false);
         }
         #endregion
 

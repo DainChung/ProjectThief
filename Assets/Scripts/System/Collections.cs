@@ -9,7 +9,7 @@ namespace Com.MyCompany.MyGame
     namespace Collections
     {
         #region Enums
-        public enum Item
+        public enum ItemCode
         {
             GOLD = 0, CAN, CHEESE, SMOKE, max
         }
@@ -49,11 +49,21 @@ namespace Com.MyCompany.MyGame
             /// <param name="tEnum1">비교할 Enum1</param>
             /// <param name="tEnum2">비교할 Enum2</param>
             /// <returns></returns>
-            public static int CompareEnum<TEnum1, TEnum2>(TEnum1 tEnum1, TEnum2 tEnum2)
-                where TEnum1 : struct, IConvertible, IComparable, IFormattable
-                where TEnum2 : struct, IConvertible, IComparable, IFormattable
+            //public static int CompareEnum<TEnum1, TEnum2>(TEnum1 tEnum1, TEnum2 tEnum2)
+            //    where TEnum1 : struct, IConvertible, IComparable, IFormattable
+            //    where TEnum2 : struct, IConvertible, IComparable, IFormattable
+            //{
+            //    return tEnum1.ToString().CompareTo(tEnum2.ToString());
+            //}
+
+            public static ItemCode ConvertWeaponToItem(WeaponCode weaponCode)
             {
-                return tEnum1.ToString().CompareTo(tEnum2.ToString());
+                ItemCode result = ItemCode.max;
+                int index = (int)weaponCode;
+
+                if (index < (int)ItemCode.max) result = (ItemCode)index;
+
+                return result;
             }
         }
 
@@ -228,6 +238,7 @@ namespace Com.MyCompany.MyGame
             private static int _EnemyRadar = 15;
             private static int _PlayerRadar = 16;
             private static int _Weapon = 17;
+            private static int _Item = 18;
 
             /// <summary>
             /// Default = 0
@@ -289,6 +300,10 @@ namespace Com.MyCompany.MyGame
             /// Weapon = 17
             /// </summary>
             public static int Weapon { get { return _Weapon; } }
+            /// <summary>
+            /// Item = 18
+            /// </summary>
+            public static int Item { get { return _Item; } }
         }
 
         //디버그용 

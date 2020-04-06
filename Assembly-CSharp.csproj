@@ -60,6 +60,7 @@
      <Compile Include="Assets\Scripts\Demo\DemoPlayerAnimatorManager.cs" />
      <Compile Include="Assets\Scripts\Demo\DemoPlayerManager.cs" />
      <Compile Include="Assets\Scripts\Item\Aggro.cs" />
+     <Compile Include="Assets\Scripts\Item\Item.cs" />
      <Compile Include="Assets\Scripts\Item\Weapon.cs" />
      <Compile Include="Assets\Scripts\Item\WeaponSmoke.cs" />
      <Compile Include="Assets\Scripts\Item\WeaponThrow.cs" />

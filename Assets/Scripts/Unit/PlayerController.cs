@@ -15,8 +15,8 @@ namespace Com.MyCompany.MyGame
         private class Inventory
         {
             private bool _takeGold = false;
-            private int[] _items = new int[(int)Item.max - 1];
-            private int[] maxAmount = new int[(int)Item.max - 1];
+            private int[] _items = new int[(int)ItemCode.max - 1];
+            private int[] maxAmount = new int[(int)ItemCode.max - 1];
 
             public bool takeGold { get { return _takeGold; } }
             public int[] items { get { return _items; } }
@@ -31,13 +31,13 @@ namespace Com.MyCompany.MyGame
                 _takeGold = false;
             }
 
-            public void Add(Item item, int amount)
+            public void Add(ItemCode item, int amount)
             {
                 switch (item)
                 {
-                    case Item.CAN:
-                    case Item.CHEESE:
-                    case Item.SMOKE:
+                    case ItemCode.CAN:
+                    case ItemCode.CHEESE:
+                    case ItemCode.SMOKE:
 
                         int index = (int)(item) - 1;
 
@@ -54,13 +54,13 @@ namespace Com.MyCompany.MyGame
                 }
 
             }
-            public void Add(Item item)
+            public void Add(ItemCode item)
             { 
                 switch (item)
                 {
-                    case Item.CAN:
-                    case Item.CHEESE:
-                    case Item.SMOKE:
+                    case ItemCode.CAN:
+                    case ItemCode.CHEESE:
+                    case ItemCode.SMOKE:
 
                         int index = (int)(item) - 1;
 
@@ -69,7 +69,7 @@ namespace Com.MyCompany.MyGame
                         else
                             _items[index]++;
                         break;
-                    case Item.GOLD:
+                    case ItemCode.GOLD:
                         _takeGold = true;
                         break;
                     default:
@@ -88,13 +88,13 @@ namespace Com.MyCompany.MyGame
                 ShowInvnetory();
             }
 
-            public void Remove(Item item, int amount)
+            public void Remove(ItemCode item, int amount)
             {
                 switch (item)
                 {
-                    case Item.CAN:
-                    case Item.CHEESE:
-                    case Item.SMOKE:
+                    case ItemCode.CAN:
+                    case ItemCode.CHEESE:
+                    case ItemCode.SMOKE:
 
                         int index = (int)(item) - 1;
 
@@ -110,13 +110,13 @@ namespace Com.MyCompany.MyGame
                         break;
                 }
             }
-            public void Remove(Item item)
+            public void Remove(ItemCode item)
             {
                 switch (item)
                 {
-                    case Item.CAN:
-                    case Item.CHEESE:
-                    case Item.SMOKE:
+                    case ItemCode.CAN:
+                    case ItemCode.CHEESE:
+                    case ItemCode.SMOKE:
 
                         int index = (int)(item) - 1;
 
@@ -125,7 +125,7 @@ namespace Com.MyCompany.MyGame
                         else
                             _items[index]--;
                         break;
-                    case Item.GOLD:
+                    case ItemCode.GOLD:
                         _takeGold = false;
                         break;
                     default:
@@ -225,9 +225,9 @@ namespace Com.MyCompany.MyGame
             aggroValue = AggroCollections.aggroRun;
 
             //인벤토리 초기화
-            pInventory.Add(Item.CAN, 50);
-            pInventory.Add(Item.CHEESE, 30);
-            pInventory.Add(Item.SMOKE, 20);
+            pInventory.Add(ItemCode.CAN, 50);
+            pInventory.Add(ItemCode.CHEESE, 30);
+            pInventory.Add(ItemCode.SMOKE, 20);
         }
 
         void Start()
@@ -462,7 +462,7 @@ namespace Com.MyCompany.MyGame
                 }
             }
             //Throw 애니메이션이 재생 중
-            else if (animator.GetBool("ThrowItem"))
+            else if (animator.GetBool("ThrowItemCode"))
             {
                 unit.curUnitPose = UnitPose.MOD_THROWEND;
                 SetBYCurUnitPose();
@@ -470,7 +470,7 @@ namespace Com.MyCompany.MyGame
             }
 
             //Throw 애니메이션 종료 후
-            if (animator.GetLayerWeight(AnimationLayers.Throw) <= 0 && animator.GetBool("ThrowItem"))
+            if (animator.GetLayerWeight(AnimationLayers.Throw) <= 0 && animator.GetBool("ThrowItemCode"))
             {
                 unit.curLookDir = LookDirState.IDLE;
   
@@ -597,14 +597,12 @@ namespace Com.MyCompany.MyGame
             }
         }
         //아이템을 주울때
-        private void ControlGetItem()
+        private void ControlGetItemCode()
         {
-            /*
-             if(Input.GetButton("GetItem"))
+             if(Input.GetButton("GetItemCode"))
              {
                 
              }
-             */
         }
         #endregion
 

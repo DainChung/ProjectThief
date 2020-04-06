@@ -16,6 +16,7 @@ namespace Com.MyCompany.MyGame
         public new void SetCode(WeaponCode code)
         {
             base._code = code;
+            transform.GetComponent<Item>().SetItem(code);
         }
 
         void Awake()
@@ -36,7 +37,7 @@ namespace Com.MyCompany.MyGame
         {
             if (!lockAggro)
             {
-                if (other.gameObject.layer == LayerMask.NameToLayer("Structure"))
+                if (other.gameObject.layer == PhysicsLayers.Structure)
                 {
                     lockAggro = true;
                     GameObject obj = Instantiate(Resources.Load(FilePaths.weaponPath + "Aggro") as GameObject, transform.position, transform.rotation) as GameObject;
