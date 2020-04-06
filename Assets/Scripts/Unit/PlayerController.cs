@@ -67,7 +67,10 @@ namespace Com.MyCompany.MyGame
                         if (_items[index] + 1 > maxAmount[index])
                             _items[index] = maxAmount[index];
                         else
+                        {
                             _items[index]++;
+                            ShowInvnetory();
+                        }
                         break;
                     case ItemCode.GOLD:
                         _takeGold = true;
@@ -84,8 +87,6 @@ namespace Com.MyCompany.MyGame
                     _items[index] = maxAmount[index];
                 else
                     _items[index]++;
-
-                ShowInvnetory();
             }
 
             public void Remove(ItemCode item, int amount)
@@ -172,6 +173,61 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        public class NearestItem
+        {
+            private Transform playerTr;
+            private Item _item;
+            private float _dist;
+
+            public NearestItem(Transform playerTransform)
+            {
+                playerTr = playerTransform;
+                _dist = float.MaxValue;
+            }
+            //가장 가까운 Item만 주울 수 있음
+            public void Set(Item item, Vector3 pos)
+            {
+                float d = Vector3.Distance(playerTr.position, pos);
+                if (d < _dist)
+                {
+                    _item = item;
+                    _dist = d;
+                }
+            }
+            public void Delete(int itemInstanceID)
+            {
+                try
+                {
+                    if ((_item.GetInstanceID() == itemInstanceID) && (_item != null))
+                        Init();
+                }
+                catch (System.Exception)
+                { }
+            }
+            public ItemCode GetItemCode()
+            {
+                ItemCode result = ItemCode.max;
+                try
+                {
+                    result = _item.code;
+                    DestroyImmediate(_item.gameObject);
+                    Init();
+                }
+                catch (System.Exception) { }
+                return result;
+            }
+            public Item GetItem()
+            {
+                MyDebug.Log("ID: " + _item.GetInstanceID() + ", code: " + _item.code + ", Dist: " + _dist);
+                return _item;
+            }
+            public void Init()
+            {
+                _item = null;
+                _dist = float.MaxValue;
+            }
+        }
+
         #endregion
 
         #region Private Fields
@@ -213,6 +269,8 @@ namespace Com.MyCompany.MyGame
 
         public Transform throwPos;
         public CheckCameraCollider checkCameraCollider;
+        [HideInInspector]
+        public NearestItem nearestItem;
 
         public float aggroVal { get { return aggroValue; } }
 
@@ -232,6 +290,7 @@ namespace Com.MyCompany.MyGame
 
         void Start()
         {
+            nearestItem = new NearestItem(transform);
             unit = GetComponent<Unit>();
             playerAnimController = GetComponent<PlayerAnimationController>();
             rb = GetComponent<Rigidbody>();
@@ -254,6 +313,9 @@ namespace Com.MyCompany.MyGame
                 if (Input.GetButtonDown("Weapon1"))
                 {
                     curWeapon = WeaponCode.HAND;
+                    unit.throwLine.HideLines();
+                    playerAnimController.unitAnimController.TurnOffAllLayers();
+                    playerSpeed = unit.speed;
                     UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
                 }
                 else if (Input.GetButtonDown("Weapon2"))
@@ -269,6 +331,9 @@ namespace Com.MyCompany.MyGame
                 else if (Input.GetButtonDown("Weapon4"))
                 {
                     curWeapon = WeaponCode.SMOKE;
+                    unit.throwLine.HideLines();
+                    playerSpeed = unit.speed;
+                    playerAnimController.unitAnimController.TurnOffAllLayers();
                     UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
                 }
 
@@ -331,6 +396,7 @@ namespace Com.MyCompany.MyGame
                 }
 
                 LookDir();
+                ControlGetItem();
             }
 
             //UnityEngine.Debug.Log("Aggro: " + aggro);
@@ -459,6 +525,7 @@ namespace Com.MyCompany.MyGame
                 {
                     unit.AttackPhaseThrow(throwPos.position, curWeapon, ref playerSpeed);
                     pInventory.Remove((int)curWeapon);
+                    animator.SetBool("ThrowItemCode", true);
                 }
             }
             //Throw 애니메이션이 재생 중
@@ -476,6 +543,7 @@ namespace Com.MyCompany.MyGame
   
                 unit.ResetThrowAnimation();
                 SetBYCurUnitPose();
+                animator.SetBool("ThrowItemCode", false);
             }
         }
 
@@ -597,12 +665,13 @@ namespace Com.MyCompany.MyGame
             }
         }
         //아이템을 주울때
-        private void ControlGetItemCode()
+        private void ControlGetItem()
         {
-             if(Input.GetButton("GetItemCode"))
-             {
-                
-             }
+            if (Input.GetButtonDown("GetItem"))
+            {
+                pInventory.Add(nearestItem.GetItemCode());
+                nearestItem.Init();
+            }
         }
         #endregion
 

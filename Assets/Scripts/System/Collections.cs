@@ -237,8 +237,10 @@ namespace Com.MyCompany.MyGame
             private static int _PlayerAttack = 14;
             private static int _EnemyRadar = 15;
             private static int _PlayerRadar = 16;
-            private static int _Weapon = 17;
-            private static int _Item = 18;
+            private static int _TargetLayer = 17;
+            private static int _EnemyRadarManager = 18;
+            private static int _Weapon = 19;
+            private static int _Item = 20;
 
             /// <summary>
             /// Default = 0
@@ -297,11 +299,19 @@ namespace Com.MyCompany.MyGame
             /// </summary>
             public static int PlayerRadar { get { return _PlayerRadar; } }
             /// <summary>
-            /// Weapon = 17
+            /// TargetLayer = 17
+            /// </summary>
+            public static int TargetLayer { get { return _TargetLayer; } }
+            /// <summary>
+            /// EnemyRadarManager = 18
+            /// </summary>
+            public static int EnemyRadarManager { get { return _EnemyRadarManager; } }
+            /// <summary>
+            /// Weapon = 19
             /// </summary>
             public static int Weapon { get { return _Weapon; } }
             /// <summary>
-            /// Item = 18
+            /// Item = 20
             /// </summary>
             public static int Item { get { return _Item; } }
         }

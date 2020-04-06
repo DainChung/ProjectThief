@@ -38,7 +38,6 @@ namespace Com.MyCompany.MyGame
             unit = transform.parent.GetComponent<Unit>();
             mainCam = Camera.main;
         }
-
         void FixedUpdate()
         {
             //메인카메라 따라서 회전
@@ -54,21 +53,19 @@ namespace Com.MyCompany.MyGame
             if (other.gameObject.layer == PhysicsLayers.Enemy)
                 other.GetComponent<EnemyController>().seenByCamera = true;
         }
-
         void OnTriggerStay(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
                 other.GetComponent<EnemyController>().seenByCamera = true;
-            if (other.gameObject.layer == PhysicsLayers.Item)
-                other.GetComponent<Item>().SeenByCamera(true);
+            //if (other.gameObject.layer == PhysicsLayers.Item)
+            //    other.GetComponent<Item>().SeenByCamera(true);
         }
-
         void OnTriggerExit(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
                 other.GetComponent<EnemyController>().seenByCamera = false;
-            if (other.gameObject.layer == PhysicsLayers.Item)
-                other.GetComponent<Item>().SeenByCamera(false);
+            //if (other.gameObject.layer == PhysicsLayers.Item)
+            //    other.GetComponent<Item>().SeenByCamera(false);
         }
         #endregion
 

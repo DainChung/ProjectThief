@@ -232,7 +232,8 @@ GameObject:
   - component: {fileID: -945746905619722431}
   - component: {fileID: 4385702786850018141}
   - component: {fileID: 67510675}
-  m_Layer: 0
+  - component: {fileID: -6703258328821328354}
+  m_Layer: 20
   m_Name: WeaponCAN
   m_TagString: WeaponCan
   m_Icon: {fileID: 0}
@@ -285,7 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c222d48086bef8a4b89ede606910b3f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeValue: 5
+  timeValue: 5000
 --- !u!54 &-945746905619722431
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -329,6 +330,18 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 2
   m_Center: {x: 0, y: 1.35, z: 0}
+--- !u!114 &-6703258328821328354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6670630277979103049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bccad53c126d29548ade46fc123cc4a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7789697901928847553
 GameObject:
   m_ObjectHideFlags: 0

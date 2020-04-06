@@ -36,9 +36,14 @@ namespace Com.MyCompany.MyGame
 
                 while (index < other.transform.childCount)
                 {
-                    if(enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
-                        Destroy(other.transform.GetChild(index).gameObject);
-                    index++;
+                    try
+                    {
+                        if (enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
+                            Destroy(other.transform.GetChild(index).gameObject);
+                        index++;
+                    }
+                    catch (System.Exception)
+                    { }
                 }
             }
         }

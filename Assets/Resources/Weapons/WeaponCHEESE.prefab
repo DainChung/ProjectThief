@@ -105,7 +105,8 @@ GameObject:
   - component: {fileID: 6443395419056336458}
   - component: {fileID: 1664584333620021089}
   - component: {fileID: 1575717775}
-  m_Layer: 0
+  - component: {fileID: 286888321443760518}
+  m_Layer: 20
   m_Name: WeaponCHEESE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c222d48086bef8a4b89ede606910b3f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeValue: 60
+  timeValue: 60000
 --- !u!54 &1664584333620021089
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -169,3 +170,15 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 2.5
   m_Center: {x: 0.1, y: 0.3, z: 0}
+--- !u!114 &286888321443760518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6186149213118375603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bccad53c126d29548ade46fc123cc4a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

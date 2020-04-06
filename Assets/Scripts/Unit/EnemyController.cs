@@ -278,7 +278,7 @@ namespace Com.MyCompany.MyGame
         }
         
         void FixedUpdate()
-        {        
+        {
             if (!unit.lockControl)
             {
                 if (unit.health > 0)
@@ -502,14 +502,6 @@ namespace Com.MyCompany.MyGame
             stayDelay.Stop();
         }
 
-        private void Stop()
-        {
-            _doesReachToTarget = false;
-            isMovingNow = false;
-            canIAttack = true;
-            InitCurTarget();
-        }
-
         private void StopWithoutInitCurtarget()
         {
             _doesReachToTarget = false;
@@ -520,6 +512,14 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Public Methods
+
+        public void Stop()
+        {
+            _doesReachToTarget = false;
+            isMovingNow = false;
+            canIAttack = true;
+            InitCurTarget();
+        }
 
         public void Detect(WeaponCode code, Transform tr, Vector3 pos)
         {

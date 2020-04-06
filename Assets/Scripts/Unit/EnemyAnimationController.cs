@@ -134,6 +134,7 @@ namespace Com.MyCompany.MyGame
                     //Mixamo의 Drunk 시리즈를 사용할 것
                 #region MOD_INSMOKE(== UnitState.INSMOKE)
                 case UnitPose.MOD_INSMOKE:
+                    animator.SetFloat("MoveSpeed", enemy.moveSpeed);
                     break;
                 #endregion
 

@@ -32,8 +32,9 @@ namespace Com.MyCompany.MyGame
         {
             if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                Vector3 destiPos = Vector3.Normalize(other.transform.position - transform.position);
+                Vector3 destiPos = other.transform.position + (other.transform.position - transform.position) * GetComponent<SphereCollider>().radius / 2;
                 destiPos.Set(destiPos.x, other.transform.position.y, destiPos.z);
+                Debug.Log("Enemy: "+other.transform.position + ", Smoke: " + transform.position + ", Diff: " + destiPos);
                 other.transform.GetComponent<EnemyController>().Detect(code, transform, destiPos);
             }
         }

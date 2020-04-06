@@ -10,11 +10,16 @@ namespace Com.MyCompany.MyGame
     {
         private Vector3 height = new Vector3(0, 0.1f, 0);
         private bool exitCoroutine = false;
+        private Unit unit;
 
-        public Unit unit;
         public float radarValue;
 
         public Transform eyes;
+
+        void Start()
+        {
+            unit = transform.parent.parent.GetComponent<Unit>();
+        }
 
         void FixedUpdate()
         {
@@ -73,6 +78,12 @@ namespace Com.MyCompany.MyGame
             {
                 exitCoroutine = false;
                 StartCoroutine(DecreaseAlertValue());
+            }
+
+            if (other.gameObject.layer == PhysicsLayers.Weapon)
+            {
+                unit.curUnitState = UnitState.ALERT;
+                unit.transform.GetComponent<EnemyController>().Stop();
             }
         }
 
