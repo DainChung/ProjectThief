@@ -15,7 +15,10 @@ https://www.cgtrader.com/free-3d-models/food/miscellaneous/coca-cola-can-60b7e50
 https://www.turbosquid.com/ko/3d-models/doughnuts-mug-lighting-3d-model-1277936
 
 
-[2] Cheese.fbx file (with Materials & Textures) int Assets\Models\UsableObjects from
+[2] Cheese.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
 https://sketchfab.com/3d-models/cheese-ecda1dabea2b4c349a8aa76b6d1a083c
 
+
+[3] Ring.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
+https://www.cgtrader.com/items/707754/download-page
 *************************	end	*************************//

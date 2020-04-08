@@ -74,6 +74,8 @@ namespace Com.MyCompany.MyGame
                         break;
                     case ItemCode.GOLD:
                         _takeGold = true;
+                        ShowInvnetory();
+                        GameObject.FindWithTag("Manager").GetComponent<StageManager>().ShowEndArea();
                         break;
                     default:
                         break;

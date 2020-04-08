@@ -11,6 +11,12 @@ namespace Com.MyCompany.MyGame
         private ItemCode _code = ItemCode.max;
         public ItemCode code { get { return _code; } }
 
+        void Start()
+        {
+            if (transform.CompareTag("Gold"))
+                _code = ItemCode.GOLD;
+        }
+
         public void SetItem(WeaponCode weaponCode)
         {
             if (_code == ItemCode.max)

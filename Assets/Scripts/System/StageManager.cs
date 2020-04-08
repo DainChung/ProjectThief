@@ -51,20 +51,30 @@ namespace Com.MyCompany.MyGame
             //탈출 지점을 숨김
             foreach (Transform endArea in end)
             {
-                //endArea.GetComponent<MeshRenderer>().enabled = false;
-                //endArea.GetComponent<BoxCollider>().enabled = false;
+                endArea.GetComponent<MeshRenderer>().enabled = false;
+                endArea.GetComponent<BoxCollider>().enabled = false;
             }
         }
 
-        //void ShowUIHandler()
-        //{
+        void Update()
+        {
+            if (Input.GetButtonDown("TEST"))
+                UnityEngine.SceneManagement.SceneManager.LoadScene("TestScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
 
-        //}
+        public void ShowEndArea()
+        {
+            Random.InitState((int)Time.unscaledTime);
+            int index = Random.Range(0, end.Length);
+            end[index].GetComponent<BoxCollider>().enabled = true;
+            end[index].GetComponent<MeshRenderer>().enabled = true;
+        }
+
         #region Events
             #region UIEvents
-        public void ShowMenu()
+        public void OnOffMenu(bool onoff)
         {
-            gameEvent.ShowMenu();
+            gameEvent.ShowMenu(onoff);
         }
         public void ShowResultMenu(bool isClear)
         {
@@ -87,7 +97,7 @@ namespace Com.MyCompany.MyGame
                 ui.Add(canvas.GetChild(i));
         }
 
-        public void ShowMenu()
+        public void ShowMenu(bool onoff)
         {
             Debug.Log("ShowMenu");
         }
