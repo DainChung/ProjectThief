@@ -17,7 +17,7 @@ namespace Com.MyCompany.MyGame
         //Enemy가 추적할 때 사용하기도 함
         public enum WeaponCode
         {
-            HAND = 0, CAN, CHEESE, SMOKE, PLAYER, PLAYERTRACK, max
+            HAND = 0, CAN, CHEESE, SMOKE, PLAYER, PLAYERTRACK, ENEMYDEAD, max
         }
 
         //Animation Layer에 관한 정보
@@ -104,10 +104,10 @@ namespace Com.MyCompany.MyGame
             #region DelayTime Values
 
             //Milli Sec
-            private static long[] _enemyDetectedDelayMax = { 0, 3000, 0, 3500, 2000, 0, -1 };
+            private static long[] _enemyDetectedDelayMax = { 0, 3000, 0, 3500, 2000, 0, 3000, -1 };
             public static long[] enemyDetectedDelayMax { get { return _enemyDetectedDelayMax; } }
             //Milli Sec
-            private static long[] _enemyDetectedStayMax = { 0, 1500, 5000, 1500, 0, 0, -1 };
+            private static long[] _enemyDetectedStayMax = { 0, 1500, 5000, 1500, 0, 0, 1000, -1 };
             public static long[] enemyDetectedStayMax { get { return _enemyDetectedStayMax; } }
             //Sec
             private static float _deadBodyRemainTime = 30.0f;

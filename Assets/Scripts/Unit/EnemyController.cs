@@ -62,13 +62,14 @@ namespace Com.MyCompany.MyGame
                         {
                             case WeaponCode.CAN:
                             case WeaponCode.SMOKE:
+                            case WeaponCode.ENEMYDEAD:
                                 queue[Count()] = input;
                                 break;
-                            case WeaponCode.PLAYERTRACK:
-                            case WeaponCode.PLAYER:
-                            case WeaponCode.CHEESE:
-                                Clear();
-                                queue[0] = input;
+                            //case WeaponCode.PLAYERTRACK:
+                            //case WeaponCode.PLAYER:
+                            //case WeaponCode.CHEESE:
+                            //    Clear();
+                            //    queue[0] = input;
                                 break;
                             default:
                                 break;
@@ -243,7 +244,7 @@ namespace Com.MyCompany.MyGame
         [HideInInspector]
         public bool seenByCamera = false;
 
-        public EnemyRadarManager radarMng;
+        public EnemyCheckStructure checkStructure;
         [HideInInspector]
         public TargetManager targetMng = new TargetManager();
 
@@ -270,11 +271,12 @@ namespace Com.MyCompany.MyGame
             unit.animator.SetBool("IsRunMode", false);
 
             rb = GetComponent<Rigidbody>();
-            InitCurTarget();
 
             agent = GetComponent<NavMeshAgent>();
             agent.speed = 0;
-            radarMng.enabled = true;
+            checkStructure.enabled = true;
+
+            InitCurTarget();
         }
         
         void FixedUpdate()
@@ -415,7 +417,6 @@ namespace Com.MyCompany.MyGame
                         Move();
                     break;
                 case WeaponCode.CHEESE:
-                    unit.curLookDir = LookDirState.AGENT;
                     targetMng.Clear();
                     player = null;
                     Move();
@@ -434,7 +435,7 @@ namespace Com.MyCompany.MyGame
                 if (!_doesReachToTarget)
                 {
                     isMovingNow = true;
-                    if (radarMng.thereIsStructure)
+                    if (checkStructure.isThereStructure)
                     {
                         unit.curLookDir = LookDirState.AGENT;
                         agent.SetDestination(curTarget.pos);
@@ -442,7 +443,7 @@ namespace Com.MyCompany.MyGame
                     else
                     {
                         rb.velocity = transform.forward * enemySpeed * 0.15f;
-                        agent.speed = 0;
+                        agent.ResetPath();
                     }
                 }
                 else if (_doesReachToTarget)
@@ -457,7 +458,7 @@ namespace Com.MyCompany.MyGame
                         _doesReachToTarget = false;
                     }
                 }
-                rb.velocity *= 0.99f;
+                rb.velocity *= 0.9f;
             }
             catch (AIsCloseToB)
             {
@@ -471,10 +472,12 @@ namespace Com.MyCompany.MyGame
             stayDelay.Stop();
             curTarget = queue.Dequeue();
             GameObject targetOBJ = Instantiate(Resources.Load(FilePaths.AISystemPath + "Target") as GameObject, curTarget.pos, transform.rotation);
+            unit.curLookDir = LookDirState.IDLE;
             if (player != null)
             {
                 targetOBJ.transform.parent = player;
                 targetMng.Add(targetOBJ);
+                unit.curLookDir = LookDirState.FINDPLAYER;
             }
             targetOBJ.GetComponent<Target>().SetID(transform.GetInstanceID());
         }
@@ -492,16 +495,16 @@ namespace Com.MyCompany.MyGame
             }
             targetOBJ.GetComponent<Target>().SetID(transform.GetInstanceID());
         }
-
         private void InitCurTarget()
         {
+            isMovingNow = false;
+            agent.ResetPath();
             curTarget.code = WeaponCode.max;
             curTarget.tr = null;
             curTarget.pos = ValueCollections.initPos;
             stayDelay.Reset();
             stayDelay.Stop();
         }
-
         private void StopWithoutInitCurtarget()
         {
             _doesReachToTarget = false;
@@ -515,16 +518,18 @@ namespace Com.MyCompany.MyGame
 
         public void Stop()
         {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
             _doesReachToTarget = false;
             isMovingNow = false;
             canIAttack = true;
             InitCurTarget();
         }
-
         public void Detect(WeaponCode code, Transform tr, Vector3 pos)
         {
             if (tr != null)
             {
+                StartCoroutine(checkStructure.CheckStructure(pos));
                 switch (code)
                 {
                     case WeaponCode.CAN:
@@ -532,20 +537,31 @@ namespace Com.MyCompany.MyGame
                         if (unit.alertValue < AggroCollections.alertMin)
                             unit.alertValue = AggroCollections.alertMin;
                         queue.Enqueue(code, tr, pos);
+                        agent.ResetPath();
                         break;
                     case WeaponCode.PLAYER:
                         if (unit.alertValue < AggroCollections.combatMin)
                             unit.alertValue = AggroCollections.combatMin;
                         queue.Enqueue(code, tr, pos);
+                        agent.ResetPath();
                         break;
                     case WeaponCode.CHEESE:
                         if (unit.alertValue < AggroCollections.combatMin)
                             unit.alertValue = AggroCollections.combatMin;
                         SetCurTarget(code, pos);
-                        MyDebug.Log(pos);
+                        agent.ResetPath();
                         queue.Clear();
                         break;
                     case WeaponCode.SMOKE:
+                        if (unit.alertValue < AggroCollections.alertMin)
+                            unit.alertValue = AggroCollections.alertMin;
+                        agent.speed = 2.5f;
+                        enemySpeed = unit.walkSpeed;
+                        queue.Enqueue(code, tr, pos);
+                        break;
+                    case WeaponCode.ENEMYDEAD:
+                        if (unit.alertValue < AggroCollections.alertMin)
+                            unit.alertValue = AggroCollections.alertMin;
                         agent.speed = 2.5f;
                         enemySpeed = unit.walkSpeed;
                         queue.Enqueue(code, tr, pos);
@@ -553,10 +569,10 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-
                 EnemyAlertManager();
             }
         }
+
         public bool IsCombatState()
         {
             return (unit.curUnitState == UnitState.COMBAT);
@@ -594,8 +610,6 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
-
-            if(curTarget.tr != null || curTarget.code == WeaponCode.CHEESE)    StartCoroutine(radarMng.CheckToTarget(curTarget.pos));
         }
 
         #endregion

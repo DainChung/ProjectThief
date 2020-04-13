@@ -34,26 +34,26 @@ namespace Com.MyCompany.MyGame
             #region Player인 경우
             if (other.transform.gameObject.layer == PhysicsLayers.Player && unit.curUnitState != UnitState.CHEESE)
             {
-                if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
-
                 Transform otherTR = other.transform;
                 Vector3 otherPos = otherTR.position;
                 RaycastHit[] hits;
-                Vector3 rayOrigin = unit.transform.position - height;
+                Vector3 rayOrigin = unit.transform.position + height;
                 Vector3 rayDesti = otherPos - rayOrigin;
 
-                //Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
                 hits = Physics.RaycastAll(rayOrigin, rayDesti);
                 foreach (RaycastHit hit in hits)
                 {
+                    if (hit.transform.gameObject.layer == PhysicsLayers.Structure)
+                        break;
+
                     if (hit.transform.gameObject.layer == PhysicsLayers.Player)
                     {
+                        if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
                         //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
                         exitCoroutine = true;
 
                         float distVal = Mathf.Clamp(Vector3.Distance(otherPos, unit.transform.position), 0.1f, 7);
                         unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
-                        //Debug.Log("Alert: " + unit.alertValue);
 
                         if (unit.curUnitState == UnitState.ALERT)
                             unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);

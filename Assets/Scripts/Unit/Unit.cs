@@ -294,7 +294,7 @@ namespace Com.MyCompany.MyGame
             _speed = 20;
             _jumpPower = 400;
 
-            long[] delays = { 200, 2000, 3000, 4000, 700};
+            long[] delays = { 200, 2000, 3000, 4000, 1000};
             swManager = new StopwatchManager(delays, 4);
 
             unitAnimController = new UnitAnimationController(this, animator);
@@ -440,7 +440,7 @@ namespace Com.MyCompany.MyGame
             GetComponent<Rigidbody>().useGravity = false;
 
             if (transform.CompareTag("Player"))
-                GameObject.FindGameObjectWithTag("Manager").GetComponent<StageManager>().ShowResultMenu(false);
+                GameObject.FindGameObjectWithTag("Manager").GetComponent<StageManager>().ShowResultWindow(false);
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }

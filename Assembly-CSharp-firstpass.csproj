@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;UNITY_2019_2_17;UNITY_2019_2;UNITY_2019;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;INCLUDE_DYNAMIC_GI;ENABLE_MONO_BDWGC;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_EVENT_QUEUE;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_STANDARD_2_0;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;CROSS_PLATFORM_INPUT;UNITY_POST_PROCESSING_STACK_V2;PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;UNITY_2019_2_17;UNITY_2019_2;UNITY_2019;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;INCLUDE_DYNAMIC_GI;ENABLE_MONO_BDWGC;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_EVENT_QUEUE;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_4_6;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;CROSS_PLATFORM_INPUT;UNITY_POST_PROCESSING_STACK_V2;PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
@@ -56,16 +56,11 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Plugins\EffectExamples\Misc Effects\Scripts\SpawnEffect.cs" />
-     <None Include="Assets\Plugins\Photon\PhotonLibs\changes-library.txt" />
-     <None Include="Assets\Plugins\Photon\PhotonUnityNetworking\link.xml" />
-     <None Include="Assets\Plugins\Photon\PhotonLibs\Photon3Unity3D.xml" />
      <None Include="Assets\Plugins\EffectExamples\Misc Effects\Shaders\Dissolve.shader" />
      <None Include="Assets\Plugins\EffectExamples\Misc Effects\Shaders\FireFly.shader" />
      <None Include="Assets\Plugins\EffectExamples\Misc Effects\Prefabs\Readme_Dissolve_Respawn_.txt" />
      <None Include="Assets\Plugins\EffectExamples\Misc Effects\Shaders\Respawn.shader" />
-     <None Include="Assets\Plugins\Photon\PhotonUnityNetworking\readme.txt" />
      <None Include="Assets\Plugins\EffectExamples\Magic Effects\Shaders\Ice.shader" />
-     <None Include="Assets\Plugins\Photon\PhotonUnityNetworking\changelog.txt" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
@@ -290,12 +285,6 @@
  </Reference>
  <Reference Include="System.Windows.Forms">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/System.Windows.Forms.dll</HintPath>
- </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="websocket-sharp">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -657,36 +646,6 @@
  <Reference Include="Boo.Lang">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.PhotonPlayer.Editor.csproj">
-      <Project>{268624A2-BFD6-401C-0B7D-671A2A10C016}</Project>
-      <Name>PhotonUnityNetworking.Utilities.PhotonPlayer.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.csproj">
-      <Project>{045E13F2-5346-7BE4-FDE9-37434B261BD6}</Project>
-      <Name>PhotonUnityNetworking.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonWebSocket.csproj">
-      <Project>{4AF0279A-E276-A7D8-29BB-306E484F14DF}</Project>
-      <Name>PhotonWebSocket</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonRealtime.csproj">
-      <Project>{3A3C3FDD-6681-3383-0885-3B812AFD19F2}</Project>
-      <Name>PhotonRealtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.csproj">
-      <Project>{6B351F4A-F722-186A-3224-F4BD35B8C044}</Project>
-      <Name>PhotonUnityNetworking</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.Culling.Editor.csproj">
-      <Project>{05CB955D-4861-3E3D-DEB9-B2E4A13AACD4}</Project>
-      <Name>PhotonUnityNetworking.Utilities.Culling.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Editor.csproj">
-      <Project>{5506EE59-E663-CFAC-B0DD-7D1AE4D53248}</Project>
-      <Name>PhotonUnityNetworking.Editor</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

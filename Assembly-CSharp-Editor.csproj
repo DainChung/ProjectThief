@@ -55,6 +55,91 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Editor\InvDatabaseInspector.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Editor\InvFindItem.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\ActiveAnimationEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\BMFontReader.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\ComponentSelector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\EventDelegateDrawer.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\EventDelegateEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\FreeType.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIContextMenu.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIEditorExtensions.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIEditorTools.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIHandles.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIHelp.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIJson.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUIMenu.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUISelectionTools.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUISettings.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUISnap.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\NGUITransformInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\PropertyBindingEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\PropertyReferenceDrawer.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\SpriteSelector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenAlphaEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenColorEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenFOVEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenHeightEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenOrthoSizeEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenPositionEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenRotationEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenScaleEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenTransformEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenVolumeEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TweenWidthEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\TypewriterEffectEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UI2DSpriteEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIAnchorEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIAtlasInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIAtlasMaker.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIBasicSpriteEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIButtonColorEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIButtonEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIButtonKeysEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIButtonMessageEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UICameraEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UICameraTool.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIColorPickerEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UICreateNewUIWizard.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UICreateWidgetWizard.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIDragObjectEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIDrawCallInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIDrawCallViewer.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIEventTriggerEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIFontInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIFontMaker.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIForwardEventsEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIGridEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIImageButtonInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIInputEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIKeyNavigationEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UILabelInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UILocalizeEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIPanelInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIPanelTool.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIPlayAnimationEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIPlayTweenEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIPopupListInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIPrefabTool.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIProgressBarEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIRectEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIRootEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIScrollBarEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIScrollViewEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UISliderEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UISnapshotPointEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UISpriteAnimationInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UISpriteInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIStretchEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UITableEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UITextureInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UITexturePacker.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIToggleInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UITweenerEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIWidgetContainerEditor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIWidgetInspector.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Editor\UIWrapContentEditor.cs" />
      <Compile Include="Assets\Shared\Ramps\Editor\RampAssetEditor.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
  <Reference Include="UnityEditor.TestRunner">
@@ -308,12 +393,6 @@
  </Reference>
  <Reference Include="System.Windows.Forms">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/System.Windows.Forms.dll</HintPath>
- </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="websocket-sharp">
- <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
  </Reference>
  <Reference Include="nunit.framework">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
@@ -687,34 +766,6 @@
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{66A89C74-A8DD-3DE0-EC5B-FC8292F05A87}</Project>
       <Name>Assembly-CSharp</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.PhotonPlayer.Editor.csproj">
-      <Project>{268624A2-BFD6-401C-0B7D-671A2A10C016}</Project>
-      <Name>PhotonUnityNetworking.Utilities.PhotonPlayer.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.csproj">
-      <Project>{045E13F2-5346-7BE4-FDE9-37434B261BD6}</Project>
-      <Name>PhotonUnityNetworking.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonWebSocket.csproj">
-      <Project>{4AF0279A-E276-A7D8-29BB-306E484F14DF}</Project>
-      <Name>PhotonWebSocket</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonRealtime.csproj">
-      <Project>{3A3C3FDD-6681-3383-0885-3B812AFD19F2}</Project>
-      <Name>PhotonRealtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.csproj">
-      <Project>{6B351F4A-F722-186A-3224-F4BD35B8C044}</Project>
-      <Name>PhotonUnityNetworking</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.Culling.Editor.csproj">
-      <Project>{05CB955D-4861-3E3D-DEB9-B2E4A13AACD4}</Project>
-      <Name>PhotonUnityNetworking.Utilities.Culling.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Editor.csproj">
-      <Project>{5506EE59-E663-CFAC-B0DD-7D1AE4D53248}</Project>
-      <Name>PhotonUnityNetworking.Editor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

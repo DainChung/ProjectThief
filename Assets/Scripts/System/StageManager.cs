@@ -20,7 +20,7 @@ namespace Com.MyCompany.MyGame
         private GameObject treasure;
 
         private GameEvent gameEvent;
-        private Transform canvas;
+        private Transform uiRoot;
 
         #endregion
 
@@ -39,10 +39,10 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             player = GameObject.FindGameObjectWithTag("Player");
-            canvas = GameObject.Find("Canvas").transform;
+            uiRoot = GameObject.Find("UI Root").transform.GetChild(0);
             //treasure = GameObject.FindGameObjectWithTag("Treasure");
 
-            gameEvent = new GameEvent(canvas);
+            gameEvent = new GameEvent(uiRoot);
             //gameEvent.showUI += ShowUIHandler;
 
             //플레이어 캐릭터를 시작 지점으로 옮김
@@ -54,12 +54,16 @@ namespace Com.MyCompany.MyGame
                 endArea.GetComponent<MeshRenderer>().enabled = false;
                 endArea.GetComponent<BoxCollider>().enabled = false;
             }
+            InitUI();
         }
 
         void Update()
         {
             if (Input.GetButtonDown("TEST"))
+            {
+                //gameEvent.OnOffUI(true, "Window_GameResult");
                 UnityEngine.SceneManagement.SceneManager.LoadScene("TestScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            }
         }
 
         public void ShowEndArea()
@@ -72,13 +76,20 @@ namespace Com.MyCompany.MyGame
 
         #region Events
             #region UIEvents
+
+        private void InitUI()
+        {
+            //gameEvent.OnOffUI(false, "Window_Menu");
+            gameEvent.OnOffUI(false, "Window_GameResult");
+        }
+
         public void OnOffMenu(bool onoff)
         {
-            gameEvent.ShowMenu(onoff);
+            gameEvent.OnOffUI(false, "Window_Menu");
         }
-        public void ShowResultMenu(bool isClear)
+        public void ShowResultWindow(bool isClear)
         {
-            gameEvent.ShowResultMenu(isClear);
+            gameEvent.ShowResultWindow(isClear);
         }
             #endregion
         #endregion
@@ -87,22 +98,43 @@ namespace Com.MyCompany.MyGame
     public class GameEvent
     {
         private List<Transform> ui = new List<Transform>();
+        private Dictionary<string, int> uiDic = new Dictionary<string, int>();
 
         public delegate void ShowUI();
         public event ShowUI showUI;
 
-        public GameEvent(Transform canvas)
+        public GameEvent(Transform uiRoot)
         {
-            for (int i = 0; i < canvas.childCount; i++)
-                ui.Add(canvas.GetChild(i));
+            for (int i = 0; i < uiRoot.childCount; i++)
+            {
+                ui.Add(uiRoot.GetChild(i));
+                uiDic.Add(uiRoot.GetChild(i).name, i);
+            }
         }
 
-        public void ShowMenu(bool onoff)
+        //MonoBehaviour를 상속받은 모든 Class를 비활성화 / 활성화
+        private void OnOffUI(bool onoff, Transform uiTR)
         {
-            Debug.Log("ShowMenu");
+            MonoBehaviour[] list = uiTR.GetComponents<MonoBehaviour>();
+            for (int i = 0; i < list.Length; i++)
+            {
+                //Debug.Log(uiTR.name+" : "+i+") "+list[i].GetType().ToString());
+                list[i].enabled = onoff;
+            }
+        }
+        public void OnOffUI(bool onoff, string uiName)
+        {
+            try
+            {
+                OnOffUI(onoff, ui[uiDic[uiName]]);
+                for (int i = 0; i <= ui[uiDic[uiName]].childCount; i++)
+                    OnOffUI(onoff, ui[uiDic[uiName]].GetChild(i));
+            }
+            catch (System.Exception e)
+            { }
         }
 
-        public void ShowResultMenu(bool isClear)
+        public void ShowResultWindow(bool isClear)
         {
             Debug.Log((isClear ? "ShowClearUI" : "ShowDeadUI"));
         }
