@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Com.MyCompany.MyGame.Collections;
+
 
 namespace Com.MyCompany.MyGame
 {
@@ -29,10 +31,18 @@ namespace Com.MyCompany.MyGame
         public Transform start;
         public Transform[] end;
 
+        [HideInInspector]
+        public Dictionary<string, string> buttonToScene = new Dictionary<string, string>();
+
         #endregion
+
+        #region MonoBehaviour Callbacks
 
         void Awake()
         {
+            buttonToScene.Add("Button_Home", "Home");
+            buttonToScene.Add("Button_Retry", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            buttonToScene.Add("Button_NextLevel", FindNextLevel());
         }
 
         // Start is called before the first frame update
@@ -65,7 +75,23 @@ namespace Com.MyCompany.MyGame
                 UnityEngine.SceneManagement.SceneManager.LoadScene("TestScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
         }
+        #endregion
 
+        #region Private Methods
+
+        private string FindNextLevel()
+        {
+            string curLevel = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            /*
+            if(NextLevel == null) this.enable = false;
+            else sceneName = FindNextLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            */
+            return "Not Yet";
+        }
+
+        #endregion
+
+        #region Public Methods
         public void ShowEndArea()
         {
             Random.InitState((int)Time.unscaledTime);
@@ -73,14 +99,14 @@ namespace Com.MyCompany.MyGame
             end[index].GetComponent<BoxCollider>().enabled = true;
             end[index].GetComponent<MeshRenderer>().enabled = true;
         }
+        #endregion
 
-        #region Events
-            #region UIEvents
-
+        #region UIEvents
         private void InitUI()
         {
             //gameEvent.OnOffUI(false, "Window_Menu");
             gameEvent.OnOffUI(false, "Window_GameResult");
+            gameEvent.OnOffUI(false, "Window_Dead");
         }
 
         public void OnOffMenu(bool onoff)
@@ -91,7 +117,12 @@ namespace Com.MyCompany.MyGame
         {
             gameEvent.ShowResultWindow(isClear);
         }
-            #endregion
+
+        public void LoadScene(string buttonName)
+        {
+            Debug.Log(buttonName + " : " + buttonToScene[buttonName]);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(buttonToScene[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
         #endregion
     }
 
@@ -130,13 +161,14 @@ namespace Com.MyCompany.MyGame
                 for (int i = 0; i <= ui[uiDic[uiName]].childCount; i++)
                     OnOffUI(onoff, ui[uiDic[uiName]].GetChild(i));
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             { }
         }
 
         public void ShowResultWindow(bool isClear)
         {
-            Debug.Log((isClear ? "ShowClearUI" : "ShowDeadUI"));
+            if (isClear) OnOffUI(true, "Window_GameResult");
+            else         OnOffUI(true, "Window_Dead");
         }
     }
 

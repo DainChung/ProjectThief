@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
+//Dic이용해서 정리 한 번 해볼것
 namespace Com.MyCompany.MyGame
 {
     namespace Collections
@@ -72,9 +72,9 @@ namespace Com.MyCompany.MyGame
             private static int[] _itemMaxAmount = { 50, 30, 20 };
             public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
 
-            private static int targetChildIndex = 7;
+            private static int targetChildIndex = 8;
             /// <summary>
-            /// TargetChildIndex == 7
+            /// TargetChildIndex == 8
             /// </summary>
             public static int TargetChildIndex { get { return targetChildIndex; } }
 

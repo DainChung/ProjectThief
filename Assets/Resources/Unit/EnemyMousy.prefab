@@ -210,6 +210,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59cff14ffa66c2408a68cb4e49fc0f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2010139471
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2010139472}
+  - component: {fileID: 2010139474}
+  m_Layer: 15
+  m_Name: EnemyRadarForward
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2010139472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010139471}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.55, z: 0.35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6150556912168944673}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2010139474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010139471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ca0a5c45dd39fa49a0ee749f11295fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &55141238386060136
 GameObject:
   m_ObjectHideFlags: 0
@@ -1434,7 +1477,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b6ec8df0137ccb408deb60f6c8b4eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unit: {fileID: 6150556912168944684}
   radarValue: 100
   eyes: {fileID: 8946021664990976102}
 --- !u!1 &5514417104108375904
@@ -1881,6 +1923,7 @@ Transform:
   - {fileID: 5781894586358001035}
   - {fileID: 5781894586840952340}
   - {fileID: 7004591937276178981}
+  - {fileID: 2010139472}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1949,9 +1992,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   curUnitPose: 1
+  alertValue: 0
   animator: {fileID: 9127562670422152171}
   throwDestiPos: {fileID: 5781894587592942494}
-  alertValue: 0
   defaultAttack: {fileID: 424311161}
   assassinate: {fileID: 39382764}
 --- !u!114 &6150556912168944687
@@ -1968,7 +2011,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   throwPos: {fileID: 5781894586358001035}
   seenByCamera: 0
-  radarMng: {fileID: 1256000706}
+  checkStructure: {fileID: 2010139474}
 --- !u!114 &6150556912168944686
 MonoBehaviour:
   m_ObjectHideFlags: 0
