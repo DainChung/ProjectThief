@@ -146,7 +146,8 @@ namespace Com.MyCompany.MyGame
         //MonoBehaviour를 상속받은 모든 Class를 비활성화 / 활성화
         private void OnOffUI(bool onoff, Transform uiTR)
         {
-            MonoBehaviour[] list = uiTR.GetComponents<MonoBehaviour>();
+            uiTR.GetComponent<MonoBehaviour>().enabled = onoff;
+            MonoBehaviour[] list = uiTR.GetComponentsInChildren<MonoBehaviour>();
             for (int i = 0; i < list.Length; i++)
             {
                 //Debug.Log(uiTR.name+" : "+i+") "+list[i].GetType().ToString());
