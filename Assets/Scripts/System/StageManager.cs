@@ -109,13 +109,27 @@ namespace Com.MyCompany.MyGame
             gameEvent.OnOffUI(false, "Window_Dead");
         }
 
-        public void OnOffMenu(bool onoff)
+        public void OnOffButton(bool onoff, string uiName)
+        {
+            gameEvent.OnOffButton(onoff, uiName);
+        }
+        public void OnOffButton(bool onoff, string uiName, string buttonName)
+        {
+            gameEvent.OnOffButton(onoff, uiName, buttonName);
+        }
+
+        public void OnOffGameMenu(bool onoff)
         {
             gameEvent.OnOffUI(false, "Window_Menu");
+            player.GetComponent<Unit>().lockControl = onoff;
         }
         public void ShowResultWindow(bool isClear)
         {
             gameEvent.ShowResultWindow(isClear);
+            player.GetComponent<Unit>().lockControl = true;
+            player.GetComponent<CapsuleCollider>().enabled = false;
+            player.GetComponent<Rigidbody>().useGravity = false;
+            Camera.main.GetComponent<CameraWork>().enabled = false;
         }
 
         public void LoadScene(string buttonName)
@@ -149,10 +163,7 @@ namespace Com.MyCompany.MyGame
             uiTR.GetComponent<MonoBehaviour>().enabled = onoff;
             MonoBehaviour[] list = uiTR.GetComponentsInChildren<MonoBehaviour>();
             for (int i = 0; i < list.Length; i++)
-            {
-                //Debug.Log(uiTR.name+" : "+i+") "+list[i].GetType().ToString());
                 list[i].enabled = onoff;
-            }
         }
         public void OnOffUI(bool onoff, string uiName)
         {
@@ -162,8 +173,35 @@ namespace Com.MyCompany.MyGame
                 for (int i = 0; i <= ui[uiDic[uiName]].childCount; i++)
                     OnOffUI(onoff, ui[uiDic[uiName]].GetChild(i));
             }
-            catch (System.Exception)
-            { }
+            catch (System.Exception) { }
+        }
+
+        //uiName에 소속된 buttonName 버튼을 비활성화
+        public void OnOffButton(bool onoff, string uiName)
+        {
+            for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
+            {
+                try
+                {
+                    ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
+                }
+                catch (System.Exception){ continue; }
+            }
+        }
+        public void OnOffButton(bool onoff, string uiName, string buttonName)
+        {
+            try
+            {
+                for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
+                {
+                    if (ui[uiDic[uiName]].GetChild(i).name == buttonName)
+                    {
+                        ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
+                        break;
+                    }
+                }
+            }
+            catch (System.Exception) { }
         }
 
         public void ShowResultWindow(bool isClear)

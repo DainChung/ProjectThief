@@ -434,7 +434,6 @@ namespace Com.MyCompany.MyGame
 
         public void Dead()
         {
-            _lockControl = true;
             GetComponent<CapsuleCollider>().enabled = false;
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().useGravity = false;
@@ -454,6 +453,7 @@ namespace Com.MyCompany.MyGame
                 {
                     if (damage >= _health)
                     {
+                        _lockControl = true;
                         _health = 0;
                         StartCoroutine(DelayPlayDeadAnim(damage));
                     }

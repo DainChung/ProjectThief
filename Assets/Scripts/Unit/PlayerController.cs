@@ -409,7 +409,7 @@ namespace Com.MyCompany.MyGame
         void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("EndArea"))
-                UnityEngine.Debug.Log("Escape");
+                GameObject.FindWithTag("Manager").GetComponent<StageManager>().ShowResultWindow(true);
         }
 
         #endregion

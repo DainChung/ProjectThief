@@ -320,6 +320,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     if (curTarget.pos != ValueCollections.initPos)
                         transform.LookAt(new Vector3(curTarget.pos.x, transform.position.y, curTarget.pos.z));
+                    if (player != null)
+                        unit.curLookDir = LookDirState.FINDPLAYER;
                     break;
             }
         }
@@ -374,7 +376,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     try
                     {
-                        ValidateException.CheckAIsCloseToB(transform.position, playerPosition, 1.4f);
+                        ValidateException.CheckAIsCloseToB(transform.position, playerPosition, 1.5f);
+                        checkStructure.CheckStructure(playerPosition);
                         ChaseTargetBYQueue();
                     }
                     catch (AIsCloseToB)
@@ -410,11 +413,16 @@ namespace Com.MyCompany.MyGame
                         Move();
                     break;
                 case WeaponCode.PLAYERTRACK:
-                case WeaponCode.PLAYER:
                     if (queue.FindCheese)
                         SetCurTarget();
                     else
                         Move();
+                    break;
+                case WeaponCode.PLAYER:
+                    if (queue.FindCheese)
+                        SetCurTarget();
+                    else
+                        CombatMove();
                     break;
                 case WeaponCode.CHEESE:
                     targetMng.Clear();
@@ -426,12 +434,36 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        private void CombatMove()
+        {
+            if (!_doesReachToTarget)
+            {
+                isMovingNow = true;
+                if (checkStructure.isThereStructure)
+                {
+                    unit.curLookDir = LookDirState.AGENT;
+                    agent.SetDestination(playerPosition);
+                }
+                else
+                {
+                    unit.curLookDir = LookDirState.FINDPLAYER;
+                    rb.velocity = transform.forward * enemySpeed * 0.15f;
+                    agent.ResetPath();
+                }
+            }
+            else if (_doesReachToTarget)
+            {
+                isMovingNow = false;
+                _doesReachToTarget = false;
+            }
+            rb.velocity *= 0.9f;
+        }
         private void Move()
         {
             try
             {
-                if (unit.curUnitState != UnitState.COMBAT)  ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 1.4f);
-
+                checkStructure.CheckStructure(curTarget.pos);
+                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 1.4f);
                 if (!_doesReachToTarget)
                 {
                     isMovingNow = true;
@@ -442,6 +474,7 @@ namespace Com.MyCompany.MyGame
                     }
                     else
                     {
+                        unit.curLookDir = LookDirState.IDLE;
                         rb.velocity = transform.forward * enemySpeed * 0.15f;
                         agent.ResetPath();
                     }
@@ -529,37 +562,23 @@ namespace Com.MyCompany.MyGame
         {
             if (tr != null)
             {
-                StartCoroutine(checkStructure.CheckStructure(pos));
                 switch (code)
                 {
-                    case WeaponCode.CAN:
-                    case WeaponCode.PLAYERTRACK:
-                        if (unit.alertValue < AggroCollections.alertMin)
-                            unit.alertValue = AggroCollections.alertMin;
-                        queue.Enqueue(code, tr, pos);
-                        agent.ResetPath();
-                        break;
                     case WeaponCode.PLAYER:
                         if (unit.alertValue < AggroCollections.combatMin)
                             unit.alertValue = AggroCollections.combatMin;
                         queue.Enqueue(code, tr, pos);
-                        agent.ResetPath();
                         break;
                     case WeaponCode.CHEESE:
                         if (unit.alertValue < AggroCollections.combatMin)
                             unit.alertValue = AggroCollections.combatMin;
                         SetCurTarget(code, pos);
-                        agent.ResetPath();
                         queue.Clear();
                         break;
                     case WeaponCode.SMOKE:
-                        if (unit.alertValue < AggroCollections.alertMin)
-                            unit.alertValue = AggroCollections.alertMin;
-                        agent.speed = 2.5f;
-                        enemySpeed = unit.walkSpeed;
-                        queue.Enqueue(code, tr, pos);
-                        break;
                     case WeaponCode.ENEMYDEAD:
+                    case WeaponCode.CAN:
+                    case WeaponCode.PLAYERTRACK:
                         if (unit.alertValue < AggroCollections.alertMin)
                             unit.alertValue = AggroCollections.alertMin;
                         agent.speed = 2.5f;
@@ -569,6 +588,7 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
+                agent.ResetPath();
                 EnemyAlertManager();
             }
         }
@@ -594,17 +614,17 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitState)
             {
                 case UnitState.IDLE:
-                    agent.speed = 3.0f;
+                    agent.speed = 2.5f;
                     enemySpeed = unit.walkSpeed;
                     break;
                 case UnitState.ALERT:
-                    agent.speed = 2.5f;
+                    agent.speed = 2.0f;
                     enemySpeed = unit.walkSpeed;
                     if (playerPosition != ValueCollections.initPos)
                         curTarget.tr = player;
                     break;
                 case UnitState.COMBAT:
-                    agent.speed = 3.2f;
+                    agent.speed = 2.7f;
                     enemySpeed = unit.speed;
                     break;
                 default:

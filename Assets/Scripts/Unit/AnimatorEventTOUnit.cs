@@ -21,7 +21,6 @@ namespace Com.MyCompany.MyGame
         {
             unit.EnableDefaultAttack(false);
             unit.animator.SetBool("IsAttack", false);
-            unit.animator.Play("Idle 0-0", AnimationLayers.Standing);
             unit.swManager.RestartSW((int)WeaponCode.HAND);
             unit.swManager.attackCountDelay.Restart();
             unit.curUnitPose = UnitPose.MOD_RUN;

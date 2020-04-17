@@ -713,7 +713,7 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1.88
+  aspectRatio: 2.56
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 16a2d4ace59bac64dbcf4085964b38eb, type: 3}
@@ -1939,7 +1939,7 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1.76
+  aspectRatio: 2.6
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 16a2d4ace59bac64dbcf4085964b38eb, type: 3}
@@ -5333,7 +5333,7 @@ Transform:
   m_GameObject: {fileID: 2075405873}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.0047281324, y: 0.0047281324, z: 0.0047281324}
+  m_LocalScale: {x: 0.004914005, y: 0.004914005, z: 0.004914005}
   m_Children:
   - {fileID: 146996320}
   m_Father: {fileID: 0}
