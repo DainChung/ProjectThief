@@ -107,6 +107,7 @@ namespace Com.MyCompany.MyGame
             //gameEvent.OnOffUI(false, "Window_Menu");
             gameEvent.OnOffUI(false, "Window_GameResult");
             gameEvent.OnOffUI(false, "Window_Dead");
+            gameEvent.OnOffUI(true, "Bar_HP");
         }
 
         public void OnOffButton(bool onoff, string uiName)
@@ -130,6 +131,28 @@ namespace Com.MyCompany.MyGame
             player.GetComponent<CapsuleCollider>().enabled = false;
             player.GetComponent<Rigidbody>().useGravity = false;
             Camera.main.GetComponent<CameraWork>().enabled = false;
+        }
+
+        /// <summary>
+        /// HP바의 길이를 ratio까지 자연스럽게 줄임
+        /// </summary>
+        /// <param name="ratio">어디까지 줄일지</param>
+        /// <param name="index">0: 실제 체력바(밝음), 1: 연출용 체력바(어두움)</param>
+        /// <returns></returns>
+        public IEnumerator UpdateHPBar(float ratio, int index)
+        {
+            float r = index + 1;
+            float t = 0.0175f;
+
+            while (gameEvent.GetHPBarFillAmount(index) > ratio)
+            {
+                gameEvent.DecreaseHPBar(r * (1 - Mathf.Cos(t)) / player.GetComponent<Unit>().maxHealth, ratio, index);
+                t += 0.01f;
+                yield return null;
+            }
+            if(index == 0)
+                StartCoroutine(UpdateHPBar(ratio, 1));
+            yield break;
         }
 
         public void LoadScene(string buttonName)
@@ -204,17 +227,27 @@ namespace Com.MyCompany.MyGame
             catch (System.Exception) { }
         }
 
+        //게임 결과창을 활성화
         public void ShowResultWindow(bool isClear)
         {
             if (isClear) OnOffUI(true, "Window_GameResult");
             else         OnOffUI(true, "Window_Dead");
         }
-    }
 
-    public static class GameUIIndex
-    {
-        private static int _sample = 0;
+        //HP바를 amount만큼 줄임
+        public void DecreaseHPBar(float amount, float ratio, int index)
+        {
+            float fill = ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
+           
+            fill -= amount;
+            if (fill <= ratio) fill = ratio;
 
-        public static int Sample { get { return _sample; } }
+            ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount = fill;
+        }
+
+        public float GetHPBarFillAmount(int index)
+        {
+            return ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
+        }
     }
 }

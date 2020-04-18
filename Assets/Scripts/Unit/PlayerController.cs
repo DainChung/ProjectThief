@@ -265,6 +265,8 @@ namespace Com.MyCompany.MyGame
         private CameraWork cam;
         private Inventory pInventory = new Inventory();
 
+        private StageManager stageManager;
+
         #endregion
 
         #region Public Fields
@@ -295,6 +297,7 @@ namespace Com.MyCompany.MyGame
             nearestItem = new NearestItem(transform);
             unit = GetComponent<Unit>();
             playerAnimController = GetComponent<PlayerAnimationController>();
+            stageManager = GameObject.FindWithTag("Manager").GetComponent<StageManager>();
             rb = GetComponent<Rigidbody>();
             animator = unit.animator;
 
@@ -711,6 +714,16 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+        }
+
+        public void UpdateHPBar(float ratio)
+        {
+            StartCoroutine(stageManager.UpdateHPBar(ratio, 0));
+        }
+
+        public void ShowResultWindow(bool isClear)
+        {
+            stageManager.ShowResultWindow(isClear);
         }
 
         #endregion

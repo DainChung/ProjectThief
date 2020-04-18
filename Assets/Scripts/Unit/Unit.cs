@@ -230,7 +230,8 @@ namespace Com.MyCompany.MyGame
         #region Private Fields
 
         private float _speed;
-        private int _health;
+        private float _maxHealth;
+        private float _health;
         private float _jumpPower;
         private bool _lockControl = false;
 
@@ -258,7 +259,8 @@ namespace Com.MyCompany.MyGame
         public float speed { get { return _speed; } set { _speed = value; } }
         public float walkSpeed { get { return 0.41f * _speed; } }
         public float coverSpeed { get { return 0.31f * speed; } }
-        public int health { get { return _health; } }
+        public float health { get { return _health; } }
+        public float maxHealth { get { return _maxHealth; } }
         public float jumpPower { get { return _jumpPower; } }
 
         public bool lockControl { get{ return _lockControl; } set { _lockControl = value; } }
@@ -290,7 +292,8 @@ namespace Com.MyCompany.MyGame
         #region MonoBehaviour Callbacks
         void Awake()
         {
-            _health = 3;
+            _maxHealth = 7;
+            _health = _maxHealth;
             _speed = 20;
             _jumpPower = 400;
 
@@ -438,13 +441,12 @@ namespace Com.MyCompany.MyGame
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().useGravity = false;
 
-            if (transform.CompareTag("Player"))
-                GameObject.FindGameObjectWithTag("Manager").GetComponent<StageManager>().ShowResultWindow(false);
+            if (transform.CompareTag("Player")) SendMessage("ShowResultWindow", false);
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }
 
-        public void HitHealth(int damage, Vector3 pos)
+        public void HitHealth(float damage, Vector3 pos)
         {
             //일반 공격(damage > 0)
             if (IsOnFloor() && _health > 0)
@@ -455,7 +457,7 @@ namespace Com.MyCompany.MyGame
                     {
                         _lockControl = true;
                         _health = 0;
-                        StartCoroutine(DelayPlayDeadAnim(damage));
+                        StartCoroutine(DelayPlayDeadAnim((int)damage));
                     }
                     else
                     {
@@ -483,8 +485,10 @@ namespace Com.MyCompany.MyGame
                 else
                 {
                     _health = 0;
-                    StartCoroutine(DelayPlayDeadAnim(damage));
+                    StartCoroutine(DelayPlayDeadAnim((int)damage));
                 }
+
+                if (transform.CompareTag("Player")) SendMessage("UpdateHPBar", _health / _maxHealth);                    
             }
 
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
