@@ -220,7 +220,7 @@ namespace Com.MyCompany.MyGame
             }
             public Item GetItem()
             {
-                MyDebug.Log("ID: " + _item.GetInstanceID() + ", code: " + _item.code + ", Dist: " + _dist);
+                if(_item != null) MyDebug.Log("ID: " + _item.GetInstanceID() + ", code: " + _item.code + ", Dist: " + _dist);
                 return _item;
             }
             public void Init()
@@ -676,7 +676,7 @@ namespace Com.MyCompany.MyGame
         //아이템을 주울때
         private void ControlGetItem()
         {
-            if (Input.GetButton("GetItem"))
+            if (Input.GetButton("GetItem") && (nearestItem.GetItem() != null))
             {
                 if (getItemDelay >= 1)
                 {
@@ -691,7 +691,7 @@ namespace Com.MyCompany.MyGame
                     uiManager.FillTextureUIName("NearestItemIndicator", getItemDelay);
                 }
             }
-            else if (Input.GetButtonUp("GetItem"))
+            else
             {
                 getItemDelay = 0;
                 uiManager.FillTextureUIName("NearestItemIndicator", getItemDelay);
@@ -738,6 +738,11 @@ namespace Com.MyCompany.MyGame
         public void OnOffItemIndicator(bool onoff)
         {
             uiManager.OnOffUI(onoff, "NearestItemIndicator");
+            if (!onoff)
+            {
+                uiManager.FillTextureUIName("NearestItemIndicator", 0);
+                getItemDelay = 0;
+            }
         }
 
         public void UpdateHPBar(float ratio)

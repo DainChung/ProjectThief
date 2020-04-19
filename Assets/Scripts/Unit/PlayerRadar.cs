@@ -35,7 +35,7 @@ namespace Com.MyCompany.MyGame
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
             {
-                playerController.nearestItem.Delete(other.GetInstanceID());
+                playerController.nearestItem.Init();
                 playerController.OnOffItemIndicator(false);
             }
         }
