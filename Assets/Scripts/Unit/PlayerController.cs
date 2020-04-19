@@ -266,6 +266,9 @@ namespace Com.MyCompany.MyGame
         private Inventory pInventory = new Inventory();
 
         private StageManager stageManager;
+        private UIManager uiManager;
+
+        private float getItemDelay = 0f;
 
         #endregion
 
@@ -273,8 +276,7 @@ namespace Com.MyCompany.MyGame
 
         public Transform throwPos;
         public CheckCameraCollider checkCameraCollider;
-        [HideInInspector]
-        public NearestItem nearestItem;
+        [HideInInspector]   public NearestItem nearestItem;
 
         public float aggroVal { get { return aggroValue; } }
 
@@ -297,7 +299,9 @@ namespace Com.MyCompany.MyGame
             nearestItem = new NearestItem(transform);
             unit = GetComponent<Unit>();
             playerAnimController = GetComponent<PlayerAnimationController>();
-            stageManager = GameObject.FindWithTag("Manager").GetComponent<StageManager>();
+            GameObject m = GameObject.FindWithTag("Manager");
+            stageManager = m.GetComponent<StageManager>();
+            uiManager = m.GetComponent<UIManager>();
             rb = GetComponent<Rigidbody>();
             animator = unit.animator;
 
@@ -412,7 +416,7 @@ namespace Com.MyCompany.MyGame
         void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("EndArea"))
-                GameObject.FindWithTag("Manager").GetComponent<StageManager>().ShowResultWindow(true);
+                GameObject.FindWithTag("Manager").GetComponent<UIManager>().ShowResultWindow(true);
         }
 
         #endregion
@@ -672,10 +676,25 @@ namespace Com.MyCompany.MyGame
         //아이템을 주울때
         private void ControlGetItem()
         {
-            if (Input.GetButtonDown("GetItem"))
+            if (Input.GetButton("GetItem"))
             {
-                pInventory.Add(nearestItem.GetItemCode());
-                nearestItem.Init();
+                if (getItemDelay >= 1)
+                {
+                    pInventory.Add(nearestItem.GetItemCode());
+                    nearestItem.Init();
+                    getItemDelay = 0;
+                    uiManager.OnOffUI(false, "NearestItemIndicator");
+                }
+                else
+                {
+                    getItemDelay += 0.01f;
+                    uiManager.FillTextureUIName("NearestItemIndicator", getItemDelay);
+                }
+            }
+            else if (Input.GetButtonUp("GetItem"))
+            {
+                getItemDelay = 0;
+                uiManager.FillTextureUIName("NearestItemIndicator", getItemDelay);
             }
         }
         #endregion
@@ -716,14 +735,19 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        public void OnOffItemIndicator(bool onoff)
+        {
+            uiManager.OnOffUI(onoff, "NearestItemIndicator");
+        }
+
         public void UpdateHPBar(float ratio)
         {
-            StartCoroutine(stageManager.UpdateHPBar(ratio, 0));
+            StartCoroutine(uiManager.UpdateHPBar(ratio, 0));
         }
 
         public void ShowResultWindow(bool isClear)
         {
-            stageManager.ShowResultWindow(isClear);
+            uiManager.ShowResultWindow(isClear);
         }
 
         #endregion

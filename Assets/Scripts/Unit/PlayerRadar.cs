@@ -18,17 +18,26 @@ namespace Com.MyCompany.MyGame
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
+            {
                 playerController.nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
+                playerController.OnOffItemIndicator(true);
+            }
         }
         void OnTriggerStay(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
+            {
                 playerController.nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
+                playerController.OnOffItemIndicator(true);
+            }
         }
         void OnTriggerExit(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
+            {
                 playerController.nearestItem.Delete(other.GetInstanceID());
+                playerController.OnOffItemIndicator(false);
+            }
         }
     }
 

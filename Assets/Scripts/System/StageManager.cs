@@ -18,11 +18,7 @@ namespace Com.MyCompany.MyGame
     {
         #region Private Fields
 
-        private GameObject player;
         private GameObject treasure;
-
-        private GameEvent gameEvent;
-        private Transform uiRoot;
 
         #endregion
 
@@ -31,32 +27,19 @@ namespace Com.MyCompany.MyGame
         public Transform start;
         public Transform[] end;
 
-        [HideInInspector]
-        public Dictionary<string, string> buttonToScene = new Dictionary<string, string>();
-
         #endregion
 
         #region MonoBehaviour Callbacks
 
-        void Awake()
-        {
-            buttonToScene.Add("Button_Home", "Home");
-            buttonToScene.Add("Button_Retry", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-            buttonToScene.Add("Button_NextLevel", FindNextLevel());
-        }
-
         // Start is called before the first frame update
         void Start()
         {
-            player = GameObject.FindGameObjectWithTag("Player");
-            uiRoot = GameObject.Find("UI Root").transform.GetChild(0);
             //treasure = GameObject.FindGameObjectWithTag("Treasure");
 
-            gameEvent = new GameEvent(uiRoot);
             //gameEvent.showUI += ShowUIHandler;
 
             //플레이어 캐릭터를 시작 지점으로 옮김
-            player.transform.position = start.position;
+            GameObject.FindGameObjectWithTag("Player").transform.position = start.position;
 
             //탈출 지점을 숨김
             foreach (Transform endArea in end)
@@ -64,7 +47,6 @@ namespace Com.MyCompany.MyGame
                 endArea.GetComponent<MeshRenderer>().enabled = false;
                 endArea.GetComponent<BoxCollider>().enabled = false;
             }
-            InitUI();
         }
 
         void Update()
@@ -77,9 +59,15 @@ namespace Com.MyCompany.MyGame
         }
         #endregion
 
-        #region Private Methods
-
-        private string FindNextLevel()
+        #region Public Methods
+        public void ShowEndArea()
+        {
+            Random.InitState((int)Time.unscaledTime);
+            int index = Random.Range(0, end.Length);
+            end[index].GetComponent<BoxCollider>().enabled = true;
+            end[index].GetComponent<MeshRenderer>().enabled = true;
+        }
+        public string FindNextLevel()
         {
             string curLevel = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             /*
@@ -89,165 +77,11 @@ namespace Com.MyCompany.MyGame
             return "Not Yet";
         }
 
-        #endregion
-
-        #region Public Methods
-        public void ShowEndArea()
-        {
-            Random.InitState((int)Time.unscaledTime);
-            int index = Random.Range(0, end.Length);
-            end[index].GetComponent<BoxCollider>().enabled = true;
-            end[index].GetComponent<MeshRenderer>().enabled = true;
-        }
-        #endregion
-
-        #region UIEvents
-        private void InitUI()
-        {
-            //gameEvent.OnOffUI(false, "Window_Menu");
-            gameEvent.OnOffUI(false, "Window_GameResult");
-            gameEvent.OnOffUI(false, "Window_Dead");
-            gameEvent.OnOffUI(true, "Bar_HP");
-        }
-
-        public void OnOffButton(bool onoff, string uiName)
-        {
-            gameEvent.OnOffButton(onoff, uiName);
-        }
-        public void OnOffButton(bool onoff, string uiName, string buttonName)
-        {
-            gameEvent.OnOffButton(onoff, uiName, buttonName);
-        }
-
-        public void OnOffGameMenu(bool onoff)
-        {
-            gameEvent.OnOffUI(false, "Window_Menu");
-            player.GetComponent<Unit>().lockControl = onoff;
-        }
-        public void ShowResultWindow(bool isClear)
-        {
-            gameEvent.ShowResultWindow(isClear);
-            player.GetComponent<Unit>().lockControl = true;
-            player.GetComponent<CapsuleCollider>().enabled = false;
-            player.GetComponent<Rigidbody>().useGravity = false;
-            Camera.main.GetComponent<CameraWork>().enabled = false;
-        }
-
-        /// <summary>
-        /// HP바의 길이를 ratio까지 자연스럽게 줄임
-        /// </summary>
-        /// <param name="ratio">어디까지 줄일지</param>
-        /// <param name="index">0: 실제 체력바(밝음), 1: 연출용 체력바(어두움)</param>
-        /// <returns></returns>
-        public IEnumerator UpdateHPBar(float ratio, int index)
-        {
-            float r = index + 1;
-            float t = 0.0175f;
-
-            while (gameEvent.GetHPBarFillAmount(index) > ratio)
-            {
-                gameEvent.DecreaseHPBar(r * (1 - Mathf.Cos(t)) / player.GetComponent<Unit>().maxHealth, ratio, index);
-                t += 0.01f;
-                yield return null;
-            }
-            if(index == 0)
-                StartCoroutine(UpdateHPBar(ratio, 1));
-            yield break;
-        }
-
         public void LoadScene(string buttonName)
         {
-            Debug.Log(buttonName + " : " + buttonToScene[buttonName]);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(buttonToScene[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
+            Debug.Log(buttonName + " : " + GetComponent<UIManager>().buttonToScene[buttonName]);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(GetComponent<UIManager>().buttonToScene[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
         #endregion
-    }
-
-    public class GameEvent
-    {
-        private List<Transform> ui = new List<Transform>();
-        private Dictionary<string, int> uiDic = new Dictionary<string, int>();
-
-        public delegate void ShowUI();
-        public event ShowUI showUI;
-
-        public GameEvent(Transform uiRoot)
-        {
-            for (int i = 0; i < uiRoot.childCount; i++)
-            {
-                ui.Add(uiRoot.GetChild(i));
-                uiDic.Add(uiRoot.GetChild(i).name, i);
-            }
-        }
-
-        //MonoBehaviour를 상속받은 모든 Class를 비활성화 / 활성화
-        private void OnOffUI(bool onoff, Transform uiTR)
-        {
-            uiTR.GetComponent<MonoBehaviour>().enabled = onoff;
-            MonoBehaviour[] list = uiTR.GetComponentsInChildren<MonoBehaviour>();
-            for (int i = 0; i < list.Length; i++)
-                list[i].enabled = onoff;
-        }
-        public void OnOffUI(bool onoff, string uiName)
-        {
-            try
-            {
-                OnOffUI(onoff, ui[uiDic[uiName]]);
-                for (int i = 0; i <= ui[uiDic[uiName]].childCount; i++)
-                    OnOffUI(onoff, ui[uiDic[uiName]].GetChild(i));
-            }
-            catch (System.Exception) { }
-        }
-
-        //uiName에 소속된 buttonName 버튼을 비활성화
-        public void OnOffButton(bool onoff, string uiName)
-        {
-            for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
-            {
-                try
-                {
-                    ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
-                }
-                catch (System.Exception){ continue; }
-            }
-        }
-        public void OnOffButton(bool onoff, string uiName, string buttonName)
-        {
-            try
-            {
-                for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
-                {
-                    if (ui[uiDic[uiName]].GetChild(i).name == buttonName)
-                    {
-                        ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
-                        break;
-                    }
-                }
-            }
-            catch (System.Exception) { }
-        }
-
-        //게임 결과창을 활성화
-        public void ShowResultWindow(bool isClear)
-        {
-            if (isClear) OnOffUI(true, "Window_GameResult");
-            else         OnOffUI(true, "Window_Dead");
-        }
-
-        //HP바를 amount만큼 줄임
-        public void DecreaseHPBar(float amount, float ratio, int index)
-        {
-            float fill = ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
-           
-            fill -= amount;
-            if (fill <= ratio) fill = ratio;
-
-            ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount = fill;
-        }
-
-        public float GetHPBarFillAmount(int index)
-        {
-            return ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
-        }
     }
 }
