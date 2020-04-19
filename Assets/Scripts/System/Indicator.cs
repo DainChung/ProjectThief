@@ -12,7 +12,7 @@ namespace Com.MyCompany.MyGame.UI
         }
         void Update()
         {
-            //base.Move(target.position);
+            if (target != null) base.Move(target.position);
         }
 
         protected override void Move(Vector3 destiPos)

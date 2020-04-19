@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
 
@@ -18,26 +16,17 @@ namespace Com.MyCompany.MyGame
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
-            {
-                playerController.nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
-                playerController.OnOffItemIndicator(true);
-            }
+                playerController.SetNeareastItem(other, true);
         }
         void OnTriggerStay(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
-            {
-                playerController.nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
-                playerController.OnOffItemIndicator(true);
-            }
+                playerController.SetNeareastItem(other, true);
         }
         void OnTriggerExit(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Item)
-            {
-                playerController.nearestItem.Init();
-                playerController.OnOffItemIndicator(false);
-            }
+                playerController.SetNeareastItem(other, false);
         }
     }
 

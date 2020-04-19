@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.UI;
 
 namespace Com.MyCompany.MyGame
 {
@@ -34,11 +35,7 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             uiCam = GameObject.Find("UICamera").transform;
-            for (int i = 0; i < uiCam.childCount; i++)
-            {
-                ui.Add(uiCam.GetChild(i));
-                uiDic.Add(uiCam.GetChild(i).name, i);
-            }
+            SetUIDic();
 
             player = GameObject.Find("Player");
             InitUI();
@@ -51,6 +48,17 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Private Methods
+        private void SetUIDic()
+        {
+            if (ui.Count != 0) ui.Clear();
+            if (uiDic.Count != 0) uiDic.Clear();
+
+            for (int i = 0; i < uiCam.childCount; i++)
+            {
+                ui.Add(uiCam.GetChild(i));
+                uiDic.Add(uiCam.GetChild(i).name, i);
+            }
+        }
         private void InitUI()
         {
             for (int i = 0; i < ui.Count; i++)
@@ -187,6 +195,14 @@ namespace Com.MyCompany.MyGame
         public void FillTextureUIName(string uiName, float fillAmount)
         {
             ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount = fillAmount;
+        }
+
+        public void SetIndicator(string uiName, Transform target)
+        {
+            OnOffUI(true, uiName);
+
+            if(ui[uiDic[uiName]].GetComponent<Indicator>().target == null)
+                ui[uiDic[uiName]].GetComponent<Indicator>().target = target;
         }
 
         //uiName이 켜진 상태인지 아닌지 확인

@@ -220,7 +220,7 @@ namespace Com.MyCompany.MyGame
             }
             public Item GetItem()
             {
-                if(_item != null) MyDebug.Log("ID: " + _item.GetInstanceID() + ", code: " + _item.code + ", Dist: " + _dist);
+                //if(_item != null) MyDebug.Log("ID: " + _item.GetInstanceID() + ", code: " + _item.code + ", Dist: " + _dist);
                 return _item;
             }
             public void Init()
@@ -735,13 +735,19 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public void OnOffItemIndicator(bool onoff)
+        public void SetNeareastItem(Collider other, bool onoff)
         {
-            uiManager.OnOffUI(onoff, "NearestItemIndicator");
             if (!onoff)
             {
+                nearestItem.Init();
                 uiManager.FillTextureUIName("NearestItemIndicator", 0);
                 getItemDelay = 0;
+                uiManager.OnOffUI(false, "NearestItemIndicator");
+            }
+            else
+            {
+                nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
+                uiManager.SetIndicator("NearestItemIndicator", other.transform);
             }
         }
 
