@@ -428,8 +428,7 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("EndArea"))
-                GameObject.FindWithTag("Manager").GetComponent<UIManager>().ShowResultWindow(true);
+            if (other.CompareTag("EndArea")) GameObject.FindWithTag("Manager").GetComponent<UIManager>().ShowResultWindow(true);
         }
 
         #endregion
@@ -771,9 +770,9 @@ namespace Com.MyCompany.MyGame
             uiManager.SetIndicator(name, tr);
         }
 
-        public void ShowResultWindow(bool isClear)
+        public void ShowDeadWindow()
         {
-            uiManager.ShowResultWindow(isClear);
+            uiManager.ShowResultWindow(false);
         }
 
         #endregion

@@ -19,6 +19,7 @@ namespace Com.MyCompany.MyGame
         #region Private Fields
 
         private GameObject treasure;
+        private float _score = 2.4f;
 
         #endregion
 
@@ -27,6 +28,7 @@ namespace Com.MyCompany.MyGame
         public Transform start;
         public Transform[] end;
 
+        public float score { get { return _score; } }
         #endregion
 
         #region MonoBehaviour Callbacks

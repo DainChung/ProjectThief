@@ -1829,9 +1829,9 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 1.074074
-  mType: 0
-  mFillDirection: 4
-  mFillAmount: 1
+  mType: 3
+  mFillDirection: 0
+  mFillAmount: 0
   mInvert: 0
   mFlip: 0
   mApplyGradient: 0
@@ -3559,9 +3559,9 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 1.074074
-  mType: 0
-  mFillDirection: 4
-  mFillAmount: 1
+  mType: 3
+  mFillDirection: 0
+  mFillAmount: 0
   mInvert: 0
   mFlip: 0
   mApplyGradient: 0
@@ -3970,9 +3970,9 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 1.074074
-  mType: 0
-  mFillDirection: 4
-  mFillAmount: 1
+  mType: 3
+  mFillDirection: 0
+  mFillAmount: 0
   mInvert: 0
   mFlip: 0
   mApplyGradient: 0

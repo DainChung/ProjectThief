@@ -440,7 +440,7 @@ namespace Com.MyCompany.MyGame
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().useGravity = false;
 
-            if (transform.CompareTag("Player")) SendMessage("ShowResultWindow", false);
+            if (transform.CompareTag("Player")) SendMessage("ShowDeadWindow");
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }

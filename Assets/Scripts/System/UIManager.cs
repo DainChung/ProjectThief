@@ -12,6 +12,7 @@ namespace Com.MyCompany.MyGame
         #region Private Values
         private Transform uiCam;
         private List<Transform> ui = new List<Transform>();
+        private List<UI2DSprite> gameResultStars = new List<UI2DSprite>();
         private Dictionary<string, int> uiDic = new Dictionary<string, int>();
 
         private GameObject player;
@@ -66,6 +67,12 @@ namespace Com.MyCompany.MyGame
             FillTextureUIName("NearestItemIndicator", 0);
             FillTextureUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
+
+            for (int i = 0; i < ui[uiDic["Window_GameResult"]].childCount; i++)
+            {
+                if (ui[uiDic["Window_GameResult"]].GetChild(i).name.Contains("Star"))
+                    gameResultStars.Add(ui[uiDic["Window_GameResult"]].GetChild(i).GetComponent<UI2DSprite>());
+            }
         }
         private void OnOffUI(bool onoff, Transform uiTR)
         {
@@ -73,6 +80,39 @@ namespace Com.MyCompany.MyGame
             MonoBehaviour[] list = uiTR.GetComponentsInChildren<MonoBehaviour>();
             for (int i = 0; i < list.Length; i++)
                 list[i].enabled = onoff;
+        }
+
+        private IEnumerator ShowGameResult(float score)
+        {
+            for (int i = 0; i < gameResultStars.Count; i++)
+            {
+                float maxAmount = Mathf.Clamp01(score);
+                while (gameResultStars[i].fillAmount < maxAmount)
+                {
+                    gameResultStars[i].fillAmount += 0.01f;
+                    yield return null;
+                }
+                Debug.Log("Score: " + score + ", maxAmount: " + maxAmount + ", Index: " + i + ", FillAmount: " + gameResultStars[i].fillAmount + ", Max: " + gameResultStars.Count);
+                score--;
+            }
+
+            yield break;
+        }
+        /// <summary>
+        /// 게임 결과창을 활성화
+        /// </summary>
+        /// <param name="isClear"> true = 클리어, false = Player 사망</param>
+        private void _ShowResultWindow(bool isClear)
+        {
+            if (isClear)
+            {
+                OnOffUI(true, "Window_GameResult");
+                StartCoroutine(ShowGameResult(transform.GetComponent<StageManager>().score));
+            }
+            else
+            {
+                OnOffUI(true, "Window_Dead");
+            }
         }
         #endregion
 
@@ -161,16 +201,6 @@ namespace Com.MyCompany.MyGame
                 }
             }
             catch (System.Exception) { }
-        }
-
-        /// <summary>
-        /// 게임 결과창을 활성화
-        /// </summary>
-        /// <param name="isClear"> true = 클리어, false = Player 사망</param>
-        public void _ShowResultWindow(bool isClear)
-        {
-            if (isClear) OnOffUI(true, "Window_GameResult");
-            else OnOffUI(true, "Window_Dead");
         }
 
         /// <summary>
