@@ -190,7 +190,20 @@ namespace Com.MyCompany.MyGame
             public void Set(Item item, Vector3 pos)
             {
                 float d = Vector3.Distance(playerTr.position, pos);
-                if (d < _dist)
+                try
+                {
+                    if (_item.GetInstanceID() != item.GetInstanceID())
+                    {
+                        if (d < _dist)
+                        {
+                            _item = item;
+                            _dist = d;
+                        }
+                    }
+                    else
+                        _dist = d;
+                }
+                catch (System.NullReferenceException)
                 {
                     _item = item;
                     _dist = d;
@@ -749,7 +762,7 @@ namespace Com.MyCompany.MyGame
             else
             {
                 nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
-                uiManager.SetIndicator("NearestItemIndicator", other.transform);
+                uiManager.SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
             }
         }
 

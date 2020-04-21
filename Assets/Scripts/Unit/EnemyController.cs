@@ -283,7 +283,6 @@ namespace Com.MyCompany.MyGame
         
         void FixedUpdate()
         {
-            MyDebug.Log("_CanA: " + _canAssassinate + ", canA: " + canAssassinate +", ATargetted: " + assassinateTargetted);
             if (!unit.lockControl)
             {
                 if (unit.health > 0)

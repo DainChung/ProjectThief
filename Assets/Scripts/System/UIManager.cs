@@ -213,7 +213,7 @@ namespace Com.MyCompany.MyGame
 
             try
             {
-                if (ui[uiDic[uiName]].GetComponent<Indicator>().target == null)
+                if (ui[uiDic[uiName]].GetComponent<Indicator>().target.GetInstanceID() != target.GetInstanceID())
                     ui[uiDic[uiName]].GetComponent<Indicator>().target = target;
                 if (target == null)
                 {
