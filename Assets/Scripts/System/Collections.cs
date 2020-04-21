@@ -353,10 +353,9 @@ namespace Com.MyCompany.MyGame
                 if (animInfo.IsName(animName) && boolVal)
                     throw new FreezingUnitException();
             }
-            public static void ValidateFreezingUnitAttackException(bool isLocked, AnimatorStateInfo animInfo, string animName)
+            public static void ValidateFreezingUnitAttackException(bool isLocked, AnimatorStateInfo animInfo, string animName, bool isAttack)
             {
-                if (!animInfo.IsTag("Attack") && isLocked && animName != "Walking")
-                    throw new FreezingUnitException();
+                if (!animInfo.IsTag("Attack") && ((isLocked && animName != "Walking") || isAttack)) throw new FreezingUnitException();
             }
             public static void ValidateAnimationIsPlayingException(AnimatorStateInfo animInfo, string animName)
             {

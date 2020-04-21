@@ -59,8 +59,15 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 1
-        functionName: UnlockControl
+      - time: 0.8242424
+        functionName: NewEvent
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.830303
+        functionName: DisableAttackDefault
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

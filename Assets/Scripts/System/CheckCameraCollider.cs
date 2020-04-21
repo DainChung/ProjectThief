@@ -12,7 +12,7 @@ namespace Com.MyCompany.MyGame
         private Camera mainCam;
 
         private bool _canAssassinate = false;
-        private Vector3 _assassinateTargetPos = ValueCollections.initPos;
+        private Transform _assassinateTarget = null;
 
         private Vector3 height = new Vector3(0, -1, 0);
         private Vector3 rayOrigin;
@@ -22,12 +22,15 @@ namespace Com.MyCompany.MyGame
         private PlayerController playerController;
         private Unit unit;
 
+        private bool check = false;
+
         #endregion
 
         #region Public Fields
 
         public bool canAssassinate { get { return _canAssassinate; } }
-        public Vector3 assassinateTargetPos { get { return _assassinateTargetPos; } }
+        public Transform assassinateTarget { get { return _assassinateTarget; } }
+        public Vector3 assassinateTargetPos { get { return ((_assassinateTarget == null) ? ValueCollections.initPos : _assassinateTarget.position); } }
 
         #endregion
 
@@ -44,28 +47,34 @@ namespace Com.MyCompany.MyGame
             transform.rotation = Quaternion.Euler(-90f, mainCam.transform.rotation.eulerAngles.y, 0);
 
             //땅에 붙어있을 때만 작동
-            if(unit.IsOnFloor())
+            if(unit.IsOnFloor() && check)
                 CheckEnemies();
         }
 
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
-                other.GetComponent<EnemyController>().seenByCamera = true;
+            {
+                check = true;
+                other.transform.GetComponent<EnemyController>().canAssassinate = true;
+            }
         }
         void OnTriggerStay(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
-                other.GetComponent<EnemyController>().seenByCamera = true;
-            //if (other.gameObject.layer == PhysicsLayers.Item)
-            //    other.GetComponent<Item>().SeenByCamera(true);
+            {
+                check = true;
+                other.transform.GetComponent<EnemyController>().canAssassinate = true;
+            }
         }
         void OnTriggerExit(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy)
-                other.GetComponent<EnemyController>().seenByCamera = false;
-            //if (other.gameObject.layer == PhysicsLayers.Item)
-            //    other.GetComponent<Item>().SeenByCamera(false);
+            {
+                check = false;
+                other.transform.GetComponent<EnemyController>().canAssassinate = false;
+                playerController.SetIndicator("AssassinateIndicator", null);
+            }
         }
         #endregion
 
@@ -79,8 +88,9 @@ namespace Com.MyCompany.MyGame
             //가까운 거리에 Enemy 없음
             if (hits.Length == 0)
             {
-                _assassinateTargetPos = ValueCollections.initPos;
+                _assassinateTarget = null;
                 _canAssassinate = false;
+                check = false;
             }
             else
             {
@@ -89,13 +99,20 @@ namespace Com.MyCompany.MyGame
                     RaycastHit hit = new RaycastHit();
                     rayDesti = -rayOrigin + obj.transform.position;
 
-                    _canAssassinate = obj.transform.GetComponent<EnemyController>().seenByCamera;
-                    _assassinateTargetPos = obj.transform.position;
-
+                    if (obj.transform.GetComponent<EnemyController>().canAssassinate)
+                    {
+                        if (obj.transform.GetComponent<Unit>().health > 0) playerController.SetIndicator("AssassinateIndicator", obj.transform);
+                        _canAssassinate = true;
+                        _assassinateTarget = obj.transform;
+                        break;
+                    }
+                    else
+                        _assassinateTarget = null;
                     //Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
                     //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
                     if (Physics.Raycast(rayOrigin, rayDesti, out hit) && hit.transform.gameObject.layer == PhysicsLayers.Structure)
                     {
+                        if(obj.transform.GetComponent<EnemyController>().canAssassinate) playerController.SetIndicator("AssassinateIndicator", null);
                         _canAssassinate = false;
                         InitAssassinateTargetPos();
                     }
@@ -109,7 +126,7 @@ namespace Com.MyCompany.MyGame
 
         public void InitAssassinateTargetPos()
         {
-            _assassinateTargetPos = ValueCollections.initPos;
+            _assassinateTarget = null;
         }
 
         public void InitCanAssassinate()

@@ -22,7 +22,7 @@ namespace Com.MyCompany.MyGame
         private Transform player;
         private Vector3 destiPos;
         private float dist;
-
+        private Vector3 v = Vector3.zero;
 
         #endregion
 
@@ -53,7 +53,6 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
-        //카메라 위치 조정 부분을 해결하면 회전 관련 문제가 해결됨
         private void FollowPlayer()
         {
             //카메라 위치 계산
@@ -68,7 +67,8 @@ namespace Com.MyCompany.MyGame
             destiPos.Set(destiPos.x, player.position.y + cameraPos.y * (1 + Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x) * 1.5f), destiPos.z);
 
             //카메라 회전을 감안해서 플레이어 캐릭터를 따라다님 => Vector3.Lerp 말고 다른 방식으로 조작해야 카메라가 벽을 못 뚫게 할 수 있음
-            transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * smooth * player.GetComponent<Unit>().speed);
+            //Time.deltaTime * smooth * player.GetComponent<Unit>().speed
+            transform.position = Vector3.SmoothDamp(transform.position, destiPos, ref v, smooth);
         }
 
         private void CameraRotation(float x, float y)

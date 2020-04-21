@@ -1898,6 +1898,7 @@ GameObject:
   - component: {fileID: 6150556912168944686}
   - component: {fileID: 6150556912168944685}
   - component: {fileID: 867030671}
+  - component: {fileID: 4092508474469506879}
   m_Layer: 10
   m_Name: EnemyMousy
   m_TagString: Untagged
@@ -2010,7 +2011,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   throwPos: {fileID: 5781894586358001035}
-  seenByCamera: 0
   checkStructure: {fileID: 2010139474}
 --- !u!114 &6150556912168944686
 MonoBehaviour:
@@ -2158,6 +2158,18 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &4092508474469506879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6150556912168944675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6c3f9daf59a50844a16b30d7da9a856, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6296234162767335596
 GameObject:
   m_ObjectHideFlags: 0
@@ -2934,15 +2946,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3adbd296348771143b89cb5ef3972404, type: 3}
---- !u!1 &5416481834475560347 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 3adbd296348771143b89cb5ef3972404,
-    type: 3}
-  m_PrefabInstance: {fileID: 4038278136164172946}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9038843608279773064 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 3adbd296348771143b89cb5ef3972404,
+    type: 3}
+  m_PrefabInstance: {fileID: 4038278136164172946}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5416481834475560347 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 3adbd296348771143b89cb5ef3972404,
     type: 3}
   m_PrefabInstance: {fileID: 4038278136164172946}
   m_PrefabAsset: {fileID: 0}

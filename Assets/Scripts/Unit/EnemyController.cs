@@ -225,6 +225,7 @@ namespace Com.MyCompany.MyGame
         private float enemySpeed;
         private bool isMovingNow = false;
         private bool canIAttack = false;
+        private bool _canAssassinate = false;
 
         private Transform player = null;
         private Vector3 playerPosition { get { return (player == null) ? ValueCollections.initPos : player.position; } }
@@ -241,12 +242,13 @@ namespace Com.MyCompany.MyGame
         public bool IsMovingNow { set { isMovingNow = value; } }
         public bool CanIAttack { set { canIAttack = value; } }
 
+        [HideInInspector] public TargetManager targetMng = new TargetManager();
         [HideInInspector]
-        public bool seenByCamera = false;
+        public bool assassinateTargetted = false;
+        //assassinateTargetted가 true면 무조건 false 반환
+        public bool canAssassinate { get { return (assassinateTargetted ? false : _canAssassinate); } set { _canAssassinate = value; } }
 
         public EnemyCheckStructure checkStructure;
-        [HideInInspector]
-        public TargetManager targetMng = new TargetManager();
 
         #endregion
 
@@ -281,6 +283,7 @@ namespace Com.MyCompany.MyGame
         
         void FixedUpdate()
         {
+            MyDebug.Log("_CanA: " + _canAssassinate + ", canA: " + canAssassinate +", ATargetted: " + assassinateTargetted);
             if (!unit.lockControl)
             {
                 if (unit.health > 0)

@@ -268,7 +268,7 @@ namespace Com.MyCompany.MyGame
         private StageManager stageManager;
         private UIManager uiManager;
 
-        private float getItemDelay = 0f;
+        private const float buttonDelay = 0.02f;
 
         #endregion
 
@@ -481,8 +481,17 @@ namespace Com.MyCompany.MyGame
                 case UnitState.INSMOKE:
                 case UnitState.ALERT:
                     if (unit.swManager.SWDelayDone(WeaponCode.HAND))
+                    {
                         if (Input.GetButton("Assassinate") && checkCameraCollider.canAssassinate)
-                            StartCoroutine(AssassinateMove());
+                        {
+                            if(uiManager.IsFullTexture("AssassinateIndicator"))
+                                StartCoroutine(AssassinateMove());
+                            else
+                                uiManager.FillTextureUIName("AssassinateIndicator", buttonDelay);
+                        }
+                        else
+                            uiManager.SetFillTextureUIName("AssassinateIndicator", 0);
+                    }
                     else
                         checkCameraCollider.InitAssassinateTargetPos();
 
@@ -493,6 +502,7 @@ namespace Com.MyCompany.MyGame
         }
         private IEnumerator AssassinateMove()
         {
+            SendMessage("OffIndicator", "AssassinateIndicator");
             unit.lockControl = true;
             unit.assassinate.enableCollider = true;
 
@@ -500,6 +510,7 @@ namespace Com.MyCompany.MyGame
             animator.SetBool("IsRunMode", false);
             animator.SetFloat("MoveSpeed", 1.0f);
 
+            checkCameraCollider.assassinateTarget.GetComponent<EnemyController>().assassinateTargetted = true;
             transform.LookAt(checkCameraCollider.assassinateTargetPos);
 
             //일정 거리 이내가 될 때까지
@@ -678,24 +689,17 @@ namespace Com.MyCompany.MyGame
         {
             if (Input.GetButton("GetItem") && (nearestItem.GetItem() != null))
             {
-                if (getItemDelay >= 1)
+                if (uiManager.IsFullTexture("NearestItemIndicator"))
                 {
                     pInventory.Add(nearestItem.GetItemCode());
                     nearestItem.Init();
-                    getItemDelay = 0;
-                    uiManager.OnOffUI(false, "NearestItemIndicator");
+                    uiManager.SetIndicator("NearestItemIndicator", null);
                 }
                 else
-                {
-                    getItemDelay += 0.01f;
-                    uiManager.FillTextureUIName("NearestItemIndicator", getItemDelay);
-                }
+                    uiManager.FillTextureUIName("NearestItemIndicator", buttonDelay);
             }
             else
-            {
-                getItemDelay = 0;
-                uiManager.FillTextureUIName("NearestItemIndicator", getItemDelay);
-            }
+                uiManager.SetFillTextureUIName("NearestItemIndicator", 0);
         }
         #endregion
 
@@ -740,9 +744,7 @@ namespace Com.MyCompany.MyGame
             if (!onoff)
             {
                 nearestItem.Init();
-                uiManager.FillTextureUIName("NearestItemIndicator", 0);
-                getItemDelay = 0;
-                uiManager.OnOffUI(false, "NearestItemIndicator");
+                uiManager.SetIndicator("NearestItemIndicator", null);
             }
             else
             {
@@ -751,9 +753,9 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public void UpdateHPBar(float ratio)
+        public void SetIndicator(string name, Transform tr)
         {
-            StartCoroutine(uiManager.UpdateHPBar(ratio, 0));
+            uiManager.SetIndicator(name, tr);
         }
 
         public void ShowResultWindow(bool isClear)

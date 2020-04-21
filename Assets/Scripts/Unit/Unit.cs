@@ -316,8 +316,7 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            if (animator.GetInteger("AttackCount") == 0 && swManager.AttackCountDelayDone())
-                animator.SetInteger("AttackCount", 1);
+            if (animator.GetInteger("AttackCount") == 0 && swManager.AttackCountDelayDone())    animator.SetInteger("AttackCount", 1);
 
             if (_health > 0)
             {
@@ -326,7 +325,7 @@ namespace Com.MyCompany.MyGame
                 {
                     try
                     {
-                        ValidateException.ValidateFreezingUnitAttackException(_lockControl, standingLayerAnimInfo, "Walking");
+                        ValidateException.ValidateFreezingUnitAttackException(_lockControl, standingLayerAnimInfo, "Walking", animator.GetBool("IsAttack"));
                         ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), standingLayerAnimInfo, "HitReaction");
                         switch (curUnitPose)
                         {
@@ -407,7 +406,7 @@ namespace Com.MyCompany.MyGame
 
         private IEnumerator DelayPlayDeadAnim(int damage)
         {
-            if (!transform.CompareTag("Player"))
+            if (gameObject.layer == PhysicsLayers.Enemy)
             {
                 Stopwatch delay = new Stopwatch();
                 delay.Start();

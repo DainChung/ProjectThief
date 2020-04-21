@@ -218,6 +218,7 @@
      <Compile Include="Assets\Scripts\Unit\PlayerAnimationController.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Unit\PlayerRadar.cs" />
+     <Compile Include="Assets\Scripts\Unit\SendMessageToManager.cs" />
      <Compile Include="Assets\Scripts\Unit\Unit.cs" />
      <Compile Include="Assets\Scripts\Unit\UnitAnimationController.cs" />
      <Compile Include="Assets\Shared\Ramps\Runtime\RampAsset.cs" />

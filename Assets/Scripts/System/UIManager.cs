@@ -64,6 +64,7 @@ namespace Com.MyCompany.MyGame
             for (int i = 0; i < ui.Count; i++)
                 OnOffUI(false, ui[i]);
             FillTextureUIName("NearestItemIndicator", 0);
+            FillTextureUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
         }
         private void OnOffUI(bool onoff, Transform uiTR)
@@ -192,17 +193,35 @@ namespace Com.MyCompany.MyGame
             return ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
         }
 
-        public void FillTextureUIName(string uiName, float fillAmount)
+        public void SetFillTextureUIName(string uiName, float fillAmount)
         {
             ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount = fillAmount;
+        }
+        public void FillTextureUIName(string uiName, float amount)
+        {
+            //Debug.Log(uiName + " : " + ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount + " + " + amount);
+            ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount += amount;
+        }
+        public bool IsFullTexture(string uiName)
+        {
+            return (ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount >= 1);
         }
 
         public void SetIndicator(string uiName, Transform target)
         {
-            OnOffUI(true, uiName);
+            OnOffUI((target != null), uiName);
 
-            if(ui[uiDic[uiName]].GetComponent<Indicator>().target == null)
-                ui[uiDic[uiName]].GetComponent<Indicator>().target = target;
+            try
+            {
+                if (ui[uiDic[uiName]].GetComponent<Indicator>().target == null)
+                    ui[uiDic[uiName]].GetComponent<Indicator>().target = target;
+                if (target == null)
+                {
+                    ui[uiDic[uiName]].GetComponent<Indicator>().target = null;
+                    SetFillTextureUIName(uiName, 0);
+                }
+            }
+            catch(System.Exception){ }
         }
 
         //uiName이 켜진 상태인지 아닌지 확인
