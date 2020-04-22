@@ -62,10 +62,10 @@ namespace Com.MyCompany.MyGame
         }
         private void InitUI()
         {
-            for (int i = 0; i < ui.Count; i++)
-                OnOffUI(false, ui[i]);
-            FillTextureUIName("NearestItemIndicator", 0);
-            FillTextureUIName("AssassinateIndicator", 0);
+            for (int i = 0; i < ui.Count; i++) OnOffUI(false, ui[i]);
+
+            FillAmountUIName("NearestItemIndicator", 0);
+            FillAmountUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
 
             for (int i = 0; i < ui[uiDic["Window_GameResult"]].childCount; i++)
@@ -76,14 +76,17 @@ namespace Com.MyCompany.MyGame
         }
         private void OnOffUI(bool onoff, Transform uiTR)
         {
-            uiTR.GetComponent<MonoBehaviour>().enabled = onoff;
-            MonoBehaviour[] list = uiTR.GetComponentsInChildren<MonoBehaviour>();
-            for (int i = 0; i < list.Length; i++)
-                list[i].enabled = onoff;
+            uiTR.GetComponent<UIController>().OnOffAll(onoff);
         }
 
-        private IEnumerator ShowGameResult(float score)
+        private IEnumerator ShowGameResult(GameResult gameResult)
         {
+            float score = gameResult.score;
+
+            Debug.Log("Score: " + score + ", Time: " + gameResult.gameTime.ToString());
+            SetUILabelText("Window_GameResult", score.ToString(), "Score Value");
+            SetUILabelText("Window_GameResult", gameResult.gameTime.ToString(), "Time Value");
+
             for (int i = 0; i < gameResultStars.Count; i++)
             {
                 float maxAmount = Mathf.Clamp01(score);
@@ -92,7 +95,6 @@ namespace Com.MyCompany.MyGame
                     gameResultStars[i].fillAmount += 0.01f;
                     yield return null;
                 }
-                Debug.Log("Score: " + score + ", maxAmount: " + maxAmount + ", Index: " + i + ", FillAmount: " + gameResultStars[i].fillAmount + ", Max: " + gameResultStars.Count);
                 score--;
             }
 
@@ -104,10 +106,11 @@ namespace Com.MyCompany.MyGame
         /// <param name="isClear"> true = 클리어, false = Player 사망</param>
         private void _ShowResultWindow(bool isClear)
         {
+            SendMessage("StopGameTimer");
             if (isClear)
             {
                 OnOffUI(true, "Window_GameResult");
-                StartCoroutine(ShowGameResult(transform.GetComponent<StageManager>().score));
+                StartCoroutine(ShowGameResult(transform.GetComponent<StageManager>().gameResult));
             }
             else
             {
@@ -117,6 +120,15 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Public Methods
+
+        public void SetUILabelText(string uiName, string text)
+        {
+            ui[uiDic[uiName]].GetComponent<UIController>().SetText(text);
+        }
+        public void SetUILabelText(string windowName, string text, string uiName)
+        {
+            ui[uiDic[windowName]].GetComponent<UIController>().SetText(text, uiName);
+        }
 
         public void OnOffGameMenu(bool onoff)
         {
@@ -172,36 +184,29 @@ namespace Com.MyCompany.MyGame
 
         public void OnOffButton(bool onoff, string uiName)
         {
-            for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
-            {
-                try
-                {
-                    ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
-                }
-                catch (System.Exception) { continue; }
-            }
+            ui[uiDic[uiName]].GetComponent<UIController>().OnOffUIButtonAll(onoff);
         }
-        /// <summary>
-        /// uiName에 소속된 buttonName 버튼을 활성화 / 비활성화
-        /// </summary>
-        /// <param name="onoff">true = 활성화, false = 비활성화<</param>
-        /// <param name="uiName">활성화 / 비활성화 할 버튼의 parent 이름 </param>
-        /// <param name="buttonName">활성화 / 비활성화 할 버튼 이름 </param>
-        public void OnOffButton(bool onoff, string uiName, string buttonName)
-        {
-            try
-            {
-                for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
-                {
-                    if (ui[uiDic[uiName]].GetChild(i).name == buttonName)
-                    {
-                        ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
-                        break;
-                    }
-                }
-            }
-            catch (System.Exception) { }
-        }
+        ///// <summary>
+        ///// uiName에 소속된 buttonName 버튼을 활성화 / 비활성화
+        ///// </summary>
+        ///// <param name="onoff">true = 활성화, false = 비활성화<</param>
+        ///// <param name="uiName">활성화 / 비활성화 할 버튼의 parent 이름 </param>
+        ///// <param name="buttonName">활성화 / 비활성화 할 버튼 이름 </param>
+        //public void OnOffButton(bool onoff, string uiName, string buttonName)
+        //{
+        //    try
+        //    {
+        //        for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
+        //        {
+        //            if (ui[uiDic[uiName]].GetChild(i).name == buttonName)
+        //            {
+        //                ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    catch (System.Exception) { }
+        //}
 
         /// <summary>
         /// HP바를 연속적으로 줄임
@@ -211,30 +216,43 @@ namespace Com.MyCompany.MyGame
         /// <param name="index">0 = 실제 체력 바, 1 = 나중에 줄어드는 장식용 체력바, ...</param>
         public void DecreaseHPBar(float amount, float ratio, int index)
         {
-            float fill = ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
-
+            string name = ((index == 0) ? "Fill_HP" : "Fill_HP Deco");
+            float fill = GetHPBarFillAmount(index);
             fill -= amount;
             if (fill <= ratio) fill = ratio;
 
-            ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount = fill;
+            ui[uiDic["Bar_HP"]].GetComponent<UIController>().SetFillAmount(fill, name);
         }
         public float GetHPBarFillAmount(int index)
         {
-            return ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
+            string name = ((index == 0) ? "Fill_HP" : "Fill_HP Deco");
+            return ui[uiDic["Bar_HP"]].GetComponent<UIController>().GetFillAmount(name);//ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
         }
 
-        public void SetFillTextureUIName(string uiName, float fillAmount)
+        public void SetFillAmountUIName(string uiName, float setValue)
         {
-            ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount = fillAmount;
+            ui[uiDic[uiName]].GetComponent<UIController>().SetFillAmount(setValue, uiName);
         }
-        public void FillTextureUIName(string uiName, float amount)
+        public void FillAmountUIName(string uiName, float amount)
         {
-            //Debug.Log(uiName + " : " + ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount + " + " + amount);
-            ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount += amount;
+            ui[uiDic[uiName]].GetComponent<UIController>().FillAmount(amount, uiName);
         }
-        public bool IsFullTexture(string uiName)
+        public bool IsFullUIBasicSprite(string uiName)
         {
-            return (ui[uiDic[uiName]].GetComponent<UITexture>().fillAmount >= 1);
+            return (ui[uiDic[uiName]].GetComponent<UIController>().GetFillAmount() >= 1);
+        }
+
+        public void SetFillAmountUIName(string windowName, float setValue, string uiName)
+        {
+            ui[uiDic[windowName]].GetComponent<UIController>().SetFillAmount(setValue, uiName);
+        }
+        public void FillAmountUIName(string windowName, float amount, string uiName)
+        {
+            ui[uiDic[windowName]].GetComponent<UIController>().FillAmount(amount, uiName);
+        }
+        public bool IsFullUIBasicSprite(string windowName, string uiName)
+        {
+            return (ui[uiDic[windowName]].GetComponent<UIController>().GetFillAmount(uiName) >= 1);
         }
 
         public void SetIndicator(string uiName, Transform target)
@@ -248,16 +266,16 @@ namespace Com.MyCompany.MyGame
                 if (target == null)
                 {
                     ui[uiDic[uiName]].GetComponent<Indicator>().target = null;
-                    SetFillTextureUIName(uiName, 0);
+                    SetFillAmountUIName(uiName, 0);
                 }
             }
             catch(System.Exception){ }
         }
 
         //uiName이 켜진 상태인지 아닌지 확인
-        public bool IsThatUIOn(string uiName)
+        public bool IsThatUIOn(string windowName, string uiName)
         {
-            return ui[uiDic[uiName]].GetComponent<MonoBehaviour>().enabled;
+            return ui[uiDic[windowName]].GetComponent<UIController>().IsUIOn();
         }
         #endregion
     }

@@ -206,6 +206,7 @@
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />
      <Compile Include="Assets\Scripts\System\Target.cs" />
      <Compile Include="Assets\Scripts\System\UI.cs" />
+     <Compile Include="Assets\Scripts\System\UIController.cs" />
      <Compile Include="Assets\Scripts\System\UIManager.cs" />
      <Compile Include="Assets\Scripts\Unit\AnimatorEventTOUnit.cs" />
      <Compile Include="Assets\Scripts\Unit\AssassinateTrigger.cs" />

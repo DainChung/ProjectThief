@@ -496,13 +496,13 @@ namespace Com.MyCompany.MyGame
                     {
                         if (Input.GetButton("Assassinate") && checkCameraCollider.canAssassinate)
                         {
-                            if(uiManager.IsFullTexture("AssassinateIndicator"))
+                            if(uiManager.IsFullUIBasicSprite("AssassinateIndicator"))
                                 StartCoroutine(AssassinateMove());
                             else
-                                uiManager.FillTextureUIName("AssassinateIndicator", buttonDelay);
+                                uiManager.FillAmountUIName("AssassinateIndicator", buttonDelay);
                         }
                         else
-                            uiManager.SetFillTextureUIName("AssassinateIndicator", 0);
+                            uiManager.SetFillAmountUIName("AssassinateIndicator", 0);
                     }
                     else
                         checkCameraCollider.InitAssassinateTargetPos();
@@ -709,17 +709,17 @@ namespace Com.MyCompany.MyGame
         {
             if (Input.GetButton("GetItem") && (nearestItem.GetItem() != null))
             {
-                if (uiManager.IsFullTexture("NearestItemIndicator"))
+                if (uiManager.IsFullUIBasicSprite("NearestItemIndicator"))
                 {
                     pInventory.Add(nearestItem.GetItemCode());
                     nearestItem.Init();
                     uiManager.SetIndicator("NearestItemIndicator", null);
                 }
                 else
-                    uiManager.FillTextureUIName("NearestItemIndicator", buttonDelay);
+                    uiManager.FillAmountUIName("NearestItemIndicator", buttonDelay);
             }
             else
-                uiManager.SetFillTextureUIName("NearestItemIndicator", 0);
+                uiManager.SetFillAmountUIName("NearestItemIndicator", 0);
         }
         #endregion
 

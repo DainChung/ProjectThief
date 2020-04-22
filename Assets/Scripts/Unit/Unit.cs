@@ -745,7 +745,7 @@ namespace Com.MyCompany.MyGame
 
         //공격 판정 콜라이더 제어
         public void EnableDefaultAttack(bool enable)
-        {           
+        {
             defaultAttack.enableCollider = enable;
         }
         public void EnableAssassinate(bool enable)

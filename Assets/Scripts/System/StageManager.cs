@@ -7,6 +7,33 @@ using Com.MyCompany.MyGame.Collections;
 
 namespace Com.MyCompany.MyGame
 {
+    #region Sub Class & Struct
+    public class GameTime
+    {
+        private int min;
+        private int sec;
+        private int milliSec;
+
+        public GameTime(System.Diagnostics.Stopwatch timer)
+        {
+            milliSec = (int)(timer.ElapsedMilliseconds % 1000);
+            sec = timer.Elapsed.Seconds;
+            min = (int)timer.Elapsed.TotalMinutes;
+        }
+
+        public new string ToString()
+        {
+            return string.Format("{0} : {1}.{2}", min.ToString(), sec.ToString(), milliSec.ToString());
+        }
+    }
+
+    public struct GameResult
+    {
+        public float score;
+        public GameTime gameTime;
+    }
+    #endregion
+
     /// <summary>
     /// 출발지점, 탈출지점 관리
     /// 점수 관리
@@ -19,7 +46,9 @@ namespace Com.MyCompany.MyGame
         #region Private Fields
 
         private GameObject treasure;
-        private float _score = 2.4f;
+        private GameResult _gameResult;
+
+        private System.Diagnostics.Stopwatch gameTimer;
 
         #endregion
 
@@ -28,7 +57,7 @@ namespace Com.MyCompany.MyGame
         public Transform start;
         public Transform[] end;
 
-        public float score { get { return _score; } }
+        public GameResult gameResult { get { return _gameResult; } }
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -49,6 +78,11 @@ namespace Com.MyCompany.MyGame
                 endArea.GetComponent<MeshRenderer>().enabled = false;
                 endArea.GetComponent<BoxCollider>().enabled = false;
             }
+
+            _gameResult.score = 1.5f;
+
+            gameTimer = new System.Diagnostics.Stopwatch();
+            gameTimer.Start();
         }
 
         void Update()
@@ -62,6 +96,12 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Public Methods
+        public void StopGameTimer()
+        {
+            gameTimer.Stop();
+            _gameResult.gameTime = new GameTime(gameTimer);
+        }
+
         public void ShowEndArea()
         {
             Random.InitState((int)Time.unscaledTime);

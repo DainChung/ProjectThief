@@ -15,6 +15,8 @@ TagManager:
   - Target
   - Manager
   - Gold
+  - UI
+  - UIWindow
   layers:
   - Default
   - TransparentFX
