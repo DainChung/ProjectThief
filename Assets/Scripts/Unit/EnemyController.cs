@@ -243,8 +243,7 @@ namespace Com.MyCompany.MyGame
         public bool CanIAttack { set { canIAttack = value; } }
 
         [HideInInspector] public TargetManager targetMng = new TargetManager();
-        [HideInInspector]
-        public bool assassinateTargetted = false;
+        [HideInInspector] public bool assassinateTargetted = false;
         //assassinateTargetted가 true면 무조건 false 반환
         public bool canAssassinate { get { return (assassinateTargetted ? false : _canAssassinate); } set { _canAssassinate = value; } }
 
@@ -598,15 +597,6 @@ namespace Com.MyCompany.MyGame
         public bool IsCombatState()
         {
             return (unit.curUnitState == UnitState.COMBAT);
-        }
-        public bool IsAlertValueSmallerThen(float value)
-        {
-            return unit.alertValue < value;
-        }
-        public void SetAlertValue(float value)
-        {
-            unit.alertValue = value;
-            EnemyAlertManager();
         }
 
         public void EnemyAlertManager()

@@ -251,6 +251,8 @@ namespace Com.MyCompany.MyGame
         private UnitState _curUnitState = UnitState.IDLE;
         private LookDirState _curLookDir = LookDirState.IDLE;
 
+        private AnimatorStateInfo currentLayerAnimInfo;
+
         #endregion
 
         #region Public Fields
@@ -325,8 +327,8 @@ namespace Com.MyCompany.MyGame
                 {
                     try
                     {
-                        ValidateException.ValidateFreezingUnitAttackException(_lockControl, standingLayerAnimInfo, "Walking", animator.GetBool("IsAttack"));
-                        ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), standingLayerAnimInfo, "HitReaction");
+                        ValidateException.ValidateFreezingUnitAttackException(_lockControl, unitAnimController.currentAnimStateInfo, "Walking", animator.GetBool("IsAttack"));
+                        ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), unitAnimController.currentAnimStateInfo, "HitReaction");
                         switch (curUnitPose)
                         {
                             case UnitPose.MOD_FALL:
@@ -421,7 +423,6 @@ namespace Com.MyCompany.MyGame
         private void UnFreezeUnit()
         {
             lockControl = false;
-            EnableDefaultAttack(false);
             animator.SetBool("IsAttack", false);
             animator.Play("Idle 0-0", AnimationLayers.Standing);
             swManager.RestartSW((int)WeaponCode.HAND);
@@ -744,17 +745,20 @@ namespace Com.MyCompany.MyGame
 
         //공격 판정 콜라이더 제어
         public void EnableDefaultAttack(bool enable)
-        {
+        {           
             defaultAttack.enableCollider = enable;
         }
         public void EnableAssassinate(bool enable)
         {
             float val = (enable ? 1.0f : 0.0f);
+            if (!enable)
+            {
+                animator.Play("Assassinate", AnimationLayers.Assassinate, 0);
+                animator.SetBool("ReadyAssassinateAnim", false);
+            }
 
             animator.SetLayerWeight(AnimationLayers.Assassinate, val);
             animator.SetFloat("AssassinateAnimSpeed", val);
-            if (!enable)
-                animator.Play("Assassinate", AnimationLayers.Assassinate);
             assassinate.enableCollider = enable;
         }
 

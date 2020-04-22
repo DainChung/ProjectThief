@@ -514,16 +514,24 @@ namespace Com.MyCompany.MyGame
         }
         private IEnumerator AssassinateMove()
         {
-            SendMessage("OffIndicator", "AssassinateIndicator");
+            try
+            {
+                checkCameraCollider.assassinateTarget.GetComponent<EnemyController>().assassinateTargetted = true;
+            }
+            catch (System.NullReferenceException) { yield break; }
+            transform.LookAt(checkCameraCollider.assassinateTargetPos);
+
+            unit.curUnitPose = UnitPose.MOD_ATTACK;
             unit.lockControl = true;
             unit.assassinate.enableCollider = true;
 
-            bool bfIsRunMode = animator.GetBool("IsRunMode");
-            animator.SetBool("IsRunMode", false);
-            animator.SetFloat("MoveSpeed", 1.0f);
+            //bool bfIsRunMode = animator.GetBool("IsRunMode");
 
-            checkCameraCollider.assassinateTarget.GetComponent<EnemyController>().assassinateTargetted = true;
-            transform.LookAt(checkCameraCollider.assassinateTargetPos);
+            unit.EnableAssassinate(true);
+            //animator.SetBool("IsRunMode", false);
+            //animator.SetFloat("MoveSpeed", 1.0f);
+
+            SendMessage("OffIndicator", "AssassinateIndicator");
 
             //일정 거리 이내가 될 때까지
             while (unit.assassinate.enableCollider)
@@ -532,13 +540,13 @@ namespace Com.MyCompany.MyGame
                 rb.velocity *= 0.9f;
                 yield return null;
             }
-            animator.SetBool("IsRunMode", bfIsRunMode);
-            animator.SetFloat("MoveSpeed", 0);
+            animator.SetBool("ReadyAssassinateAnim", true);
+            //animator.SetBool("IsRunMode", bfIsRunMode);
+            //animator.SetFloat("MoveSpeed", 0);
             animator.Play("Idle 0-0", AnimationLayers.Standing, 0);
 
             checkCameraCollider.InitCanAssassinate();
             checkCameraCollider.InitAssassinateTargetPos();
-            unit.EnableAssassinate(true);
 
             unit.lockControl = false;
             yield break;

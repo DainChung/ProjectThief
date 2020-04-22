@@ -12,6 +12,14 @@ namespace Com.MyCompany.MyGame
 
         private Unit _unit;
         private Animator _animator;
+        private int _currentAnimLayer = 0;
+
+        #endregion
+
+        #region Public Fields
+
+        public int currentAnimLayer { get { return _currentAnimLayer; } }
+        public AnimatorStateInfo currentAnimStateInfo { get { return _animator.GetCurrentAnimatorStateInfo(_currentAnimLayer); } }
 
         #endregion
 
@@ -29,7 +37,44 @@ namespace Com.MyCompany.MyGame
             _animator.SetLayerWeight(AnimationLayers.CoverCrouch, 0);
             _animator.SetLayerWeight(AnimationLayers.Throw, 0);
             _animator.SetLayerWeight(AnimationLayers.ThrowMove, 0);
+
+            _currentAnimLayer = AnimationLayers.Standing;
         }
+
+        #region Private Methods
+
+        private void SetCurrentAnimLayer()
+        {
+            switch (_unit.curUnitPose)
+            {
+                case UnitPose.MOD_WALK:
+                case UnitPose.MOD_RUN:
+                case UnitPose.MOD_FALL:
+                case UnitPose.MOD_ATTACK:
+                    _currentAnimLayer = AnimationLayers.Standing;
+                    break;
+                case UnitPose.MOD_CROUCH:
+                    _currentAnimLayer = AnimationLayers.Crouch;
+                    break;
+                case UnitPose.MOD_COVERCROUCH:
+                    _currentAnimLayer = AnimationLayers.CoverCrouch;
+                    break;
+                case UnitPose.MOD_COVERSTAND:
+                    _currentAnimLayer = AnimationLayers.CoverStanding;
+                    break;
+                case UnitPose.MOD_INSMOKE:
+                    _currentAnimLayer = AnimationLayers.InSmoke;
+                    break;
+                case UnitPose.MOD_THROW:
+                case UnitPose.MOD_THROWEND:
+                    _currentAnimLayer = AnimationLayers.Throw;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        #endregion
 
         #region Public Methods
 
@@ -61,6 +106,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+
+            SetCurrentAnimLayer();
         }
 
         public void RunPoseTONewPose(UnitPose newPose)
@@ -90,6 +137,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+
+            SetCurrentAnimLayer();
         }
 
         public void CrouchPoseTONewPose(UnitPose newPose)
@@ -124,6 +173,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+
+            SetCurrentAnimLayer();
         }
 
         public void CoverStandingPoseTONewPose(UnitPose newPose)
@@ -146,6 +197,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+
+            SetCurrentAnimLayer();
         }
 
         public void CoverCrouchPoseTONewPose(UnitPose newPose)
@@ -170,6 +223,8 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+
+            SetCurrentAnimLayer();
         }
 
         /// <summary>
@@ -329,6 +384,8 @@ namespace Com.MyCompany.MyGame
                 _animator.SetLayerWeight(AnimationLayers.Throw, 0);
                 _animator.SetLayerWeight(AnimationLayers.ThrowMove, 1);
             }
+
+            SetCurrentAnimLayer();
         }
 
         /// <summary>
@@ -351,6 +408,7 @@ namespace Com.MyCompany.MyGame
             _animator.SetBool("ThrowItem", false);
 
             _unit.curUnitPose = UnitPose.MOD_RUN;
+            SetCurrentAnimLayer();
         }
 
         public void PlayDeadAnim(int damage)

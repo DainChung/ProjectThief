@@ -345,17 +345,15 @@ namespace Com.MyCompany.MyGame
         {
             public static void CheckAIsCloseToB(Vector3 a, Vector3 b, float dist)
             {
-                if (Vector3.Distance(a, b) <= dist)
-                    throw new AIsCloseToB();
+                if (Vector3.Distance(a, b) <= dist) throw new AIsCloseToB();
             }
             public static void ValidateFreezingUnitException(bool boolVal, AnimatorStateInfo animInfo, string animName)
             {
-                if (animInfo.IsName(animName) && boolVal)
-                    throw new FreezingUnitException();
+                if (animInfo.IsName(animName) && boolVal) throw new FreezingUnitException();
             }
             public static void ValidateFreezingUnitAttackException(bool isLocked, AnimatorStateInfo animInfo, string animName, bool isAttack)
             {
-                if (!animInfo.IsTag("Attack") && ((isLocked && animName != "Walking") || isAttack)) throw new FreezingUnitException();
+                if (!animInfo.IsTag("Attack") && ((isLocked && !animInfo.IsName(animName) || isAttack))) throw new FreezingUnitException();
             }
             public static void ValidateAnimationIsPlayingException(AnimatorStateInfo animInfo, string animName)
             {

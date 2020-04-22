@@ -23,11 +23,8 @@ namespace Com.MyCompany.MyGame
 
         #region Public Fields
 
-        [HideInInspector]
-        public UnitAnimationController unitAnimController;
-
-        [HideInInspector]
-        public bool lockAnim = false;
+        [HideInInspector] public UnitAnimationController unitAnimController;
+        [HideInInspector] public bool lockAnim = false;
 
         #endregion
 

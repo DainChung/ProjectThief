@@ -11,6 +11,7 @@ namespace Com.MyCompany.MyGame
         private Unit unit;
 
         public EnemyController enemy;
+        public EnemyRadar enemyRadar;
 
         void Start()
         {
@@ -19,28 +20,43 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerStay(Collider other)
         {
-            if (other.CompareTag("Player") && unit.curUnitState != UnitState.CHEESE)
+            //암살당할때는 작동 안 함
+            if (!enemy.assassinateTargetted)
             {
-                if (enemy.IsAlertValueSmallerThen(AggroCollections.combatMin))
-                    enemy.SetAlertValue(AggroCollections.combatMin);
-                enemy.doesReachToTarget = true;
-                enemy.IsMovingNow = false;
-                unit.curUnitPose = UnitPose.MOD_ATTACK;
-                if(unit.alertValue < AggroCollections.combatMin)
-                    unit.alertValue = AggroCollections.combatMin;
-
-                int index = ValueCollections.TargetChildIndex;
-
-                while (index < other.transform.childCount)
+                if (other.CompareTag("Player"))
                 {
-                    try
+                    switch (unit.curUnitState)
                     {
-                        if (enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
-                            Destroy(other.transform.GetChild(index).gameObject);
-                        index++;
+                        case UnitState.CHEESE:
+                            break;
+                        case UnitState.IDLE:
+                            enemyRadar.PlayerDetection(other.transform);
+                            break;
+                        default:
+                            enemy.doesReachToTarget = true;
+                            enemy.IsMovingNow = false;
+                            unit.curUnitPose = UnitPose.MOD_ATTACK;
+                            if (unit.alertValue < AggroCollections.combatMin)
+                            {
+                                unit.alertValue = AggroCollections.combatMin;
+                                unit.AlertManager();
+                            }
+
+                            int index = ValueCollections.TargetChildIndex;
+
+                            while (index < other.transform.childCount)
+                            {
+                                try
+                                {
+                                    if (enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
+                                        Destroy(other.transform.GetChild(index).gameObject);
+                                    index++;
+                                }
+                                catch (System.Exception)
+                                { }
+                            }
+                            break;
                     }
-                    catch (System.Exception)
-                    { }
                 }
             }
         }
