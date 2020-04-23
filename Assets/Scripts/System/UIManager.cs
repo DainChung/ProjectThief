@@ -55,8 +55,6 @@ namespace Com.MyCompany.MyGame
             FillAmountUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
 
-            //SetUILabelText("NearestItemIndicator", , "Text");
-
             for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
             {
                 if (uiCam.Find("Window_GameResult").GetChild(i).name.Contains("Star"))
@@ -65,7 +63,7 @@ namespace Com.MyCompany.MyGame
         }
         private void OnOffUI(bool onoff, Transform uiTR)
         {
-            //uiTR.GetComponent<UIController>().OnOffAll(onoff);
+            uiTR.GetComponent<UIController>().OnOffAll(onoff);
         }
 
         private IEnumerator ShowGameResult(GameResult gameResult)
