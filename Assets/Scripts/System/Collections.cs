@@ -37,6 +37,11 @@ namespace Com.MyCompany.MyGame
             IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, max
         }
 
+        public enum KeyAxis
+        {
+            HOR = 0, VER, max
+        }
+
         #endregion
 
         public static class EnumCollections

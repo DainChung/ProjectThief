@@ -4,10 +4,10 @@ namespace Com.MyCompany.MyGame.UI
 {
     public class UIController : UI
     {
-
         public void OnOffAll(bool enable)
         {
             base.OnOffUI(enable);
+
             try
             {
                 transform.GetComponent<Indicator>().enabled = enable;
@@ -39,16 +39,8 @@ namespace Com.MyCompany.MyGame.UI
         }
         public void OnOffUIButton(bool enable, string buttonName)
         {
-            try
-            {
-                if (transform.name != buttonName) throw new System.NullReferenceException();
-                else base.OnOffUIButton(enable);
-            }
-            catch (System.NullReferenceException)
-            {
-                for (int i = 0; i < transform.childCount; i++)
-                    transform.GetChild(i).GetComponent<UIController>().OnOffUIButton(enable, buttonName);
-            }
+            if (transform.name != buttonName) transform.Find(buttonName).GetComponent<UIController>().OnOffUIButton(enable, buttonName);
+            else base.OnOffUIButton(enable);
         }
 
         /// <summary>
@@ -61,12 +53,12 @@ namespace Com.MyCompany.MyGame.UI
         {
             try
             {
-                if (transform.name != uiName) throw new System.NullReferenceException();
+                if (transform.name != uiName) transform.Find(uiName).GetComponent<UIController>().FillAmount(amount, uiName);
                 else base.FillAmount(amount);
             }
             catch (System.NullReferenceException)
             {
-                for (int i = 0; i < transform.childCount; i++)
+                for(int i = 0; i < transform.childCount; i++)
                     transform.GetChild(i).GetComponent<UIController>().FillAmount(amount, uiName);
             }
         }
@@ -74,7 +66,7 @@ namespace Com.MyCompany.MyGame.UI
         {
             try
             {
-                if (transform.name != uiName) throw new System.NullReferenceException();
+                if (transform.name != uiName) transform.Find(uiName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
                 else base.SetFillAmount(setValue);
             }
             catch (System.NullReferenceException)
@@ -89,7 +81,7 @@ namespace Com.MyCompany.MyGame.UI
 
             try
             {
-                if (transform.name != uiName) throw new System.NullReferenceException();
+                if (transform.name != uiName) result = transform.Find(uiName).GetComponent<UIController>().GetFillAmount(uiName);
                 else result = base.GetFillAmount();
             }
             catch (System.NullReferenceException)
@@ -108,7 +100,7 @@ namespace Com.MyCompany.MyGame.UI
         {
             try
             {
-                if (transform.name != uiName) throw new System.NullReferenceException();
+                if (transform.name != uiName) transform.Find(uiName).GetComponent<UIController>().SetText(text, uiName);
                 else base.SetText(text);
             }
             catch (System.NullReferenceException)
@@ -116,6 +108,26 @@ namespace Com.MyCompany.MyGame.UI
                 for (int i = 0; i < transform.childCount; i++)
                     transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName);
             }
+        }
+        public string GetText(string uiName)
+        {
+            string result = "NULL";
+
+            try
+            {
+                if (transform.name != uiName) result = transform.Find(uiName).GetComponent<UIController>().GetText(uiName);
+                else result = base.GetText();
+            }
+            catch (System.NullReferenceException)
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    result = transform.GetChild(i).GetComponent<UIController>().GetText(uiName);
+                    if (result.CompareTo("NULL") != 0) break;
+                }
+            }
+
+            return result;
         }
     }
 }

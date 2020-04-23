@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Com.MyCompany.MyGame.UI
 {
@@ -65,6 +67,10 @@ namespace Com.MyCompany.MyGame.UI
         public virtual void SetText(string text)
         {
             transform.GetComponent<UILabel>().text = text;
+        }
+        public virtual string GetText()
+        {
+            return transform.GetComponent<UILabel>().text;
         }
 
         public bool IsUIOn()

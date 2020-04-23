@@ -11,9 +11,7 @@ namespace Com.MyCompany.MyGame
     {
         #region Private Values
         private Transform uiCam;
-        private List<Transform> ui = new List<Transform>();
         private List<UI2DSprite> gameResultStars = new List<UI2DSprite>();
-        private Dictionary<string, int> uiDic = new Dictionary<string, int>();
 
         private GameObject player;
         #endregion
@@ -36,7 +34,6 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             uiCam = GameObject.Find("UICamera").transform;
-            SetUIDic();
 
             player = GameObject.Find("Player");
             InitUI();
@@ -49,29 +46,20 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Private Methods
-        private void SetUIDic()
-        {
-            if (ui.Count != 0) ui.Clear();
-            if (uiDic.Count != 0) uiDic.Clear();
-
-            for (int i = 0; i < uiCam.childCount; i++)
-            {
-                ui.Add(uiCam.GetChild(i));
-                uiDic.Add(uiCam.GetChild(i).name, i);
-            }
-        }
         private void InitUI()
         {
-            for (int i = 0; i < ui.Count; i++) OnOffUI(false, ui[i]);
+            OnOffUI(false, uiCam);
 
             FillAmountUIName("NearestItemIndicator", 0);
             FillAmountUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
 
-            for (int i = 0; i < ui[uiDic["Window_GameResult"]].childCount; i++)
+            //SetUILabelText("NearestItemIndicator", , "Text");
+
+            for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
             {
-                if (ui[uiDic["Window_GameResult"]].GetChild(i).name.Contains("Star"))
-                    gameResultStars.Add(ui[uiDic["Window_GameResult"]].GetChild(i).GetComponent<UI2DSprite>());
+                if (uiCam.Find("Window_GameResult").GetChild(i).name.Contains("Star"))
+                    gameResultStars.Add(uiCam.Find("Window_GameResult").GetChild(i).GetComponent<UI2DSprite>());
             }
         }
         private void OnOffUI(bool onoff, Transform uiTR)
@@ -107,6 +95,8 @@ namespace Com.MyCompany.MyGame
         private void _ShowResultWindow(bool isClear)
         {
             SendMessage("StopGameTimer");
+            OnOffUI(false, "AssassinateIndicator");
+            OnOffUI(false, "NearestItemIndicator");
             if (isClear)
             {
                 OnOffUI(true, "Window_GameResult");
@@ -121,13 +111,18 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
+        public void OnOffUIWindow(bool enable, string windowName)
+        {
+            uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
+        }
+
         public void SetUILabelText(string uiName, string text)
         {
-            ui[uiDic[uiName]].GetComponent<UIController>().SetText(text);
+            uiCam.Find(uiName).GetComponent<UIController>().SetText(text);
         }
         public void SetUILabelText(string windowName, string text, string uiName)
         {
-            ui[uiDic[windowName]].GetComponent<UIController>().SetText(text, uiName);
+            uiCam.Find(windowName).GetComponent<UIController>().SetText(text, uiName);
         }
 
         public void OnOffGameMenu(bool onoff)
@@ -138,6 +133,7 @@ namespace Com.MyCompany.MyGame
         public void ShowResultWindow(bool isClear)
         {
             _ShowResultWindow(isClear);
+
             player.GetComponent<Unit>().lockControl = true;
             player.GetComponent<CapsuleCollider>().enabled = false;
             player.GetComponent<Rigidbody>().useGravity = false;
@@ -167,7 +163,7 @@ namespace Com.MyCompany.MyGame
         }
 
         /// <summary>
-        /// MonoBehaviour를 상속받은 모든 Class를 활성화 / 비활성화
+        /// uiName과 uiName.Childs에 속한 모든 NGUI 스크립트 비활성화
         /// </summary>
         /// <param name="onoff"> true = 활성화, false = 비활성화</param>
         /// <param name="uiName"> 활성화 / 비활성화 할 UI 이름 </param>
@@ -175,16 +171,14 @@ namespace Com.MyCompany.MyGame
         {
             try
             {
-                OnOffUI(onoff, ui[uiDic[uiName]]);
-                for (int i = 0; i <= ui[uiDic[uiName]].childCount; i++)
-                    OnOffUI(onoff, ui[uiDic[uiName]].GetChild(i));
+                OnOffUI(onoff, uiCam.Find(uiName));
             }
             catch (System.Exception) { }
         }
 
         public void OnOffButton(bool onoff, string uiName)
         {
-            ui[uiDic[uiName]].GetComponent<UIController>().OnOffUIButtonAll(onoff);
+            uiCam.Find(uiName).GetComponent<UIController>().OnOffUIButtonAll(onoff);
         }
         ///// <summary>
         ///// uiName에 소속된 buttonName 버튼을 활성화 / 비활성화
@@ -221,38 +215,38 @@ namespace Com.MyCompany.MyGame
             fill -= amount;
             if (fill <= ratio) fill = ratio;
 
-            ui[uiDic["Bar_HP"]].GetComponent<UIController>().SetFillAmount(fill, name);
+            uiCam.Find("Bar_HP").GetComponent<UIController>().SetFillAmount(fill, name);
         }
         public float GetHPBarFillAmount(int index)
         {
             string name = ((index == 0) ? "Fill_HP" : "Fill_HP Deco");
-            return ui[uiDic["Bar_HP"]].GetComponent<UIController>().GetFillAmount(name);//ui[uiDic["Bar_HP"]].GetChild(index).GetComponent<UI2DSprite>().fillAmount;
+            return uiCam.Find("Bar_HP").GetComponent<UIController>().GetFillAmount(name);
         }
 
         public void SetFillAmountUIName(string uiName, float setValue)
         {
-            ui[uiDic[uiName]].GetComponent<UIController>().SetFillAmount(setValue, uiName);
+            uiCam.Find(uiName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
         }
         public void FillAmountUIName(string uiName, float amount)
         {
-            ui[uiDic[uiName]].GetComponent<UIController>().FillAmount(amount, uiName);
+            uiCam.Find(uiName).GetComponent<UIController>().FillAmount(amount, uiName);
         }
         public bool IsFullUIBasicSprite(string uiName)
         {
-            return (ui[uiDic[uiName]].GetComponent<UIController>().GetFillAmount() >= 1);
+            return (uiCam.Find(uiName).GetComponent<UIController>().GetFillAmount() >= 1);
         }
 
         public void SetFillAmountUIName(string windowName, float setValue, string uiName)
         {
-            ui[uiDic[windowName]].GetComponent<UIController>().SetFillAmount(setValue, uiName);
+            uiCam.Find(windowName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
         }
         public void FillAmountUIName(string windowName, float amount, string uiName)
         {
-            ui[uiDic[windowName]].GetComponent<UIController>().FillAmount(amount, uiName);
+            uiCam.Find(windowName).GetComponent<UIController>().FillAmount(amount, uiName);
         }
         public bool IsFullUIBasicSprite(string windowName, string uiName)
         {
-            return (ui[uiDic[windowName]].GetComponent<UIController>().GetFillAmount(uiName) >= 1);
+            return (uiCam.Find(windowName).GetComponent<UIController>().GetFillAmount(uiName) >= 1);
         }
 
         public void SetIndicator(string uiName, Transform target)
@@ -261,11 +255,11 @@ namespace Com.MyCompany.MyGame
 
             try
             {
-                if (ui[uiDic[uiName]].GetComponent<Indicator>().target.GetInstanceID() != target.GetInstanceID())
-                    ui[uiDic[uiName]].GetComponent<Indicator>().target = target;
+                if (uiCam.Find(uiName).GetComponent<Indicator>().target.GetInstanceID() != target.GetInstanceID())
+                    uiCam.Find(uiName).GetComponent<Indicator>().target = target;
                 if (target == null)
                 {
-                    ui[uiDic[uiName]].GetComponent<Indicator>().target = null;
+                    uiCam.Find(uiName).GetComponent<Indicator>().target = null;
                     SetFillAmountUIName(uiName, 0);
                 }
             }
@@ -275,7 +269,7 @@ namespace Com.MyCompany.MyGame
         //uiName이 켜진 상태인지 아닌지 확인
         public bool IsThatUIOn(string windowName, string uiName)
         {
-            return ui[uiDic[windowName]].GetComponent<UIController>().IsUIOn();
+            return uiCam.Find(windowName).GetComponent<UIController>().IsUIOn();
         }
         #endregion
     }

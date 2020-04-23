@@ -761,15 +761,18 @@ namespace Com.MyCompany.MyGame
 
         public void SetNeareastItem(Collider other, bool onoff)
         {
-            if (!onoff)
+            if (unit.health > 0)
             {
-                nearestItem.Init();
-                uiManager.SetIndicator("NearestItemIndicator", null);
-            }
-            else
-            {
-                nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
-                uiManager.SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
+                if (!onoff)
+                {
+                    nearestItem.Init();
+                    uiManager.SetIndicator("NearestItemIndicator", null);
+                }
+                else
+                {
+                    nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
+                    uiManager.SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
+                }
             }
         }
 
@@ -780,6 +783,7 @@ namespace Com.MyCompany.MyGame
 
         public void ShowDeadWindow()
         {
+            transform.Find("PlayerRadar").GetComponent<PlayerRadar>().enabled = false;
             uiManager.ShowResultWindow(false);
         }
 

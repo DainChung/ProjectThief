@@ -101,7 +101,7 @@ namespace Com.MyCompany.MyGame
 
                     if (obj.transform.GetComponent<EnemyController>().canAssassinate)
                     {
-                        if (obj.transform.GetComponent<Unit>().health > 0) playerController.SetIndicator("AssassinateIndicator", obj.transform);
+                        if (obj.transform.GetComponent<Unit>().health > 0 && unit.health > 0) playerController.SetIndicator("AssassinateIndicator", obj.transform);
                         _canAssassinate = true;
                         _assassinateTarget = obj.transform;
                         break;
