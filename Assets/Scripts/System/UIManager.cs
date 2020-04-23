@@ -41,7 +41,8 @@ namespace Com.MyCompany.MyGame
 
         // Update is called once per frame
         void Update()
-        { 
+        {
+           
         }
         #endregion
 
@@ -64,7 +65,7 @@ namespace Com.MyCompany.MyGame
         }
         private void OnOffUI(bool onoff, Transform uiTR)
         {
-            uiTR.GetComponent<UIController>().OnOffAll(onoff);
+            //uiTR.GetComponent<UIController>().OnOffAll(onoff);
         }
 
         private IEnumerator ShowGameResult(GameResult gameResult)
@@ -100,11 +101,13 @@ namespace Com.MyCompany.MyGame
             if (isClear)
             {
                 OnOffUI(true, "Window_GameResult");
+                OnOffButtonAll(true, "Window_GameResult");
                 StartCoroutine(ShowGameResult(transform.GetComponent<StageManager>().gameResult));
             }
             else
             {
                 OnOffUI(true, "Window_Dead");
+                OnOffButtonAll(true, "Window_Dead");
             }
         }
         #endregion
@@ -178,7 +181,17 @@ namespace Com.MyCompany.MyGame
 
         public void OnOffButton(bool onoff, string uiName)
         {
-            uiCam.Find(uiName).GetComponent<UIController>().OnOffUIButtonAll(onoff);
+            uiCam.Find(uiName).GetComponent<UIController>().OnOffUIButton(onoff);
+        }
+
+        public void OnOffButton(bool onoff, string windowName, string uiName)
+        {
+            uiCam.Find(windowName).GetComponent<UIController>().OnOffUIButton(onoff, uiName);
+        }
+
+        public void OnOffButtonAll(bool onoff, string windowName)
+        {
+            uiCam.Find(windowName).GetComponent<UIController>().OnOffUIButtonAll(onoff);
         }
         ///// <summary>
         ///// uiName에 소속된 buttonName 버튼을 활성화 / 비활성화

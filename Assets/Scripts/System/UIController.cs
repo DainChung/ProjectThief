@@ -34,7 +34,16 @@ namespace Com.MyCompany.MyGame.UI
             finally
             {
                 for (int i = 0; i < transform.childCount; i++)
+                {
                     transform.GetChild(i).GetComponent<UIController>().OnOffUIButtonAll(enable);
+                    try
+                    {
+                        Debug.Log(transform.GetChild(i).name + ".isEnabled == " + transform.GetChild(i).GetComponent<UIButton>().isEnabled);
+                    }
+                    catch (System.Exception)
+                    { //Debug.Log(transform.GetChild(i).name + " not have UIButton"); }
+                    }
+                }
             }
         }
         public void OnOffUIButton(bool enable, string buttonName)

@@ -70,7 +70,7 @@ namespace Com.MyCompany.MyGame
                             //case WeaponCode.CHEESE:
                             //    Clear();
                             //    queue[0] = input;
-                                break;
+                            //    break;
                             default:
                                 break;
                         }
