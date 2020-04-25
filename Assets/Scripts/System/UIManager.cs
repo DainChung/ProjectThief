@@ -68,10 +68,12 @@ namespace Com.MyCompany.MyGame
 
         private IEnumerator ShowGameResult(GameResult gameResult)
         {
+            OnOffButtonAll(false, "Window_GameResult");
+
+            float addAmount = 0.008f;
             float score = gameResult.score;
 
-            Debug.Log("Score: " + score + ", Time: " + gameResult.gameTime.ToString());
-            SetUILabelText("Window_GameResult", score.ToString(), "Score Value");
+            SetUILabelText("Window_GameResult", ((int)(gameResult.score * 1000)).ToString(), "Score Value");
             SetUILabelText("Window_GameResult", gameResult.gameTime.ToString(), "Time Value");
 
             for (int i = 0; i < gameResultStars.Count; i++)
@@ -79,11 +81,16 @@ namespace Com.MyCompany.MyGame
                 float maxAmount = Mathf.Clamp01(score);
                 while (gameResultStars[i].fillAmount < maxAmount)
                 {
-                    gameResultStars[i].fillAmount += 0.01f;
+                    gameResultStars[i].fillAmount += addAmount;
+                    if (gameResultStars[i].fillAmount > maxAmount) gameResultStars[i].fillAmount = maxAmount;
+                    //마우스 좌클릭하면 빠른 결과
+                    if (Input.GetMouseButtonDown(0)) addAmount = 1;
                     yield return null;
                 }
                 score--;
             }
+
+            OnOffButtonAll(true, "Window_GameResult");
 
             yield break;
         }
@@ -93,7 +100,6 @@ namespace Com.MyCompany.MyGame
         /// <param name="isClear"> true = 클리어, false = Player 사망</param>
         private void _ShowResultWindow(bool isClear)
         {
-            SendMessage("StopGameTimer");
             OnOffUI(false, "AssassinateIndicator");
             OnOffUI(false, "NearestItemIndicator");
             if (isClear)
@@ -134,10 +140,6 @@ namespace Com.MyCompany.MyGame
         public void ShowResultWindow(bool isClear)
         {
             _ShowResultWindow(isClear);
-
-            player.GetComponent<Unit>().lockControl = true;
-            player.GetComponent<CapsuleCollider>().enabled = false;
-            player.GetComponent<Rigidbody>().useGravity = false;
             Camera.main.GetComponent<CameraWork>().enabled = false;
         }
 

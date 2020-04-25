@@ -428,7 +428,11 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("EndArea")) GameObject.FindWithTag("Manager").GetComponent<UIManager>().ShowResultWindow(true);
+            if (other.CompareTag("EndArea"))
+            {
+                Time.timeScale = 0;
+                GameObject.FindWithTag("Manager").GetComponent<StageManager>().GameClear();
+            }
         }
 
         #endregion

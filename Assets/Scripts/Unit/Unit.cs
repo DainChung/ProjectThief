@@ -442,6 +442,7 @@ namespace Com.MyCompany.MyGame
             GetComponent<Rigidbody>().useGravity = false;
 
             if (transform.CompareTag("Player")) SendMessage("ShowDeadWindow");
+            //else if(transform.CompareTag)
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }
@@ -455,6 +456,7 @@ namespace Com.MyCompany.MyGame
                 {
                     if (damage >= _health)
                     {
+                        GameObject.Find("Manager").GetComponent<StageManager>().UpdateScore(Score.NORNALKILL);
                         _lockControl = true;
                         _health = 0;
                         StartCoroutine(DelayPlayDeadAnim((int)damage));
@@ -481,9 +483,10 @@ namespace Com.MyCompany.MyGame
                         _lockControl = true;
                     }
                 }
-                //암살(damage < 0)
+                //암살(damage < 0), Player만 사용가능
                 else
                 {
+                    GameObject.Find("Manager").GetComponent<StageManager>().UpdateScore(Score.ASSASSINATE);
                     _health = 0;
                     StartCoroutine(DelayPlayDeadAnim((int)damage));
                 }
@@ -753,7 +756,7 @@ namespace Com.MyCompany.MyGame
             float val = (enable ? 1.0f : 0.0f);
             if (!enable)
             {
-                animator.Play("Assassinate", AnimationLayers.Assassinate, 0);
+                animator.Play("Walk", AnimationLayers.Assassinate, 0);
                 animator.SetBool("ReadyAssassinateAnim", false);
             }
 

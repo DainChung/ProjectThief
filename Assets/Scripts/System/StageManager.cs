@@ -14,6 +14,9 @@ namespace Com.MyCompany.MyGame
         private int sec;
         private int milliSec;
 
+        public float time { get { return (float)min + (sec + (float)milliSec * 0.001f) / 60; } }
+        public int minutes { get { return min; } }
+
         public GameTime(System.Diagnostics.Stopwatch timer)
         {
             milliSec = (int)(timer.ElapsedMilliseconds % 1000);
@@ -79,7 +82,7 @@ namespace Com.MyCompany.MyGame
                 endArea.GetComponent<BoxCollider>().enabled = false;
             }
 
-            _gameResult.score = 1.5f;
+            _gameResult.score = 0.0f;
 
             gameTimer = new System.Diagnostics.Stopwatch();
             gameTimer.Start();
@@ -89,21 +92,24 @@ namespace Com.MyCompany.MyGame
         {
             if (Input.GetButtonDown("TEST"))
             {
-                //gameEvent.OnOffUI(true, "Window_GameResult");
                 UnityEngine.SceneManagement.SceneManager.LoadScene("TestScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
         }
         #endregion
 
-        #region Public Methods
-        public void StopGameTimer()
+        #region Private Methods
+        private void UpdateScore(float amount)
         {
-            gameTimer.Stop();
-            _gameResult.gameTime = new GameTime(gameTimer);
+            Debug.Log("Score: " + _gameResult.score + " + " + amount + " = " + (_gameResult.score+amount));
+            _gameResult.score += amount;
+            if (_gameResult.score > 3) _gameResult.score = 3;
         }
+        #endregion
 
+        #region Public Methods
         public void ShowEndArea()
         {
+            UpdateScore(Score.GETGOLD);
             Random.InitState((int)Time.unscaledTime);
             int index = Random.Range(0, end.Length);
             end[index].GetComponent<BoxCollider>().enabled = true;
@@ -123,6 +129,33 @@ namespace Com.MyCompany.MyGame
         {
             Debug.Log(buttonName + " : " + GetComponent<UIManager>().buttonToScene[buttonName]);
             UnityEngine.SceneManagement.SceneManager.LoadScene(GetComponent<UIManager>().buttonToScene[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
+
+        public void UpdateScore(Score scoreCode)
+        {
+            switch (scoreCode)
+            {
+                case Score.ASSASSINATE:
+                    UpdateScore(0.5f);
+                    break;
+                case Score.NORNALKILL:
+                    UpdateScore(0.1f);
+                    break;
+                case Score.GETGOLD:
+                    UpdateScore(1);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void GameClear()
+        {
+            gameTimer.Stop();
+            _gameResult.gameTime = new GameTime(gameTimer);
+            UpdateScore(3 - _gameResult.gameTime.time);
+            Debug.Log("Min: " + _gameResult.gameTime.time);
+            SendMessage("ShowResultWindow", true);
         }
         #endregion
     }

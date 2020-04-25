@@ -743,8 +743,8 @@ MonoBehaviour:
   touchDragThreshold: 40
   touchClickThreshold: 40
   rangeDistance: -1
-  horizontalAxisName: Horizontal
-  verticalAxisName: Vertical
+  horizontalAxisName: 
+  verticalAxisName: 
   horizontalPanAxisName: 
   verticalPanAxisName: 
   scrollAxisName: Mouse ScrollWheel

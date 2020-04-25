@@ -37,9 +37,9 @@ namespace Com.MyCompany.MyGame
             IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, max
         }
 
-        public enum KeyAxis
+        public enum Score
         {
-            HOR = 0, VER, max
+            ASSASSINATE = 0, NORNALKILL, GETGOLD, max
         }
 
         #endregion
