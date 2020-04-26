@@ -68,6 +68,7 @@ namespace Com.MyCompany.MyGame
         // Start is called before the first frame update
         void Start()
         {
+            Time.timeScale = 1;
             //treasure = GameObject.FindGameObjectWithTag("Treasure");
 
             //gameEvent.showUI += ShowUIHandler;
@@ -154,7 +155,6 @@ namespace Com.MyCompany.MyGame
             gameTimer.Stop();
             _gameResult.gameTime = new GameTime(gameTimer);
             UpdateScore(3 - _gameResult.gameTime.time);
-            Debug.Log("Min: " + _gameResult.gameTime.time);
             SendMessage("ShowResultWindow", true);
         }
         #endregion

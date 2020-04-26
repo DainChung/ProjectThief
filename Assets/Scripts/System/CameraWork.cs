@@ -17,43 +17,23 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region Private Fields
-
-        private Transform player;
-        private Vector3 destiPos;
-        private float dist;
-        private Vector3 v = Vector3.zero;
-
+        #region Protected Fields
+        protected Transform player;
+        protected Vector3 destiPos;
+        protected Vector3 v = Vector3.zero;
         #endregion
 
-        #region MonoBehaviour Callbacks
-
-        void Start()
-        {
-            player = GameObject.FindGameObjectWithTag("Player").transform;
-
-            destiPos = cameraPos;
-        }
-
-        //프레임과 상관없이 일정 시간마다 호출
-        void FixedUpdate()
-        {
-            //마우스를 움직이면 카메라 회전
-            CameraRotation(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
-            //플레이어 캐릭터를 따라다님
-            FollowPlayer();
-        }
-
+        #region Private Fields
+        private float dist;
         #endregion
 
         #region Public Methods
 
         #endregion
 
-        #region Private Methods
+        #region Protected Methods
 
-        private void FollowPlayer()
+        protected virtual void FollowPlayer()
         {
             //카메라 위치 계산
             dist = Vector3.Distance(cameraPos, Vector3.zero);
@@ -71,7 +51,7 @@ namespace Com.MyCompany.MyGame
             transform.position = Vector3.SmoothDamp(transform.position, destiPos, ref v, smooth);
         }
 
-        private void CameraRotation(float x, float y)
+        protected virtual void CameraRotation(float x, float y)
         {
             //x값 보정
             if (x != 0) x = x > 0 ? rotationSpeed : -rotationSpeed;

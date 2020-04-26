@@ -314,6 +314,8 @@ namespace Com.MyCompany.MyGame
             assassinate.InitAttackCollider(-1);
 
             rb = GetComponent<Rigidbody>();
+            GetComponent<CapsuleCollider>().enabled = true;
+            rb.useGravity = true;
         }
 
         void FixedUpdate()
@@ -492,6 +494,13 @@ namespace Com.MyCompany.MyGame
                 }
 
                 if (transform.CompareTag("Player")) SendMessage("UpdateHPBar", _health / _maxHealth);                    
+            }
+
+            if (_health == 0)
+            {
+                Transform icon = transform.Find("Icon");
+                icon.GetComponent<SpriteRenderer>().enabled = false;
+                icon.GetChild(0).GetComponent<SpriteRenderer>().enabled = true;
             }
 
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
