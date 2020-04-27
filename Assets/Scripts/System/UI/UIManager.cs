@@ -28,6 +28,7 @@ namespace Com.MyCompany.MyGame
             buttonNameToString.Add("Button_Retry", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
             buttonNameToString.Add("Button_NextLevel", GetComponent<StageManager>().FindNextLevel());
             buttonNameToString.Add("Button_Menu", "Window_Menu");
+            buttonNameToString.Add("Button_Inventory", "Window_Inventory");
         }
 
         // Start is called before the first frame update
@@ -55,6 +56,9 @@ namespace Com.MyCompany.MyGame
             FillAmountUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
             OnOffUI(true, "Button_Menu");
+            OnOffUI(true, "Button_Inventory");
+            OnOffUI(true, "Window_EquippedWeapon");
+            ControlEquippedWeapon(WeaponCode.HAND);
 
             for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
             {
@@ -101,6 +105,7 @@ namespace Com.MyCompany.MyGame
         /// <param name="isClear"> true = 클리어, false = Player 사망</param>
         private void _ShowResultWindow(bool isClear)
         {
+            OnOffButton(false, "Button_Inventory");
             OnOffButton(false, "Button_Menu");
             OnOffUI(false, "AssassinateIndicator");
             OnOffUI(false, "NearestItemIndicator");
@@ -129,9 +134,13 @@ namespace Com.MyCompany.MyGame
         {
             string windowName = buttonNameToString[buttonName];
 
-            if (windowName == "Window_Menu") Time.timeScale = (enable ? 0 : 1);
+            if (windowName == "Window_Menu" || windowName == "Window_Inventory")
+            {
+                Time.timeScale = (enable ? 0 : 1);
+                OnOffButton(!enable, "Button_Menu");
+                OnOffButton(!enable, "Button_Inventory");
+            }
 
-            uiCam.Find(buttonName).GetComponent<UIController>().OnOffUIButton(!enable);
             uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
         }
 
@@ -146,7 +155,14 @@ namespace Com.MyCompany.MyGame
         }
         public void SetUILabelText(string windowName, string text, string uiName)
         {
-            uiCam.Find(windowName).GetComponent<UIController>().SetText(text, uiName);
+            try
+            {
+                uiCam.Find(windowName).GetComponent<UIController>().SetText(text, uiName);
+            }
+            catch (System.NullReferenceException)
+            {
+                GameObject.Find("UICamera").transform.Find(windowName).GetComponent<UIController>().SetText(text, uiName);
+            }
         }
 
         public void OnOffGameMenu(bool onoff)
@@ -180,6 +196,24 @@ namespace Com.MyCompany.MyGame
             if (index == 0)
                 StartCoroutine(UpdateHPBar(ratio, 1));
             yield break;
+        }
+
+        public void ControlEquippedWeapon(WeaponCode curWeapon)
+        {
+            Transform windowInventory = null;
+            try
+            {
+                windowInventory = uiCam.Find("Window_EquippedWeapon");
+            }
+            catch (System.NullReferenceException)
+            {
+                windowInventory = GameObject.Find("UICamera").transform.Find("Window_EquippedWeapon");
+            }
+            finally
+            {
+                windowInventory.GetComponent<UIController>().OnOffChildren(false);
+                windowInventory.Find(curWeapon.ToString()).GetComponent<UIController>().OnOffUI(true);
+            }
         }
 
         /// <summary>

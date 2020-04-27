@@ -354,6 +354,9 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
+            if (other.CompareTag("Floor"))
+                unitAnimHelper.isOnFloor = true;
+
             if (other.CompareTag("Wall"))
             {
                 unitAnimHelper.isWallClose = true;
@@ -378,7 +381,6 @@ namespace Com.MyCompany.MyGame
         {
             if (other.CompareTag("Floor"))
                 unitAnimHelper.isOnFloor = true;
-
             if (other.CompareTag("Wall"))
             {
                 unitAnimHelper.isWallClose = true;
@@ -498,6 +500,10 @@ namespace Com.MyCompany.MyGame
 
             if (_health == 0)
             {
+                unitAnimController.TurnOffAllLayers();
+                _curUnitState = UnitState.IDLE;
+                alertValue = 0;
+
                 Transform icon = transform.Find("Icon");
                 icon.GetComponent<SpriteRenderer>().enabled = false;
                 icon.GetChild(0).GetComponent<SpriteRenderer>().enabled = true;

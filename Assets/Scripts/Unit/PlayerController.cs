@@ -14,6 +14,7 @@ namespace Com.MyCompany.MyGame
 
         private class Inventory
         {
+            private UIManager uiManager;
             private bool _takeGold = false;
             private int[] _items = new int[(int)ItemCode.max - 1];
             private int[] maxAmount = new int[(int)ItemCode.max - 1];
@@ -21,8 +22,9 @@ namespace Com.MyCompany.MyGame
             public bool takeGold { get { return _takeGold; } }
             public int[] items { get { return _items; } }
 
-            public Inventory()
+            public Inventory(UIManager UIManager)
             {
+                uiManager = UIManager;
                 for (int i = 0; i < _items.Length; i++)
                 {
                     _items[i] = 0;
@@ -52,7 +54,7 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-
+                ShowInvnetory();
             }
             public void Add(ItemCode item)
             { 
@@ -67,19 +69,17 @@ namespace Com.MyCompany.MyGame
                         if (_items[index] + 1 > maxAmount[index])
                             _items[index] = maxAmount[index];
                         else
-                        {
                             _items[index]++;
-                            ShowInvnetory();
-                        }
                         break;
                     case ItemCode.GOLD:
                         _takeGold = true;
-                        ShowInvnetory();
                         GameObject.FindWithTag("Manager").GetComponent<StageManager>().ShowEndArea();
                         break;
                     default:
                         break;
                 }
+
+                ShowInvnetory();
             }
             public void Add(int index)
             {
@@ -89,6 +89,8 @@ namespace Com.MyCompany.MyGame
                     _items[index] = maxAmount[index];
                 else
                     _items[index]++;
+
+                ShowInvnetory();
             }
 
             public void Remove(ItemCode item, int amount)
@@ -112,6 +114,8 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
+
+                ShowInvnetory();
             }
             public void Remove(ItemCode item)
             {
@@ -134,6 +138,8 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
+
+                ShowInvnetory();
             }
             public void Remove(int index)
             {
@@ -171,7 +177,11 @@ namespace Com.MyCompany.MyGame
             }
             public void ShowInvnetory()
             {
-                UnityEngine.Debug.Log("[ShowInventory] GOLD: " + _takeGold + ", CAN: " + _items[0] + ", CHEESE: " + _items[1] + ", SMOKE: " + _items[2]);
+                uiManager.SetUILabelText("Window_Inventory", (takeGold ? "1" : "0"), "Treasure Value");
+                uiManager.SetUILabelText("Window_Inventory", items[0].ToString(), "Can Value");
+                uiManager.SetUILabelText("Window_Inventory", items[1].ToString(), "Cheese Value");
+                uiManager.SetUILabelText("Window_Inventory", items[2].ToString(), "Smoke Value");
+                //UnityEngine.Debug.Log("[ShowInventory] GOLD: " + _takeGold + ", CAN: " + _items[0] + ", CHEESE: " + _items[1] + ", SMOKE: " + _items[2]);
             }
         }
 
@@ -277,7 +287,7 @@ namespace Com.MyCompany.MyGame
         private Unit unit;
         private CameraWork cam;
         private MinimapCameraWork miniMapcam;
-        private Inventory pInventory = new Inventory();
+        private Inventory pInventory;
 
         private StageManager stageManager;
         private UIManager uiManager;
@@ -301,11 +311,6 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             aggroValue = AggroCollections.aggroRun;
-
-            //인벤토리 초기화
-            pInventory.Add(ItemCode.CAN, 50);
-            pInventory.Add(ItemCode.CHEESE, 30);
-            pInventory.Add(ItemCode.SMOKE, 20);
         }
 
         void Start()
@@ -324,6 +329,12 @@ namespace Com.MyCompany.MyGame
             lookDir = mainCameraTransform.forward + transform.position;
 
             playerSpeed = unit.speed;
+
+            //인벤토리 초기화
+            pInventory = new Inventory(uiManager);
+            pInventory.Add(ItemCode.CAN, 50);
+            pInventory.Add(ItemCode.CHEESE, 30);
+            pInventory.Add(ItemCode.SMOKE, 20);
         }
 
         void FixedUpdate()
@@ -339,17 +350,17 @@ namespace Com.MyCompany.MyGame
                     unit.throwLine.HideLines();
                     playerAnimController.unitAnimController.TurnOffAllLayers();
                     playerSpeed = unit.speed;
-                    UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
+                    uiManager.ControlEquippedWeapon(curWeapon);
                 }
                 else if (Input.GetButtonDown("Weapon2"))
                 {
                     curWeapon = WeaponCode.CAN;
-                    UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
+                    uiManager.ControlEquippedWeapon(curWeapon);
                 }
                 else if (Input.GetButtonDown("Weapon3"))
                 {
                     curWeapon = WeaponCode.CHEESE;
-                    UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
+                    uiManager.ControlEquippedWeapon(curWeapon);
                 }
                 else if (Input.GetButtonDown("Weapon4"))
                 {
@@ -357,7 +368,7 @@ namespace Com.MyCompany.MyGame
                     unit.throwLine.HideLines();
                     playerSpeed = unit.speed;
                     playerAnimController.unitAnimController.TurnOffAllLayers();
-                    UnityEngine.Debug.Log("CurWeapon: " + curWeapon);
+                    uiManager.ControlEquippedWeapon(curWeapon);
                 }
 
                 #endregion

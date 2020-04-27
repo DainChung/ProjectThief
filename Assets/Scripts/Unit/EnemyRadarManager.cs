@@ -23,6 +23,12 @@ namespace Com.MyCompany.MyGame
             //암살당할때는 작동 안 함
             if (!enemy.assassinateTargetted)
             {
+                #region 연막탄인 경우
+                if (other.gameObject.layer == PhysicsLayers.Weapon)
+                    unit.curUnitState = UnitState.INSMOKE;
+                #endregion
+
+                #region Player인 경우
                 if (other.CompareTag("Player"))
                 {
                     switch (unit.curUnitState)
@@ -58,6 +64,7 @@ namespace Com.MyCompany.MyGame
                             break;
                     }
                 }
+                #endregion
             }
         }
 
@@ -67,6 +74,14 @@ namespace Com.MyCompany.MyGame
             {
                 enemy.doesReachToTarget = false;
                 enemy.CanIAttack = false;
+            }
+
+            if (other.gameObject.layer == PhysicsLayers.Weapon)
+            {
+                unit.curUnitState = UnitState.ALERT;
+                unit.curLookDir = LookDirState.SMOKE;
+                unit.transform.GetComponent<EnemyController>().lookDir = other.transform.position;
+                unit.transform.GetComponent<EnemyController>().Stop();
             }
         }    
     }

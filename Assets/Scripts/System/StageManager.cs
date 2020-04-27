@@ -81,6 +81,7 @@ namespace Com.MyCompany.MyGame
             {
                 endArea.GetComponent<MeshRenderer>().enabled = false;
                 endArea.GetComponent<BoxCollider>().enabled = false;
+                endArea.GetChild(0).GetComponent<SpriteRenderer>().enabled = false;
             }
 
             _gameResult.score = 0.0f;
@@ -115,6 +116,7 @@ namespace Com.MyCompany.MyGame
             int index = Random.Range(0, end.Length);
             end[index].GetComponent<BoxCollider>().enabled = true;
             end[index].GetComponent<MeshRenderer>().enabled = true;
+            end[index].GetChild(0).GetComponent<SpriteRenderer>().enabled = true;
         }
         public string FindNextLevel()
         {

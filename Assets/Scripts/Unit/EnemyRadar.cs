@@ -31,15 +31,8 @@ namespace Com.MyCompany.MyGame
             if (unit.health <= 0)
                 Destroy(gameObject);
 
-            #region Player인 경우
             if (other.transform.gameObject.layer == PhysicsLayers.Player && unit.curUnitState != UnitState.CHEESE)
                 PlayerDetection(other.transform);
-            #endregion
-
-            #region 연막탄인 경우
-            if (other.gameObject.layer == PhysicsLayers.Weapon)
-                unit.curUnitState = UnitState.INSMOKE;
-            #endregion
         }
         void OnTriggerExit(Collider other)
         {
@@ -55,6 +48,7 @@ namespace Com.MyCompany.MyGame
             if (other.gameObject.layer == PhysicsLayers.Weapon)
             {
                 unit.curUnitState = UnitState.ALERT;
+                unit.transform.GetComponent<EnemyController>().lookDir = other.transform.position;
                 unit.transform.GetComponent<EnemyController>().Stop();
             }
         }

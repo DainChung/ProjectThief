@@ -34,7 +34,7 @@ namespace Com.MyCompany.MyGame
         //캐릭터가 바라보는 방향
         public enum LookDirState
         {
-            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, max
+            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, SMOKE,max
         }
 
         public enum Score

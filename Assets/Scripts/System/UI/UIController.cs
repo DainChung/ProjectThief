@@ -24,6 +24,19 @@ namespace Com.MyCompany.MyGame.UI
             }
         }
 
+        public void OnOffChildren(bool enable)
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                try
+                {
+                    transform.GetChild(i).GetComponent<UIController>().OnOffAll(enable);
+                    transform.GetChild(i).GetComponent<Indicator>().enabled = enable;
+                }
+                catch (System.Exception) { }
+            }
+        }
+
         public void OnOffUIButtonAll(bool enable)
         {
             try
@@ -34,16 +47,7 @@ namespace Com.MyCompany.MyGame.UI
             finally
             {
                 for (int i = 0; i < transform.childCount; i++)
-                {
                     transform.GetChild(i).GetComponent<UIController>().OnOffUIButtonAll(enable);
-                    try
-                    {
-                        Debug.Log(transform.GetChild(i).name + ".isEnabled == " + transform.GetChild(i).GetComponent<UIButton>().isEnabled);
-                    }
-                    catch (System.Exception)
-                    { //Debug.Log(transform.GetChild(i).name + " not have UIButton"); }
-                    }
-                }
             }
         }
         public void OnOffUIButton(bool enable, string buttonName)
@@ -115,7 +119,13 @@ namespace Com.MyCompany.MyGame.UI
             catch (System.NullReferenceException)
             {
                 for (int i = 0; i < transform.childCount; i++)
-                    transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName);
+                {
+                    try
+                    {
+                        transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName);
+                    }
+                    catch (System.NullReferenceException) { }
+                }
             }
         }
         public string GetText(string uiName)

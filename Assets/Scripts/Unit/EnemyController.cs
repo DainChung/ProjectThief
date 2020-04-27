@@ -248,6 +248,7 @@ namespace Com.MyCompany.MyGame
         public bool canAssassinate { get { return (assassinateTargetted ? false : _canAssassinate); } set { _canAssassinate = value; } }
 
         public EnemyCheckStructure checkStructure;
+        public Vector3 lookDir = new Vector3();
 
         #endregion
 
@@ -317,6 +318,10 @@ namespace Com.MyCompany.MyGame
                     transform.LookAt(playerPosition);
                     break;
                 case LookDirState.AGENT:
+                    break;
+                case LookDirState.SMOKE:
+                    lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
+                    transform.LookAt(lookDir);
                     break;
                 default:
                     if (curTarget.pos != ValueCollections.initPos)
