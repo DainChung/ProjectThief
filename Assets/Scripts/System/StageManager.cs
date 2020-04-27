@@ -128,8 +128,8 @@ namespace Com.MyCompany.MyGame
 
         public void LoadScene(string buttonName)
         {
-            Debug.Log(buttonName + " : " + GetComponent<UIManager>().buttonToScene[buttonName]);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(GetComponent<UIManager>().buttonToScene[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
+            Debug.Log(buttonName + " : " + GetComponent<UIManager>().buttonNameToString[buttonName]);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(GetComponent<UIManager>().buttonNameToString[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
 
         public void UpdateScore(Score scoreCode)

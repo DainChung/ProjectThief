@@ -607,17 +607,17 @@ namespace Com.MyCompany.MyGame
             {
                 case UnitState.IDLE:
                     agent.speed = 2.5f;
-                    enemySpeed = unit.walkSpeed;
+                    enemySpeed = unit.walkSpeed * 2;
                     break;
                 case UnitState.ALERT:
                     agent.speed = 2.0f;
-                    enemySpeed = unit.walkSpeed;
+                    enemySpeed = unit.walkSpeed * 2;
                     if (playerPosition != ValueCollections.initPos)
                         curTarget.tr = player;
                     break;
                 case UnitState.COMBAT:
                     agent.speed = 2.7f;
-                    enemySpeed = unit.speed;
+                    enemySpeed = unit.speed * 2;
                     break;
                 default:
                     break;

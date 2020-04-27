@@ -17,17 +17,17 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Public Values
-        [HideInInspector]   public Dictionary<string, string> buttonToScene = new Dictionary<string, string>();
+        [HideInInspector]   public Dictionary<string, string> buttonNameToString = new Dictionary<string, string>();
         #endregion
-
 
         #region MonoBehaviour
 
         void Awake()
         {
-            buttonToScene.Add("Button_Home", "Home");
-            buttonToScene.Add("Button_Retry", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-            buttonToScene.Add("Button_NextLevel", GetComponent<StageManager>().FindNextLevel());
+            buttonNameToString.Add("Button_Home", "Home");
+            buttonNameToString.Add("Button_Retry", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            buttonNameToString.Add("Button_NextLevel", GetComponent<StageManager>().FindNextLevel());
+            buttonNameToString.Add("Button_Menu", "Window_Menu");
         }
 
         // Start is called before the first frame update
@@ -54,6 +54,7 @@ namespace Com.MyCompany.MyGame
             FillAmountUIName("NearestItemIndicator", 0);
             FillAmountUIName("AssassinateIndicator", 0);
             OnOffUI(true, "Bar_HP");
+            OnOffUI(true, "Button_Menu");
 
             for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
             {
@@ -100,6 +101,7 @@ namespace Com.MyCompany.MyGame
         /// <param name="isClear"> true = 클리어, false = Player 사망</param>
         private void _ShowResultWindow(bool isClear)
         {
+            OnOffButton(false, "Button_Menu");
             OnOffUI(false, "AssassinateIndicator");
             OnOffUI(false, "NearestItemIndicator");
             if (isClear)
@@ -117,6 +119,21 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// buttonName 버튼으로 특정 Window를 열 때 사용
+        /// </summary>
+        /// <param name="enable">true = Window 활성화, false = Window 비활성화</param>
+        /// <param name="buttonName">버튼 이름</param>
+        public void OnOffUIWindowByButton(bool enable, string buttonName)
+        {
+            string windowName = buttonNameToString[buttonName];
+
+            if (windowName == "Window_Menu") Time.timeScale = (enable ? 0 : 1);
+
+            uiCam.Find(buttonName).GetComponent<UIController>().OnOffUIButton(!enable);
+            uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
+        }
 
         public void OnOffUIWindow(bool enable, string windowName)
         {

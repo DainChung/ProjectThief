@@ -204,6 +204,7 @@
      <Compile Include="Assets\Scripts\System\MinimapCameraWork.cs" />
      <Compile Include="Assets\Scripts\System\PlayerCameraWork.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
+     <Compile Include="Assets\Scripts\System\Structure\Floor.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />
      <Compile Include="Assets\Scripts\System\Target.cs" />
      <Compile Include="Assets\Scripts\System\UI\Icon.cs" />

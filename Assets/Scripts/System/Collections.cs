@@ -77,9 +77,9 @@ namespace Com.MyCompany.MyGame
             private static int[] _itemMaxAmount = { 50, 30, 20 };
             public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
 
-            private static int targetChildIndex = 8;
+            private static int targetChildIndex = 9;
             /// <summary>
-            /// TargetChildIndex == 8
+            /// TargetChildIndex == 9
             /// </summary>
             public static int TargetChildIndex { get { return targetChildIndex; } }
 
@@ -225,6 +225,41 @@ namespace Com.MyCompany.MyGame
             public static int Assassinate { get { return _assassinate; } }
         }
 
+        public static class UILayers
+        {
+            private static int _UI = 5;
+            private static int _MiniMap = 21;
+            private static int _MiniMap1F = 22;
+            private static int _MiniMap2F = 23;
+            private static int _MiniMap3F = 24;
+            private static int _MiniMap4F = 25;
+
+            /// <summary>
+            /// UI = 5
+            /// </summary>
+            public static int UI { get { return _UI; } }
+            /// <summary>
+            /// MiniMap1F = 21
+            /// </summary>
+            public static int MiniMap { get { return _MiniMap; } }
+            /// <summary>
+            /// MiniMap1F = 22
+            /// </summary>
+            public static int MiniMap1F { get { return _MiniMap1F; } }
+            /// <summary>
+            /// MiniMap2F = 23
+            /// </summary>
+            public static int MiniMap2F { get { return _MiniMap2F; } }
+            /// <summary>
+            /// MiniMap3F = 24
+            /// </summary>
+            public static int MiniMap3F { get { return _MiniMap3F; } }
+            /// <summary>
+            /// MiniMap4F = 25
+            /// </summary>
+            public static int MiniMap4F { get { return _MiniMap4F; } }
+        }
+
         //물리 레이어
         public static class PhysicsLayers
         {
@@ -232,7 +267,6 @@ namespace Com.MyCompany.MyGame
             private static int _TransparentFX = 1;
             private static int _IgnoreRaycast = 2;
             private static int _Water = 4;
-            private static int _UI = 5;
             private static int _Lighting = 8;
             private static int _Structure = 9;
             private static int _Enemy = 10;
@@ -263,10 +297,6 @@ namespace Com.MyCompany.MyGame
             /// Water = 4
             /// </summary>
             public static int Water { get { return _Water; } }
-            /// <summary>
-            /// UI = 5
-            /// </summary>
-            public static int UI { get { return _UI; } }
             /// <summary>
             /// Lighting = 8
             /// </summary>

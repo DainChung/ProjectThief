@@ -24,20 +24,29 @@ namespace Com.MyCompany.MyGame.UI
             transform.localPosition = destiPos;
         }
 
+        /// <summary>
+        /// NGUI Unity2DSprite, NGUI Texture, UI Button을 모두 활성화 / 비활성화 함
+        /// </summary>
+        /// <param name="enable">true = 활성화, false = 비활성화</param>
         public virtual void OnOffUI(bool enable)
         {
             UIRect[] uiRects = transform.GetComponents<UIRect>();
             UIWidgetContainer[] uiWidgetConts = transform.GetComponents<UIWidgetContainer>();
 
             for (int i = 0; i < uiRects.Length; i++) uiRects[i].enabled = enable;
-            for (int j = 0; j < uiWidgetConts.Length; j++) uiWidgetConts[j].enabled = enable;
+
+            for (int j = 0; j < uiWidgetConts.Length; j++)
+            {
+                uiWidgetConts[j].enabled = enable;
+                OnOffUIButton(enable);
+            }
         }
         public virtual void OnOffUIButton(bool enable)
         {
             transform.GetComponent<UIButton>().isEnabled = enable;
         }
         /// <summary>
-        /// transform이 UITexture 또는 UI2DSprite를 갖고 있어야 작동,
+        /// transform이 NGUI Texture 또는 NGUI Unity2DSprite를 갖고 있어야 작동,
         /// fillAmount += amount
         /// </summary>
         /// <param name="amount">fillAmount에 더할 값</param>

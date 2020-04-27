@@ -276,6 +276,7 @@ namespace Com.MyCompany.MyGame
 
         private Unit unit;
         private CameraWork cam;
+        private MinimapCameraWork miniMapcam;
         private Inventory pInventory = new Inventory();
 
         private StageManager stageManager;
@@ -319,7 +320,7 @@ namespace Com.MyCompany.MyGame
             animator = unit.animator;
 
             mainCameraTransform = Camera.main.transform;
-            cam = mainCameraTransform.GetComponent<CameraWork>();
+            miniMapcam = GameObject.Find("MinimapCamera").GetComponent<MinimapCameraWork>();
             lookDir = mainCameraTransform.forward + transform.position;
 
             playerSpeed = unit.speed;
@@ -428,6 +429,15 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
+            if (other.CompareTag("Floor"))
+            {
+                try
+                {
+                    miniMapcam.ChangeFloor(other.GetComponent<Floor>().floor);
+                }
+                catch (System.Exception){ }
+            }
+
             if (other.CompareTag("EndArea"))
             {
                 Time.timeScale = 0;
