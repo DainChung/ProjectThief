@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Com.MyCompany.MyGame
+namespace Com.MyCompany.MyGame.GameSystem
 {
     public class SendMessageToManager : MonoBehaviour
     {

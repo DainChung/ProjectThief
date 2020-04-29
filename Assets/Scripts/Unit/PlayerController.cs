@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
-using Com.MyCompany.MyGame.Exceptions;
+using Com.MyCompany.MyGame.GameSystem;
 
 namespace Com.MyCompany.MyGame
 { 
@@ -562,7 +562,7 @@ namespace Com.MyCompany.MyGame
             while (unit.assassinate.enableCollider)
             {
                 rb.AddForce(transform.forward * unit.walkSpeed);
-                rb.velocity *= 0.9f;
+                //rb.velocity *= 0.9f;
                 yield return null;
             }
             animator.SetBool("ReadyAssassinateAnim", true);

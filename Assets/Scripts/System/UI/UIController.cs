@@ -7,21 +7,12 @@ namespace Com.MyCompany.MyGame.UI
         public void OnOffAll(bool enable)
         {
             base.OnOffUI(enable);
-
+            OnOffChildren(enable);
             try
             {
                 transform.GetComponent<Indicator>().enabled = enable;
             }
             catch(System.NullReferenceException) { }
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                try
-                {
-                    transform.GetChild(i).GetComponent<UIController>().OnOffAll(enable);
-                    transform.GetChild(i).GetComponent<Indicator>().enabled = enable;
-                }
-                catch (System.Exception) { }
-            }
         }
 
         public void OnOffChildren(bool enable)

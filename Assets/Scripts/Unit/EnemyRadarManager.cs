@@ -24,8 +24,23 @@ namespace Com.MyCompany.MyGame
             if (!enemy.assassinateTargetted)
             {
                 #region 연막탄인 경우
-                if (other.gameObject.layer == PhysicsLayers.Weapon)
-                    unit.curUnitState = UnitState.INSMOKE;
+                if (other.gameObject.layer == PhysicsLayers.TargetLayer)
+                {
+                    switch (other.GetComponent<Target>().code)
+                    {
+                        case WeaponCode.SMOKE:
+                            unit.curLookDir = LookDirState.DIRECT;
+                            enemy.lookDir = 2 * enemy.transform.position - other.transform.position;
+                            enemy.transform.GetChild(0).Find("EnemyRadarEye").GetComponent<MeshCollider>().enabled = true;
+                            break;
+                        case WeaponCode.CHEESE:
+
+                            break;
+                        default:
+                            break;
+
+                    }
+                }
                 #endregion
 
                 #region Player인 경우
@@ -74,14 +89,6 @@ namespace Com.MyCompany.MyGame
             {
                 enemy.doesReachToTarget = false;
                 enemy.CanIAttack = false;
-            }
-
-            if (other.gameObject.layer == PhysicsLayers.Weapon)
-            {
-                unit.curUnitState = UnitState.ALERT;
-                unit.curLookDir = LookDirState.SMOKE;
-                unit.transform.GetComponent<EnemyController>().lookDir = other.transform.position;
-                unit.transform.GetComponent<EnemyController>().Stop();
             }
         }    
     }

@@ -43,7 +43,8 @@ namespace Com.MyCompany.MyGame.UI
         }
         public virtual void OnOffUIButton(bool enable)
         {
-            transform.GetComponent<UIButton>().isEnabled = enable;
+            try{ transform.GetComponent<UIButton>().isEnabled = enable;}
+            catch(System.Exception){ }
         }
         /// <summary>
         /// transform이 NGUI Texture 또는 NGUI Unity2DSprite를 갖고 있어야 작동,

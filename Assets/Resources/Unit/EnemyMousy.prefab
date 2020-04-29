@@ -1665,7 +1665,7 @@ GameObject:
   - component: {fileID: 5781894586840952347}
   - component: {fileID: 5781894586840952346}
   - component: {fileID: 5781894586840952341}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2093,8 +2093,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8b2e9d7e1f0d55439bda0b623f1a6b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rightArm: {fileID: 437986700466764274}
   throwPos: {fileID: 5781894586358001035}
   assassinateTargetted: 0
+  lookDir: {x: 0, y: 0, z: 0}
   checkStructure: {fileID: 2010139474}
 --- !u!114 &6150556912168944686
 MonoBehaviour:

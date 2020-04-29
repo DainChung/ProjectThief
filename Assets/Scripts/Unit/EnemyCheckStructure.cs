@@ -21,7 +21,7 @@ namespace Com.MyCompany.MyGame
                 ray.origin = transform.position;
                 ray.direction = destiPos - transform.position;
 
-                RaycastHit[] hits = Physics.SphereCastAll(ray, 0.5f, Vector3.Distance(transform.position, destiPos), 1 << PhysicsLayers.Structure);
+                RaycastHit[] hits = Physics.SphereCastAll(ray, 0.5f, Vector3.Distance(transform.position, destiPos), (1 << PhysicsLayers.Structure | 1 << PhysicsLayers.Weapon));
                 Debug.DrawRay(ray.origin, ray.direction * Vector3.Distance(transform.position, destiPos), Color.red);
 
                 if (hits.Length > 0) _isThereStructure = true;

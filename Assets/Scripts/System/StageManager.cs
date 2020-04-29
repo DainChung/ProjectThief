@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Audio;
 
 using Com.MyCompany.MyGame.Collections;
 
 
-namespace Com.MyCompany.MyGame
+namespace Com.MyCompany.MyGame.GameSystem
 {
     #region Sub Class & Struct
     public class GameTime
@@ -57,6 +56,7 @@ namespace Com.MyCompany.MyGame
 
         #region Public Fields
 
+        public AudioMixer audioSettings;
         public Transform start;
         public Transform[] end;
 
@@ -102,7 +102,6 @@ namespace Com.MyCompany.MyGame
         #region Private Methods
         private void UpdateScore(float amount)
         {
-            Debug.Log("Score: " + _gameResult.score + " + " + amount + " = " + (_gameResult.score+amount));
             _gameResult.score += amount;
             if (_gameResult.score > 3) _gameResult.score = 3;
         }
@@ -158,6 +157,11 @@ namespace Com.MyCompany.MyGame
             _gameResult.gameTime = new GameTime(gameTimer);
             UpdateScore(3 - _gameResult.gameTime.time);
             SendMessage("ShowResultWindow", true);
+        }
+
+        public void SetSound(float value)
+        {
+            audioSettings.SetFloat("AllVolume", -80 + value * 100);
         }
         #endregion
     }

@@ -30,11 +30,39 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            if (other.gameObject.layer == PhysicsLayers.Enemy)
             {
-                Vector3 destiPos = other.transform.position + (other.transform.position - transform.position) * GetComponent<SphereCollider>().radius / 2;
-                destiPos.Set(destiPos.x, other.transform.position.y, destiPos.z);
-                other.transform.GetComponent<EnemyController>().Detect(code, transform, destiPos);
+                RaycastHit[] hits = Physics.SphereCastAll(transform.position, transform.GetComponent<SphereCollider>().radius, transform.forward, 0.01f, 1 << PhysicsLayers.Enemy);
+                Vector3 destiPos;
+
+                foreach (RaycastHit enemy in hits)
+                {
+                    destiPos = enemy.transform.position - Vector3.Normalize(transform.position - enemy.transform.position) * GetComponent<SphereCollider>().radius;
+                    destiPos.Set(destiPos.x, enemy.transform.position.y, destiPos.z);
+                    enemy.transform.GetComponent<EnemyController>().Detect(code, transform, destiPos);
+                    try
+                    {
+                        enemy.transform.GetChild(0).Find("EnemyRadarEye").GetComponent<MeshCollider>().enabled = false;
+                    }
+                    catch (System.Exception) { }
+                }
+            }
+
+            if(other.gameObject.layer == PhysicsLayers.Structure) PlayAudio();
+        }
+
+        void OnTriggerStay(Collider other)
+        {
+            if (other.gameObject.layer == PhysicsLayers.Enemy)
+            {
+                RaycastHit[] hits = Physics.SphereCastAll(transform.position, transform.GetComponent<SphereCollider>().radius, transform.forward, 0.01f, 1 << PhysicsLayers.Enemy);
+
+                foreach (RaycastHit enemy in hits)
+                {
+                    EnemyController enemyController = enemy.transform.GetComponent<EnemyController>();
+                    if (enemyController.curTargetCode != WeaponCode.SMOKE)
+                        enemyController.InitCurTarget();
+                }
             }
         }
     }

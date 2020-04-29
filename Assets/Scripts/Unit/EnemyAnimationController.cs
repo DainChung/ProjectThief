@@ -45,6 +45,12 @@ namespace Com.MyCompany.MyGame
 
         void ControlEnemyAnimation()
         {
+            if (animator.GetFloat("MoveSpeed") != 0 || animator.GetInteger("DeadAnim") != 0)
+            {
+                if (animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsTag("Idle"))
+                    animator.Play("Running", AnimationLayers.Standing);
+            }
+
             switch (unit.curUnitPose)
             {
                 #region MOD_WALK(== UnitState.IDLE)

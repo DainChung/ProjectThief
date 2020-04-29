@@ -68,17 +68,24 @@ namespace Com.MyCompany.MyGame
 
                 if (hit.transform.gameObject.layer == PhysicsLayers.Player)
                 {
-                    if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
-                    //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
-                    exitCoroutine = true;
+                    try
+                    {
+                        if (unit.curUnitState != UnitState.INSMOKE)
+                        {
+                            if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
+                            //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
+                            exitCoroutine = true;
 
-                    float distVal = Mathf.Clamp(Vector3.Distance(otherPos, unit.transform.position), 0.1f, 7);
-                    unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
+                            float distVal = Mathf.Clamp(Vector3.Distance(otherPos, unit.transform.position), 0.1f, 7);
+                            unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
 
-                    if (unit.curUnitState == UnitState.ALERT)
-                        unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
-                    else if (unit.curUnitState == UnitState.COMBAT)
-                        unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR, otherPos);
+                            if (unit.curUnitState == UnitState.ALERT)
+                                unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
+                            else if (unit.curUnitState == UnitState.COMBAT)
+                                unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR, otherPos);
+                        }
+                    }
+                    catch (System.Exception) { }
                 }
             }
         }

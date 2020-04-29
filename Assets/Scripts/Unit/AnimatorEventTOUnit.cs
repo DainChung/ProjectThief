@@ -35,6 +35,11 @@ namespace Com.MyCompany.MyGame
             unit.Dead();
         }
 
+        public void Assassinated()
+        {
+            unit.HitHealth(-1, Vector3.zero);
+        }
+
         public void UnlockControl()
         {
             unit.animator.SetBool("IsHit", false);

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 //Dic이용해서 정리 한 번 해볼것
@@ -29,12 +27,12 @@ namespace Com.MyCompany.MyGame
         //적 캐릭터 상태에 관한 정보
         public enum UnitState
         {
-            IDLE = 0, ALERT, COMBAT, CHEESE, INSMOKE, SLEEP, ASSASSINATE, max
+            IDLE = 0, ALERT, COMBAT, CHEESE, INSMOKE, EAT, ASSASSINATE, max
         }
         //캐릭터가 바라보는 방향
         public enum LookDirState
         {
-            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, SMOKE,max
+            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, DIRECT,max
         }
 
         public enum Score
@@ -141,6 +139,10 @@ namespace Com.MyCompany.MyGame
 
             private static string _AISystemPath = "AISystem/";
             public static string AISystemPath { get { return _AISystemPath; } }
+
+            private static string _AudioPath = "Audios/";
+            public static string AudioPath { get { return _AudioPath; } }
+
         }
 
         public static class AggroCollections

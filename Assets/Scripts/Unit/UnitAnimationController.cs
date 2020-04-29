@@ -296,6 +296,7 @@ namespace Com.MyCompany.MyGame
                     _animator.SetLayerWeight(AnimationLayers.CoverCrouch, layerWeight);
                 }
             }
+            else if (!_animator.GetBool("IsCrouchMode")) TurnOffAllLayers();
         }
 
         //자연스러운 Crouch -> Standing, Player전용
@@ -355,7 +356,7 @@ namespace Com.MyCompany.MyGame
                     }
                     else
                     {
-                        if(_animator.GetBool("IsRunMode"))
+                        if (_animator.GetBool("IsRunMode"))
                             _unit.curUnitPose = UnitPose.MOD_RUN;
                         else
                             _unit.curUnitPose = UnitPose.MOD_WALK;
@@ -368,6 +369,23 @@ namespace Com.MyCompany.MyGame
                     _animator.SetLayerWeight(AnimationLayers.CoverStanding, 1 - layerWeight);
                     _animator.SetLayerWeight(AnimationLayers.CoverCrouch, layerWeight);
                 }
+            }
+            else if (_animator.GetBool("IsCrouchMode"))
+            {
+                if (_animator.GetBool("IsCovering"))
+                {
+                    _unit.curUnitPose = UnitPose.MOD_COVERSTAND;
+                    _animator.SetBool("IsRunMode", false);
+                }
+                else
+                {
+                    if (_animator.GetBool("IsRunMode"))
+                        _unit.curUnitPose = UnitPose.MOD_RUN;
+                    else
+                        _unit.curUnitPose = UnitPose.MOD_WALK;
+                }
+                _animator.SetLayerWeight(AnimationLayers.CoverStanding, 0);
+                _animator.SetLayerWeight(AnimationLayers.CoverCrouch, 1);
             }
         }
 

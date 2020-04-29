@@ -22,3 +22,10 @@ https://sketchfab.com/3d-models/cheese-ecda1dabea2b4c349a8aa76b6d1a083c
 [3] Ring.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
 https://www.cgtrader.com/items/707754/download-page
 *************************	end	*************************//
+
+//
+[0] Smoke Grenade.mp3 from
+https://www.youtube.com/watch?v=CsDIM0pLEt0
+
+[1] All of Others OGG files from
+https://www.kenney.nl/

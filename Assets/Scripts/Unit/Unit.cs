@@ -7,6 +7,7 @@ using System.Diagnostics;
 
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.Exceptions;
+using Com.MyCompany.MyGame.GameSystem;
 
 /*  Line Renderer 제어하는 스크립트를 Unit.cs로 옮길 것
  *  Stopwatch도 Unit.cs로 옮길 것
@@ -446,7 +447,11 @@ namespace Com.MyCompany.MyGame
             GetComponent<Rigidbody>().useGravity = false;
 
             if (transform.CompareTag("Player")) SendMessage("ShowDeadWindow");
-            //else if(transform.CompareTag)
+            else if (transform.gameObject.layer == PhysicsLayers.Enemy)
+            {
+                try { DestroyImmediate(transform.GetComponent<EnemyController>().rightArm.Find("WeaponCHEESE").gameObject); }
+                catch (System.Exception) { }
+            }
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.UI;
 
-namespace Com.MyCompany.MyGame
+namespace Com.MyCompany.MyGame.GameSystem
 {
     public class UIManager : MonoBehaviour
     {
@@ -29,6 +29,7 @@ namespace Com.MyCompany.MyGame
             buttonNameToString.Add("Button_NextLevel", GetComponent<StageManager>().FindNextLevel());
             buttonNameToString.Add("Button_Menu", "Window_Menu");
             buttonNameToString.Add("Button_Inventory", "Window_Inventory");
+            buttonNameToString.Add("Button_Setting", "Window_Setting");
         }
 
         // Start is called before the first frame update
@@ -140,6 +141,8 @@ namespace Com.MyCompany.MyGame
                 OnOffButton(!enable, "Button_Menu");
                 OnOffButton(!enable, "Button_Inventory");
             }
+            else if (windowName == "Window_Setting")
+                OnOffButton(!enable, "Window_Menu", "Button_Setting");
 
             uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
         }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
 
@@ -15,7 +13,7 @@ namespace Com.MyCompany.MyGame
 
         public new void SetCode(WeaponCode code)
         {
-            base._code = code;
+            base.SetCode(code);
             transform.GetComponent<Item>().SetItem(code);
         }
 
@@ -33,16 +31,23 @@ namespace Com.MyCompany.MyGame
             Destroy(gameObject, base.time);
         }
 
+        void FixedUpdate()
+        {
+            if (transform.parent != null) transform.position = transform.parent.position;
+        }
+
         void OnTriggerEnter(Collider other)
         {
-            if (!lockAggro)
+            if (other.gameObject.layer == PhysicsLayers.Structure)
             {
-                if (other.gameObject.layer == PhysicsLayers.Structure)
+                if (!lockAggro)
                 {
                     lockAggro = true;
                     GameObject obj = Instantiate(Resources.Load(FilePaths.weaponPath + "Aggro") as GameObject, transform.position, transform.rotation) as GameObject;
                     obj.GetComponent<Aggro>().SetCode(base._code);
                 }
+
+                PlayAudio();
             }
         }
     }

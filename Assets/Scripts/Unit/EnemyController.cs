@@ -236,6 +236,8 @@ namespace Com.MyCompany.MyGame
 
         #region Public Fields
 
+        public Transform rightArm;
+
         public Transform throwPos;
         public float moveSpeed { get { return isMovingNow ? 1 : 0; } }
         public bool doesReachToTarget { set { _doesReachToTarget = value; } }
@@ -244,11 +246,13 @@ namespace Com.MyCompany.MyGame
 
         [HideInInspector] public TargetManager targetMng = new TargetManager();
         [HideInInspector] public bool assassinateTargetted = false;
+        [HideInInspector] public Vector3 lookDir = new Vector3();
         //assassinateTargetted가 true면 무조건 false 반환
         public bool canAssassinate { get { return (assassinateTargetted ? false : _canAssassinate); } set { _canAssassinate = value; } }
 
         public EnemyCheckStructure checkStructure;
-        public Vector3 lookDir = new Vector3();
+
+        public WeaponCode curTargetCode { get { return curTarget.code; } }
 
         #endregion
 
@@ -278,7 +282,7 @@ namespace Com.MyCompany.MyGame
             agent.speed = 0;
             checkStructure.enabled = true;
 
-            InitCurTarget();
+            _InitCurTarget();
         }
         
         void FixedUpdate()
@@ -292,17 +296,38 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Target"))
+            #region Target 위치에 도달
+            if (other.gameObject.layer == PhysicsLayers.TargetLayer)
             {
+                if (other.GetComponent<Target>().code == WeaponCode.CHEESE)
+                {
+                    RaycastHit[] hits = Physics.SphereCastAll(transform.position, 7f, transform.forward, 0.01f, 1 << PhysicsLayers.Item);
+
+                    foreach (RaycastHit hit in hits)
+                    {
+                        Transform hitTR = hit.transform;
+
+                        if (hitTR.name.Contains("CHEESE"))
+                        {
+                            unit.curUnitState = UnitState.EAT;
+                            unit.curLookDir = LookDirState.DIRECT;
+                            lookDir = hitTR.position;
+                            _InitCurTarget();
+                            curTarget.tr = hitTR;
+                            curTarget.pos = hitTR.position;
+                        }
+                    }
+                }
+
                 _doesReachToTarget = true;
-                if(transform.GetInstanceID() == other.transform.GetComponent<Target>().ID)
-                    Destroy(other.transform.gameObject);
+                if (transform.GetInstanceID() == other.transform.GetComponent<Target>().ID) Destroy(other.transform.gameObject);
             }
+            #endregion
         }
+
         void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Target"))
-                _doesReachToTarget = false;
+            if (other.CompareTag("Target")) _doesReachToTarget = false;
         }
 
         #endregion
@@ -319,7 +344,7 @@ namespace Com.MyCompany.MyGame
                     break;
                 case LookDirState.AGENT:
                     break;
-                case LookDirState.SMOKE:
+                case LookDirState.DIRECT:
                     lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
                     transform.LookAt(lookDir);
                     break;
@@ -337,7 +362,7 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitState)
             {
                 case UnitState.IDLE:
-                    ChaseTargetBYQueue();
+                    //ChaseTargetBYQueue();
                     break;
                 case UnitState.ALERT:
                     ChaseTargetBYQueue();
@@ -351,7 +376,9 @@ namespace Com.MyCompany.MyGame
                 case UnitState.INSMOKE:
                     ChaseTargetBYQueue();
                     break;
-                case UnitState.SLEEP:
+                case UnitState.EAT:
+                    LookDir();
+                    Move(1.2f);
                     break;
                 default:
                     break;
@@ -416,13 +443,13 @@ namespace Com.MyCompany.MyGame
                     if (queue.FindPlayer || queue.FindCheese)
                         SetCurTarget();
                     else
-                        Move();
+                        Move(1.4f);
                     break;
                 case WeaponCode.PLAYERTRACK:
                     if (queue.FindCheese)
                         SetCurTarget();
                     else
-                        Move();
+                        Move(1.4f);
                     break;
                 case WeaponCode.PLAYER:
                     if (queue.FindCheese)
@@ -433,7 +460,7 @@ namespace Com.MyCompany.MyGame
                 case WeaponCode.CHEESE:
                     targetMng.Clear();
                     player = null;
-                    Move();
+                    Move(1.4f);
                     break;
                 default:
                     break;
@@ -464,12 +491,12 @@ namespace Com.MyCompany.MyGame
             }
             rb.velocity *= 0.9f;
         }
-        private void Move()
+        private void Move(float dist)
         {
             try
             {
                 checkStructure.CheckStructure(curTarget.pos);
-                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 1.4f);
+                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, dist);
                 if (!_doesReachToTarget)
                 {
                     isMovingNow = true;
@@ -493,7 +520,7 @@ namespace Com.MyCompany.MyGame
 
                     if (checkStayDelay)
                     {
-                        InitCurTarget();
+                        _InitCurTarget();
                         _doesReachToTarget = false;
                     }
                 }
@@ -518,7 +545,7 @@ namespace Com.MyCompany.MyGame
                 targetMng.Add(targetOBJ);
                 unit.curLookDir = LookDirState.FINDPLAYER;
             }
-            targetOBJ.GetComponent<Target>().SetID(transform.GetInstanceID());
+            targetOBJ.GetComponent<Target>().SetTarget(transform.GetInstanceID(), curTarget.code);
         }
         private void SetCurTarget(WeaponCode code, Vector3 pos)
         {
@@ -532,15 +559,18 @@ namespace Com.MyCompany.MyGame
                 targetOBJ.transform.parent = player;
                 targetMng.Add(targetOBJ);
             }
-            targetOBJ.GetComponent<Target>().SetID(transform.GetInstanceID());
+            targetOBJ.GetComponent<Target>().SetTarget(transform.GetInstanceID(), curTarget.code);
         }
-        private void InitCurTarget()
+        private void _InitCurTarget()
         {
+            if (curTarget.code != WeaponCode.max && curTarget.pos != ValueCollections.initPos)
+            {
+                curTarget.code = WeaponCode.max;
+                curTarget.tr = null;
+                curTarget.pos = ValueCollections.initPos;
+            }
             isMovingNow = false;
             agent.ResetPath();
-            curTarget.code = WeaponCode.max;
-            curTarget.tr = null;
-            curTarget.pos = ValueCollections.initPos;
             stayDelay.Reset();
             stayDelay.Stop();
         }
@@ -555,18 +585,33 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
+        public void InitCurTarget()
+        {
+            player = null;
+            _InitCurTarget();
+        }
+
         public void Stop()
         {
+            if (unit.curUnitState == UnitState.EAT && curTarget.tr != null)
+            {
+                DestroyImmediate(curTarget.tr.gameObject);
+                //줍는 애니메이션 수행
+                unit.animator.SetInteger("DeadAnim", -2);
+                unit.animator.Play("Eat Cheese", AnimationLayers.Standing);
+                unit.lockControl = true;
+            }
+
             agent.ResetPath();
             agent.velocity = Vector3.zero;
             _doesReachToTarget = false;
             isMovingNow = false;
             canIAttack = true;
-            InitCurTarget();
+            _InitCurTarget();
         }
         public void Detect(WeaponCode code, Transform tr, Vector3 pos)
         {
-            if (tr != null)
+            if (tr != null && unit.health > 0)
             {
                 switch (code)
                 {
@@ -612,17 +657,18 @@ namespace Com.MyCompany.MyGame
             {
                 case UnitState.IDLE:
                     agent.speed = 2.5f;
-                    enemySpeed = unit.walkSpeed * 2;
+                    enemySpeed = unit.walkSpeed * 1.5f;
                     break;
+                case UnitState.INSMOKE:
                 case UnitState.ALERT:
                     agent.speed = 2.0f;
-                    enemySpeed = unit.walkSpeed * 2;
+                    enemySpeed = unit.walkSpeed * 1.5f;
                     if (playerPosition != ValueCollections.initPos)
                         curTarget.tr = player;
                     break;
                 case UnitState.COMBAT:
                     agent.speed = 2.7f;
-                    enemySpeed = unit.speed * 2;
+                    enemySpeed = unit.speed * 1.5f;
                     break;
                 default:
                     break;
