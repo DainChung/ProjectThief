@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.GameSystem;
 
 namespace Com.MyCompany.MyGame
 {
     public class AnimatorEventTOUnit : MonoBehaviour
     {
-        public Unit unit;
+        private Unit unit;
+        private AudioManager audioManager;
+
+        void Start()
+        {
+            unit = transform.parent.GetComponent<Unit>();
+            audioManager = transform.parent.GetComponent<AudioManager>();
+        }
 
         public void DisableAssassinate()
         {
@@ -20,13 +28,14 @@ namespace Com.MyCompany.MyGame
         public void DisableAttackDefault()
         {
             unit.EnableDefaultAttack(false);
-            unit.animator.SetBool("IsAttack", false);
-            unit.animator.SetBool("IsHit", false);
             unit.swManager.RestartSW((int)WeaponCode.HAND);
             unit.swManager.attackCountDelay.Restart();
             unit.curUnitPose = UnitPose.MOD_RUN;
 
             unit.transform.GetComponent<Unit>().curLookDir = LookDirState.IDLE;
+
+            unit.animator.SetBool("IsAttack", false);
+            unit.animator.SetBool("IsHit", false);
         }
 
         public void Dead()
@@ -48,6 +57,11 @@ namespace Com.MyCompany.MyGame
         public void LockControl()
         {
             unit.lockControl = true;
+        }
+
+        public void PlayAudio(string name)
+        {
+            audioManager.PlayAudio(name);
         }
     }
 }

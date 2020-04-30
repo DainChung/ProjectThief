@@ -56,7 +56,6 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         #region Public Fields
 
-        public AudioMixer audioSettings;
         public Transform start;
         public Transform[] end;
 
@@ -157,11 +156,6 @@ namespace Com.MyCompany.MyGame.GameSystem
             _gameResult.gameTime = new GameTime(gameTimer);
             UpdateScore(3 - _gameResult.gameTime.time);
             SendMessage("ShowResultWindow", true);
-        }
-
-        public void SetSound(float value)
-        {
-            audioSettings.SetFloat("AllVolume", -80 + value * 100);
         }
         #endregion
     }

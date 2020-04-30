@@ -351,16 +351,19 @@ namespace Com.MyCompany.MyGame
                     playerAnimController.unitAnimController.TurnOffAllLayers();
                     playerSpeed = unit.speed;
                     uiManager.ControlEquippedWeapon(curWeapon);
+                    SendMessage("PlayAudio", "ChangeWeapon");
                 }
                 else if (Input.GetButtonDown("Weapon2"))
                 {
                     curWeapon = WeaponCode.CAN;
                     uiManager.ControlEquippedWeapon(curWeapon);
+                    SendMessage("PlayAudio", "ChangeWeapon");
                 }
                 else if (Input.GetButtonDown("Weapon3"))
                 {
                     curWeapon = WeaponCode.CHEESE;
                     uiManager.ControlEquippedWeapon(curWeapon);
+                    SendMessage("PlayAudio", "ChangeWeapon");
                 }
                 else if (Input.GetButtonDown("Weapon4"))
                 {
@@ -369,6 +372,7 @@ namespace Com.MyCompany.MyGame
                     playerSpeed = unit.speed;
                     playerAnimController.unitAnimController.TurnOffAllLayers();
                     uiManager.ControlEquippedWeapon(curWeapon);
+                    SendMessage("PlayAudio", "ChangeWeapon");
                 }
 
                 #endregion
@@ -546,15 +550,11 @@ namespace Com.MyCompany.MyGame
             catch (System.NullReferenceException) { yield break; }
             transform.LookAt(checkCameraCollider.assassinateTargetPos);
 
+            SendMessage("EnableAudio", false);
             unit.curUnitPose = UnitPose.MOD_ATTACK;
             unit.lockControl = true;
             unit.assassinate.enableCollider = true;
-
-            //bool bfIsRunMode = animator.GetBool("IsRunMode");
-
             unit.EnableAssassinate(true);
-            //animator.SetBool("IsRunMode", false);
-            //animator.SetFloat("MoveSpeed", 1.0f);
 
             SendMessage("OffIndicator", "AssassinateIndicator");
 
@@ -562,12 +562,11 @@ namespace Com.MyCompany.MyGame
             while (unit.assassinate.enableCollider)
             {
                 rb.AddForce(transform.forward * unit.walkSpeed);
-                //rb.velocity *= 0.9f;
                 yield return null;
             }
+            SendMessage("EnableAudio", true);
             animator.SetBool("ReadyAssassinateAnim", true);
-            //animator.SetBool("IsRunMode", bfIsRunMode);
-            //animator.SetFloat("MoveSpeed", 0);
+
             animator.Play("Idle 0-0", AnimationLayers.Standing, 0);
 
             checkCameraCollider.InitCanAssassinate();
@@ -738,6 +737,7 @@ namespace Com.MyCompany.MyGame
                 {
                     pInventory.Add(nearestItem.GetItemCode());
                     nearestItem.Init();
+                    SendMessage("PlayAudio", "GetItem");
                     uiManager.SetIndicator("NearestItemIndicator", null);
                 }
                 else

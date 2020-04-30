@@ -198,12 +198,13 @@
      <Compile Include="Assets\Scripts\Item\Weapon.cs" />
      <Compile Include="Assets\Scripts\Item\WeaponSmoke.cs" />
      <Compile Include="Assets\Scripts\Item\WeaponThrow.cs" />
-     <Compile Include="Assets\Scripts\System\CameraWork.cs" />
-     <Compile Include="Assets\Scripts\System\CheckCameraCollider.cs" />
+     <Compile Include="Assets\Scripts\System\AudioManager.cs" />
+     <Compile Include="Assets\Scripts\System\Camera\CameraWork.cs" />
+     <Compile Include="Assets\Scripts\System\Camera\CheckCameraCollider.cs" />
+     <Compile Include="Assets\Scripts\System\Camera\MinimapCameraWork.cs" />
+     <Compile Include="Assets\Scripts\System\Camera\PlayerCameraWork.cs" />
      <Compile Include="Assets\Scripts\System\Collections.cs" />
      <Compile Include="Assets\Scripts\System\FileManager.cs" />
-     <Compile Include="Assets\Scripts\System\MinimapCameraWork.cs" />
-     <Compile Include="Assets\Scripts\System\PlayerCameraWork.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\System\Structure\Floor.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />

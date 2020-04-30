@@ -33,9 +33,6 @@ namespace Com.MyCompany.MyGame
                             enemy.lookDir = 2 * enemy.transform.position - other.transform.position;
                             enemy.transform.GetChild(0).Find("EnemyRadarEye").GetComponent<MeshCollider>().enabled = true;
                             break;
-                        case WeaponCode.CHEESE:
-
-                            break;
                         default:
                             break;
 
@@ -63,19 +60,21 @@ namespace Com.MyCompany.MyGame
                                 unit.AlertManager();
                             }
 
-                            int index = ValueCollections.TargetChildIndex;
+                            //int index = 0;
 
-                            while (index < other.transform.childCount)
-                            {
-                                try
-                                {
-                                    if (enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
-                                        Destroy(other.transform.GetChild(index).gameObject);
-                                    index++;
-                                }
-                                catch (System.Exception)
-                                { }
-                            }
+                            //while (index < other.transform.childCount)
+                            //{
+                            //    if (other.transform.GetChild(index).name == "Target(Clone)")
+                            //    {
+                            //        try
+                            //        {
+                            //            if (enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
+                            //                Destroy(other.transform.GetChild(index).gameObject);
+                            //            index++;
+                            //        }
+                            //        catch (System.Exception) { }
+                            //    }
+                            //}
                             break;
                     }
                 }

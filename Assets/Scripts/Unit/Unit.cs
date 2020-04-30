@@ -449,6 +449,7 @@ namespace Com.MyCompany.MyGame
             if (transform.CompareTag("Player")) SendMessage("ShowDeadWindow");
             else if (transform.gameObject.layer == PhysicsLayers.Enemy)
             {
+                SendMessage("OffIndicator", "AssassinateIndicator");
                 try { DestroyImmediate(transform.GetComponent<EnemyController>().rightArm.Find("WeaponCHEESE").gameObject); }
                 catch (System.Exception) { }
             }
@@ -785,7 +786,6 @@ namespace Com.MyCompany.MyGame
             assassinate.enableCollider = enable;
         }
 
-        //아래 함수들을 Unit에서 호출하도록 변경할 것
         //캐릭터가 추락 중일 때
         public void Fall()
         {

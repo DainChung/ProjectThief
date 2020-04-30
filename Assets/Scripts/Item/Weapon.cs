@@ -28,7 +28,11 @@ namespace Com.MyCompany.MyGame
 
         protected void PlayAudio()
         {
-            try { audio.Play(); }
+            try
+            {
+                if (audio.clip.name == "Smoke Grenade") audio.time = 0.5f;
+                audio.Play();
+            }
             catch (System.Exception) { }
         }
     }
