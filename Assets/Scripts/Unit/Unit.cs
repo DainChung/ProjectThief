@@ -462,6 +462,7 @@ namespace Com.MyCompany.MyGame
             //일반 공격(damage > 0)
             if (IsOnFloor() && _health > 0)
             {
+                _curUnitState = UnitState.COMBAT;
                 if (damage > 0)
                 {
                     if (damage >= _health)
@@ -838,7 +839,10 @@ namespace Com.MyCompany.MyGame
             else if (alertValue >= AggroCollections.combatMin && alertValue < AggroCollections.combatMin + 1)
                 curUnitState = UnitState.COMBAT;
             else
+            {
                 alertValue = AggroCollections.combatMin + 1;
+                curUnitState = UnitState.COMBAT;
+            }
         }
 
         #endregion

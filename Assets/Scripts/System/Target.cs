@@ -14,7 +14,7 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             //생성후 600초 경과시 자동 삭제
-            Destroy(gameObject, 600.0f);
+            Destroy(gameObject, 60.0f);
         }
 
         public void SetTarget(int id, WeaponCode code)

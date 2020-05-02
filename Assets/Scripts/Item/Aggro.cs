@@ -9,8 +9,9 @@ namespace Com.MyCompany.MyGame
     {
         private WeaponCode code;
 
-        public void SetCode(WeaponCode weaponCode)
+        public void SetCode(WeaponCode weaponCode, float radius)
         {
+            GetComponent<SphereCollider>().radius = radius;
             code = weaponCode;
         }
 

@@ -75,7 +75,7 @@ namespace Com.MyCompany.MyGame
                     break;
                 #endregion
 
-                #region MOD_RUN(== UnitState.CHEESE)
+                #region MOD_RUN(== UnitState.CHEESE || UnitState.COMBAT)
                 case UnitPose.MOD_RUN:
                     if (unit.curUnitState == UnitState.IDLE)
                     {

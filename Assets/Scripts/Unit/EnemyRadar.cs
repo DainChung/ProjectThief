@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
@@ -13,8 +14,10 @@ namespace Com.MyCompany.MyGame
         private Unit unit;
 
         public float radarValue;
+        [HideInInspector] public Stopwatch delays = new Stopwatch();
 
         public Transform eyes;
+        public EnemyCheckStructure checkStructure;
 
         void Start()
         {
@@ -24,6 +27,7 @@ namespace Com.MyCompany.MyGame
         void FixedUpdate()
         {
             transform.rotation = Quaternion.Euler(-90f, eyes.rotation.eulerAngles.y, 0);
+            if (delays.Elapsed.Seconds > 10) StartCoroutine(DecreaseAlertValue());
         }
 
         void OnTriggerStay(Collider other)
@@ -43,6 +47,7 @@ namespace Com.MyCompany.MyGame
             {
                 exitCoroutine = false;
                 StartCoroutine(DecreaseAlertValue());
+                delays.Start();
             }
 
             if (other.gameObject.layer == PhysicsLayers.Weapon)
@@ -50,6 +55,7 @@ namespace Com.MyCompany.MyGame
                 unit.curUnitState = UnitState.ALERT;
                 unit.transform.GetComponent<EnemyController>().lookDir = other.transform.position;
                 unit.transform.GetComponent<EnemyController>().Stop();
+                delays.Start();
             }
         }
 
@@ -70,19 +76,18 @@ namespace Com.MyCompany.MyGame
                 {
                     try
                     {
-                        if (unit.curUnitState != UnitState.INSMOKE)
+                        checkStructure.CheckStructure(hit.transform.position);
+                        if (unit.curUnitState != UnitState.INSMOKE && !checkStructure.isThereStructure)
                         {
-                            if (unit.alertValue > 0.5f) unit.curLookDir = LookDirState.FINDPLAYER;
+                            if (unit.alertValue > 0.15f) unit.curLookDir = LookDirState.FINDPLAYER;
                             //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.
                             exitCoroutine = true;
 
                             float distVal = Mathf.Clamp(Vector3.Distance(otherPos, unit.transform.position), 0.1f, 7);
                             unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
 
-                            if (unit.curUnitState == UnitState.ALERT)
-                                unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
-                            else if (unit.curUnitState == UnitState.COMBAT)
-                                unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR, otherPos);
+                            if (unit.curUnitState == UnitState.ALERT) unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
+                            else if (unit.curUnitState == UnitState.COMBAT) unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR, otherPos);
                         }
                     }
                     catch (System.Exception) { }
@@ -95,10 +100,12 @@ namespace Com.MyCompany.MyGame
             //전투 중이면 일정 시간 대기 후 경계상태로 전환
             if (unit.alertValue >= AggroCollections.combatMin)
             {
-                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                delays.Reset();
+                delays.Stop();
+                Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                while (sw.ElapsedMilliseconds <= 30000)
+                while (sw.ElapsedMilliseconds <= 10000)
                 {
                     if (exitCoroutine)
                         yield break;
@@ -114,8 +121,10 @@ namespace Com.MyCompany.MyGame
             //비전투 상태면
             else
             {
+                delays.Reset();
+                delays.Stop();
                 //일정 시간 대기 후
-                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                Stopwatch sw = new Stopwatch();
                 sw.Start();
 
                 while (sw.ElapsedMilliseconds <= 2000)
@@ -134,6 +143,7 @@ namespace Com.MyCompany.MyGame
                     yield return null;
                 }
 
+                unit.curUnitState = UnitState.IDLE;
                 unit.curLookDir = LookDirState.IDLE;
             }
 

@@ -227,12 +227,20 @@ namespace Com.MyCompany.MyGame
             SetCurrentAnimLayer();
         }
 
-        /// <summary>
-        /// Enemy가 연막탄에 당했을 때, Enemy 전용
-        /// </summary>
-        public void AnyPoseTOInSmokePose()
+        public void AnyPoseTONewPose(UnitPose newPose)
         {
-
+            switch (newPose)
+            {
+                case UnitPose.MOD_RUN:
+                    TurnOffAllLayers();
+                    break;
+                case UnitPose.MOD_WALK:
+                    TurnOffAllLayers();
+                    _animator.SetBool("IsRunMode", false);
+                    break;
+                default:
+                    break;
+            }
         }
         
         //자연스러운 Standing -> Crouch, Player 전용
@@ -295,8 +303,12 @@ namespace Com.MyCompany.MyGame
                     _animator.SetLayerWeight(AnimationLayers.CoverStanding, 1 - layerWeight);
                     _animator.SetLayerWeight(AnimationLayers.CoverCrouch, layerWeight);
                 }
+                SetCurrentAnimLayer();
             }
-            else if (!_animator.GetBool("IsCrouchMode")) TurnOffAllLayers();
+            else if (layerWeight > 0 && layerWeight <= 1 && !_animator.GetBool("IsCrouchMode"))
+            {
+                _animator.SetLayerWeight(AnimationLayers.Crouch, 1);
+            }
         }
 
         //자연스러운 Crouch -> Standing, Player전용
@@ -369,23 +381,27 @@ namespace Com.MyCompany.MyGame
                     _animator.SetLayerWeight(AnimationLayers.CoverStanding, 1 - layerWeight);
                     _animator.SetLayerWeight(AnimationLayers.CoverCrouch, layerWeight);
                 }
+                SetCurrentAnimLayer();
             }
-            else if (_animator.GetBool("IsCrouchMode"))
+            else if (layerWeight >= 0 && layerWeight < 1 && _animator.GetBool("IsCrouchMode"))
             {
                 if (_animator.GetBool("IsCovering"))
                 {
                     _unit.curUnitPose = UnitPose.MOD_COVERSTAND;
                     _animator.SetBool("IsRunMode", false);
+
+                    _animator.SetLayerWeight(AnimationLayers.CoverStanding, 1);
+                    _animator.SetLayerWeight(AnimationLayers.CoverCrouch, 0);
                 }
                 else
                 {
+                    TurnOffAllLayers();
                     if (_animator.GetBool("IsRunMode"))
                         _unit.curUnitPose = UnitPose.MOD_RUN;
                     else
                         _unit.curUnitPose = UnitPose.MOD_WALK;
                 }
-                _animator.SetLayerWeight(AnimationLayers.CoverStanding, 0);
-                _animator.SetLayerWeight(AnimationLayers.CoverCrouch, 1);
+                SetCurrentAnimLayer();
             }
         }
 

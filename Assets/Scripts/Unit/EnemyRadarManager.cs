@@ -26,17 +26,21 @@ namespace Com.MyCompany.MyGame
                 #region 연막탄인 경우
                 if (other.gameObject.layer == PhysicsLayers.TargetLayer)
                 {
-                    switch (other.GetComponent<Target>().code)
+                    try
                     {
-                        case WeaponCode.SMOKE:
-                            unit.curLookDir = LookDirState.DIRECT;
-                            enemy.lookDir = 2 * enemy.transform.position - other.transform.position;
-                            enemy.transform.GetChild(0).Find("EnemyRadarEye").GetComponent<MeshCollider>().enabled = true;
-                            break;
-                        default:
-                            break;
+                        switch (other.GetComponent<Target>().code)
+                        {
+                            case WeaponCode.SMOKE:
+                                unit.curLookDir = LookDirState.DIRECT;
+                                enemy.lookDir = 2 * enemy.transform.position - other.transform.position;
+                                enemyRadar.GetComponent<MeshCollider>().enabled = false;
+                                break;
+                            default:
+                                break;
 
+                        }
                     }
+                    catch (System.Exception) { }
                 }
                 #endregion
 
