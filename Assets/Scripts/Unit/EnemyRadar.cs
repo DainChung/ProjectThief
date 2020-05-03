@@ -32,8 +32,7 @@ namespace Com.MyCompany.MyGame
 
         void OnTriggerStay(Collider other)
         {
-            if (unit.health <= 0)
-                Destroy(gameObject);
+            if (unit.health <= 0) Destroy(gameObject);
 
             if (other.transform.gameObject.layer == PhysicsLayers.Player && unit.curUnitState != UnitState.CHEESE)
                 PlayerDetection(other.transform);
@@ -63,8 +62,9 @@ namespace Com.MyCompany.MyGame
         {
             Vector3 otherPos = otherTR.position;
             RaycastHit[] hits;
-            Vector3 rayOrigin = unit.transform.position + height;
+            Vector3 rayOrigin = unit.transform.position;
             Vector3 rayDesti = otherPos - rayOrigin;
+            rayOrigin += height;
 
             hits = Physics.RaycastAll(rayOrigin, rayDesti);
             foreach (RaycastHit hit in hits)

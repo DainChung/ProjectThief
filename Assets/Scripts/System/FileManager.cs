@@ -19,7 +19,6 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             audioSettings.GetFloat("AllVolume", out _audioVolume);
             //나중에 파일에서 읽어올 것
-            //audioDic.Add("HAND", "someAudioFile");
             audioDic.Add("CAN", "metalPot3");
             audioDic.Add("CHEESE", "bookClose");
             audioDic.Add("SMOKE", "Smoke Grenade");

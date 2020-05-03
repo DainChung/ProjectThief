@@ -23,6 +23,27 @@ namespace Com.MyCompany.MyGame.GameSystem
             min = (int)timer.Elapsed.TotalMinutes;
         }
 
+        public GameTime(string s)
+        {
+            float t;
+            float.TryParse(s, out t);
+
+            min = (int)t;
+            t = (t % 1) * 60;
+            sec = (int)t;
+            t -= sec;
+            milliSec = (int)(t * 1000);
+        }
+
+        //public GameTime(float t)
+        //{
+        //    min = (int)t;
+        //    t = (t % 1) * 60;
+        //    sec = (int)t;
+        //    t -= sec;
+        //    milliSec = (int)(t * 1000);
+        //}
+
         public new string ToString()
         {
             return string.Format("{0} : {1}.{2}", min.ToString(), sec.ToString(), milliSec.ToString());
@@ -63,6 +84,13 @@ namespace Com.MyCompany.MyGame.GameSystem
         #endregion
 
         #region MonoBehaviour Callbacks
+
+        void Awake()
+        {
+            //UnitStat workIt = FileIO.DBIO.Read("Hello");
+            GameResult hello = FileIO.DataIO.Read("TestStage");
+            MyDebug.Log(hello.gameTime.ToString() + ", " + hello.score);
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -155,6 +183,13 @@ namespace Com.MyCompany.MyGame.GameSystem
             gameTimer.Stop();
             _gameResult.gameTime = new GameTime(gameTimer);
             UpdateScore(3 - _gameResult.gameTime.time);
+
+            //bestRec = FileIO.DataIO.Read("ThisStage");
+            //if (_gameResult.score >= bestRec.score || _gameResult.gameTime.time <= bestRec.gameTime.time)
+            //{
+            //    FileIO.DataIO.Write(_gameResult);
+            //    SendMessage("GetBestRecord");
+            //}
             SendMessage("ShowResultWindow", true);
         }
         #endregion

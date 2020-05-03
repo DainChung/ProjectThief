@@ -2221,6 +2221,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
       propertyPath: patrolSpots.Array.data[0]
@@ -2804,6 +2809,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EnemyMousy (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944675, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
@@ -6150,6 +6165,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
       propertyPath: patrolSpots.Array.size
@@ -7875,6 +7895,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
@@ -10324,6 +10349,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyMousy (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944675, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
       propertyPath: patrolSpots.Array.size
@@ -10519,6 +10554,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
@@ -11037,6 +11077,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EnemyMousy (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944675, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7065a4eb5a8ffdb448ee6139575cc56f, type: 3}
@@ -12054,6 +12104,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
       propertyPath: patrolSpots.Array.size
@@ -12345,6 +12400,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EnemyMousy (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944675, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+        type: 3}
+      propertyPath: unitCode
+      value: Enemy
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7065a4eb5a8ffdb448ee6139575cc56f, type: 3}
@@ -13921,10 +13986,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyMousy
       objectReference: {fileID: 0}
-    - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
+    - target: {fileID: 6150556912168944684, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
-      propertyPath: patrolSpots.Array.size
-      value: 4
+      propertyPath: unitCode
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
         type: 3}
@@ -13946,11 +14011,6 @@ PrefabInstance:
       propertyPath: patrolSpots.Array.data[3]
       value: 
       objectReference: {fileID: 340485700}
-    - target: {fileID: 6150556912168944687, guid: 7065a4eb5a8ffdb448ee6139575cc56f,
-        type: 3}
-      propertyPath: patrolSpots.Array.data[4]
-      value: 
-      objectReference: {fileID: 39643844}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7065a4eb5a8ffdb448ee6139575cc56f, type: 3}
 --- !u!1 &1985488563
@@ -15282,6 +15342,11 @@ PrefabInstance:
     - target: {fileID: 4986488552723358096, guid: c7ee93629e5f13746aa814898467ceeb,
         type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8362609536502272480, guid: c7ee93629e5f13746aa814898467ceeb,
+        type: 3}
+      propertyPath: unitCode
       value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []

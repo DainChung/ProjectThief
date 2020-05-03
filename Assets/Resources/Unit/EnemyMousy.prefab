@@ -2147,7 +2147,7 @@ GameObject:
   - component: {fileID: 1973961665}
   m_Layer: 10
   m_Name: EnemyMousy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2263,7 +2263,11 @@ MonoBehaviour:
   lookDir: {x: 0, y: 0, z: 0}
   enemyRadar: {fileID: 9038843608279773064}
   checkStructure: {fileID: 2010139474}
-  patrolSpots: []
+  patrolSpots:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &6150556912168944686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2464,7 +2468,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 5
   MinDistance: 1
-  MaxDistance: 25
+  MaxDistance: 9.342569
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -3379,7 +3383,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 3adbd296348771143b89cb5ef3972404,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 360
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 3adbd296348771143b89cb5ef3972404,
         type: 3}

@@ -786,19 +786,23 @@ namespace Com.MyCompany.MyGame
 
         public void SetNeareastItem(Collider other, bool onoff)
         {
-            if (unit.health > 0)
+            try
             {
-                if (!onoff)
+                if (unit.health > 0)
                 {
-                    nearestItem.Init();
-                    uiManager.SetIndicator("NearestItemIndicator", null);
-                }
-                else
-                {
-                    nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
-                    uiManager.SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
+                    if (!onoff)
+                    {
+                        nearestItem.Init();
+                        uiManager.SetIndicator("NearestItemIndicator", null);
+                    }
+                    else
+                    {
+                        nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
+                        uiManager.SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
+                    }
                 }
             }
+            catch (System.Exception) { }
         }
 
         public void SetIndicator(string name, Transform tr)

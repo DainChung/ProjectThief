@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+using Com.MyCompany.MyGame.FileIO;
+
 //Dic이용해서 정리 한 번 해볼것
 namespace Com.MyCompany.MyGame
 {
@@ -40,6 +42,96 @@ namespace Com.MyCompany.MyGame
             ASSASSINATE = 0, NORNALKILL, GETGOLD, max
         }
 
+        #endregion
+
+        #region Classes
+        public class UnitStat
+        {
+            private string _unitCode;
+
+            private float _speed;
+            private float _walkVar;
+            private float _coverVar;
+            private float _health;
+            private float _maxHealth;
+            private float _jumpPower;
+
+            public string unitCode { get { return _unitCode; } }
+
+            public float speed { get { return _speed; } }
+            public float walkSpeed { get { return _walkVar * _speed; } }
+            public float coverSpeed { get { return _coverVar * _speed; } }
+            public float health { get { return _health; } }
+            public float MaxHealth { get { return _maxHealth; } }
+            public float jumpPower { get { return _jumpPower; } }
+
+            public float hpRatio { get { return _health / _maxHealth; } }
+
+            public UnitStat(float sp, float walkV, float coverV, float hp, float jump)
+            {
+                _speed = sp;
+                _walkVar = walkV;
+                _coverVar = coverV;
+                _health = hp;
+                _maxHealth = hp;
+                _jumpPower = jump;
+            }
+            public UnitStat(string code,float sp, float walkV, float coverV, float hp, float jump)
+            {
+                _unitCode = code;
+                _speed = sp;
+                _walkVar = walkV;
+                _coverVar = coverV;
+                _health = hp;
+                _maxHealth = hp;
+                _jumpPower = jump;
+            }
+
+            public UnitStat()
+            {
+                _unitCode = "NULL";
+            }
+            public UnitStat(string unitCode)
+            {
+                SetUnitStat(DBIO.Read(unitCode));
+            }
+            private void SetUnitStat(UnitStat data)
+            {
+                if (data == null)
+                {
+                    Debug.LogError("data == NULL, 올바른 unitCode를 사용하십시오");
+                    _unitCode = "NULL";
+                    _speed = 0;
+                    _walkVar = 0;
+                    _coverVar = 0;
+                    _health = 0;
+                    _maxHealth = 0;
+                    _jumpPower = 0;
+                    return;
+                }
+
+                _unitCode = data.unitCode;
+                _speed = data.speed;
+                _walkVar = data.walkSpeed / _speed;
+                _coverVar = data.coverSpeed / _speed;
+                _health = data.health;
+                _maxHealth = data.MaxHealth;
+                _jumpPower = data.jumpPower;
+            }
+
+            public void SetHealth(float val)
+            {
+                _health = val;
+            }
+            public void SetCode(string code)
+            {
+                _unitCode = code;
+            }
+            public void SetSpeed(float val)
+            {
+                _speed = val;
+            }
+        }
         #endregion
 
         public static class EnumCollections
@@ -146,6 +238,9 @@ namespace Com.MyCompany.MyGame
 
             private static string _AudioPath = "Audios/";
             public static string AudioPath { get { return _AudioPath; } }
+
+            private static string _DataPath = Application.persistentDataPath;
+            public static string DataPath { get { return _DataPath; } }
 
         }
 

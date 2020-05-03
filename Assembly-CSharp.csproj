@@ -198,12 +198,14 @@
      <Compile Include="Assets\Scripts\Item\Weapon.cs" />
      <Compile Include="Assets\Scripts\Item\WeaponSmoke.cs" />
      <Compile Include="Assets\Scripts\Item\WeaponThrow.cs" />
+     <Compile Include="Assets\Scripts\System\AllTargetManager.cs" />
      <Compile Include="Assets\Scripts\System\AudioManager.cs" />
      <Compile Include="Assets\Scripts\System\Camera\CameraWork.cs" />
      <Compile Include="Assets\Scripts\System\Camera\CheckCameraCollider.cs" />
      <Compile Include="Assets\Scripts\System\Camera\MinimapCameraWork.cs" />
      <Compile Include="Assets\Scripts\System\Camera\PlayerCameraWork.cs" />
      <Compile Include="Assets\Scripts\System\Collections.cs" />
+     <Compile Include="Assets\Scripts\System\FileIO.cs" />
      <Compile Include="Assets\Scripts\System\FileManager.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\System\Structure\Floor.cs" />
@@ -512,6 +514,9 @@
  </Reference>
  <Reference Include="UnityEngine.XRModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.17f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
+ </Reference>
+ <Reference Include="Mono.Data.Sqlite">
+ <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
  </Reference>
  <Reference Include="System.Windows.Forms">
  <HintPath>C:/Users/Dian/Downloads/백업폴더/개발/개발관련백업/Unity/2020/ProjectThief/Assets/Plugins/System.Windows.Forms.dll</HintPath>

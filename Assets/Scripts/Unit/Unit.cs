@@ -230,10 +230,7 @@ namespace Com.MyCompany.MyGame
 
         #region Private Fields
 
-        private float _speed;
-        private float _maxHealth;
-        private float _health;
-        private float _jumpPower;
+        private UnitStat unitStat;
         private bool _lockControl = false;
 
         //조준 후 발사되지 않는 경우 발사하도록 제어
@@ -259,12 +256,12 @@ namespace Com.MyCompany.MyGame
         #region Public Fields
 
         //UnitStat구조체를 만들것
-        public float speed { get { return _speed; } set { _speed = value; } }
-        public float walkSpeed { get { return 0.41f * _speed; } }
-        public float coverSpeed { get { return 0.31f * speed; } }
-        public float health { get { return _health; } }
-        public float maxHealth { get { return _maxHealth; } }
-        public float jumpPower { get { return _jumpPower; } }
+        public float speed { get { return unitStat.speed; } set { unitStat.SetSpeed(value); } }
+        public float walkSpeed { get { return unitStat.walkSpeed; } }
+        public float coverSpeed { get { return unitStat.coverSpeed; } }
+        public float health { get { return unitStat.health; } }
+        public float maxHealth { get { return unitStat.MaxHealth; } }
+        public float jumpPower { get { return unitStat.jumpPower; } }
 
         public bool lockControl { get{ return _lockControl; } set { _lockControl = value; } }
 
@@ -290,15 +287,15 @@ namespace Com.MyCompany.MyGame
 
         public UnitAnimationController unitAnimController;
 
+        public string unitCode;
+
         #endregion
 
         #region MonoBehaviour Callbacks
         void Awake()
         {
-            _maxHealth = 7;
-            _health = _maxHealth;
-            _speed = 20;
-            _jumpPower = 400;
+            unitStat = new UnitStat(unitCode);
+            //unitStat = new UnitStat(20, 0.41f, 0.31f, 7, 400);
 
             long[] delays = { 200, 2000, 3000, 4000, 1000};
             swManager = new StopwatchManager(delays, 4);
@@ -323,7 +320,7 @@ namespace Com.MyCompany.MyGame
         {
             if (animator.GetInteger("AttackCount") == 0 && swManager.AttackCountDelayDone())    animator.SetInteger("AttackCount", 1);
 
-            if (_health > 0)
+            if (health > 0)
             {
                 //추락, 착륙시 변수 제어
                 if (IsOnFloor())
@@ -460,21 +457,21 @@ namespace Com.MyCompany.MyGame
         public void HitHealth(float damage, Vector3 pos)
         {
             //일반 공격(damage > 0)
-            if (IsOnFloor() && _health > 0)
+            if (IsOnFloor() && health > 0)
             {
                 _curUnitState = UnitState.COMBAT;
                 if (damage > 0)
                 {
-                    if (damage >= _health)
+                    if (damage >= health)
                     {
                         GameObject.Find("Manager").GetComponent<StageManager>().UpdateScore(Score.NORNALKILL);
                         _lockControl = true;
-                        _health = 0;
+                        unitStat.SetHealth(0);
                         StartCoroutine(DelayPlayDeadAnim((int)damage));
                     }
                     else
                     {
-                        _health -= damage;
+                        unitStat.SetHealth(health - damage);
 
                         transform.LookAt(pos);
                         if (!standingLayerAnimInfo.IsName("HitReaction"))
@@ -498,14 +495,14 @@ namespace Com.MyCompany.MyGame
                 else
                 {
                     GameObject.Find("Manager").GetComponent<StageManager>().UpdateScore(Score.ASSASSINATE);
-                    _health = 0;
+                    unitStat.SetHealth(0);
                     StartCoroutine(DelayPlayDeadAnim((int)damage));
                 }
 
-                if (transform.CompareTag("Player")) SendMessage("UpdateHPBar", _health / _maxHealth);                    
+                if (transform.CompareTag("Player")) SendMessage("UpdateHPBar", unitStat.hpRatio);                    
             }
 
-            if (_health == 0)
+            if (health == 0)
             {
                 unitAnimController.TurnOffAllLayers();
                 _curUnitState = UnitState.IDLE;
@@ -812,7 +809,7 @@ namespace Com.MyCompany.MyGame
 
         public void AddToAlertValue(float amount)
         {
-            if (_health > 0)
+            if (health > 0)
             {
                 alertValue += amount;
                 AlertManager();
@@ -820,7 +817,7 @@ namespace Com.MyCompany.MyGame
         }
         public void SetAlertValue(float amount)
         {
-            if (_health > 0)
+            if (health > 0)
             {
                 alertValue = amount;
                 AlertManager();

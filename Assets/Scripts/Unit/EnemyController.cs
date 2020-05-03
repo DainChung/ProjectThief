@@ -7,6 +7,7 @@ using UnityEngine.AI;
 
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.Exceptions;
+using Com.MyCompany.MyGame.GameSystem;
 
 namespace Com.MyCompany.MyGame
 {
@@ -255,6 +256,7 @@ namespace Com.MyCompany.MyGame
         public Transform[] patrolSpots = new Transform[6];
 
         public WeaponCode curTargetCode { get { return curTarget.code; } }
+        public Vector3 curTargetPos { get { return curTarget.pos; } }
 
         #endregion
 
@@ -299,31 +301,35 @@ namespace Com.MyCompany.MyGame
             #region Target 위치에 도달
             if (other.gameObject.layer == PhysicsLayers.TargetLayer)
             {
-                if (other.GetComponent<Target>().code == WeaponCode.CHEESE)
+                try
                 {
-                    RaycastHit[] hits = Physics.SphereCastAll(transform.position, 7f, transform.forward, 0.01f, 1 << PhysicsLayers.Item);
-
-                    foreach (RaycastHit hit in hits)
+                    if (other.GetComponent<Target>().code == WeaponCode.CHEESE)
                     {
-                        Transform hitTR = hit.transform;
+                        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 7f, transform.forward, 0.01f, 1 << PhysicsLayers.Item);
 
-                        if (hitTR.name.Contains("CHEESE"))
+                        foreach (RaycastHit hit in hits)
                         {
-                            unit.curUnitState = UnitState.EAT;
-                            unit.curLookDir = LookDirState.DIRECT;
-                            lookDir = hitTR.position;
-                            _InitCurTarget();
-                            curTarget.tr = hitTR;
-                            curTarget.pos = hitTR.position;
+                            Transform hitTR = hit.transform;
+
+                            if (hitTR.name.Contains("CHEESE"))
+                            {
+                                unit.curUnitState = UnitState.EAT;
+                                unit.curLookDir = LookDirState.DIRECT;
+                                lookDir = hitTR.position;
+                                _InitCurTarget();
+                                curTarget.tr = hitTR;
+                                curTarget.pos = hitTR.position;
+                            }
                         }
                     }
-                }
 
-                if (transform.GetInstanceID() == other.transform.GetComponent<Target>().ID)
-                {
-                    _doesReachToTarget = true;
-                    Destroy(other.transform.gameObject);
+                    if (transform.GetInstanceID() == other.transform.GetComponent<Target>().ID)
+                    {
+                        _doesReachToTarget = true;
+                        Destroy(other.transform.gameObject);
+                    }
                 }
+                catch (System.Exception) { }
             }
             #endregion
         }
@@ -332,8 +338,12 @@ namespace Com.MyCompany.MyGame
         {
             if (other.gameObject.layer == PhysicsLayers.TargetLayer)
             {
-                if(transform.GetInstanceID() == other.transform.GetComponent<Target>().ID)
-                    _doesReachToTarget = false;
+                try
+                {
+                    if (transform.GetInstanceID() == other.transform.GetComponent<Target>().ID)
+                        _doesReachToTarget = false;
+                }
+                catch (System.Exception) { }
             }
         }
 
@@ -401,6 +411,7 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+            //EnemyAlertManager();
         }
 
         //curUnitState == UnitState.IDLE
@@ -410,7 +421,7 @@ namespace Com.MyCompany.MyGame
             if (curTarget.code == WeaponCode.max)
             {
                 if(patrolSpotIndex >= patrolSpots.Length) patrolSpotIndex = 0;
-                try { SetCurTarget(WeaponCode.PATROL, patrolSpots[patrolSpotIndex].position); }
+                try { SetCurTarget(patrolSpots[patrolSpotIndex], WeaponCode.PATROL); }
                 catch (System.Exception) { }
             }
             else if (unit.curLookDir == LookDirState.FINDPLAYER)
@@ -451,18 +462,8 @@ namespace Com.MyCompany.MyGame
                     StopWithoutInitCurtarget();
                     break;
                 default:
-                    try
-                    {
-                        ValidateException.CheckAIsCloseToB(transform.position, playerPosition, 1.5f);
-                        checkStructure.CheckStructure(playerPosition);
-                        ChaseTargetBYQueue();
-                    }
-                    catch (AIsCloseToB)
-                    {
-                        LookDir();
-                        Stop();
-                        unit.AttackDefault(false);
-                    }
+                    checkStructure.CheckStructure(playerPosition);
+                    ChaseTargetBYQueue();
                     break;
             }
         }
@@ -473,13 +474,12 @@ namespace Com.MyCompany.MyGame
         {
             LookDir();
 
-            if (queue.Count() > 0 && curTarget.code == WeaponCode.PATROL && unit.curUnitState != UnitState.IDLE) _InitCurTarget();
-
-            //queue에 뭔가 있을 때
-            if (queue.Count() > 0 && curTarget.code == WeaponCode.max)
+            if (queue.Count() > 0)
             {
+                if(curTarget.code == WeaponCode.PATROL && unit.curUnitState != UnitState.IDLE) _InitCurTarget();
+                //queue에 뭔가 있을 때
                 //현재 추적하고 있는 타겟이 없을 때만 queue에서 정보를 받아온다.
-                SetCurTarget();
+                if (curTarget.code == WeaponCode.max) SetCurTarget();
             }
 
             switch (curTarget.code)
@@ -516,25 +516,35 @@ namespace Com.MyCompany.MyGame
 
         private void CombatMove()
         {
-            if (!_doesReachToTarget)
+            try
             {
-                isMovingNow = true;
-                if (checkStructure.isThereStructure)
+                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 1.2f);
+                if (!_doesReachToTarget)
                 {
-                    unit.curLookDir = LookDirState.AGENT;
-                    agent.SetDestination(playerPosition);
+                    isMovingNow = true;
+                    if (checkStructure.isThereStructure)
+                    {
+                        unit.curLookDir = LookDirState.AGENT;
+                        agent.SetDestination(playerPosition);
+                    }
+                    else
+                    {
+                        unit.curLookDir = LookDirState.FINDPLAYER;
+                        rb.velocity = transform.forward * enemySpeed * 0.15f;
+                        agent.ResetPath();
+                    }
                 }
-                else
+                else if (_doesReachToTarget)
                 {
-                    unit.curLookDir = LookDirState.FINDPLAYER;
-                    rb.velocity = transform.forward * enemySpeed * 0.15f;
-                    agent.ResetPath();
+                    unit.AttackDefault(false);
+                    isMovingNow = false;
+                    _doesReachToTarget = false;
                 }
             }
-            else if (_doesReachToTarget)
+            catch (AIsCloseToB)
             {
-                isMovingNow = false;
-                _doesReachToTarget = false;
+                Stop();
+                stayDelay.Stop();
             }
             rb.velocity *= 0.9f;
         }
@@ -542,9 +552,9 @@ namespace Com.MyCompany.MyGame
         {
             try
             {
+                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, dist);
                 if (assassinateTargetted) throw new AIsCloseToB();
                 checkStructure.CheckStructure(curTarget.pos);
-                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, dist);
                 if (!_doesReachToTarget)
                 {
                     isMovingNow = true;
@@ -563,7 +573,6 @@ namespace Com.MyCompany.MyGame
                 }
                 else if (_doesReachToTarget)
                 {
-                    isMovingNow = false;
                     if (!stayDelay.IsRunning) stayDelay.Restart();
 
                     if (checkStayDelay)
@@ -585,6 +594,7 @@ namespace Com.MyCompany.MyGame
         {
             curTarget = queue.Dequeue();
             GameObject targetOBJ = Instantiate(Resources.Load(FilePaths.AISystemPath + "Target") as GameObject, curTarget.pos, transform.rotation);
+
             unit.curLookDir = LookDirState.IDLE;
             if (player != null)
             {
@@ -600,7 +610,7 @@ namespace Com.MyCompany.MyGame
             }
             stayDelay.Reset();
             stayDelay.Stop();
-            targetOBJ.GetComponent<Target>().SetTarget(transform.GetInstanceID(), curTarget.code);
+            targetOBJ.GetComponent<Target>().SetTarget(transform.GetInstanceID(), curTarget.code, this);
             if (curTargetCode != WeaponCode.PLAYER || curTargetCode != WeaponCode.PLAYERTRACK) player = null;
         }
         private void SetCurTarget(WeaponCode code, Vector3 pos)
@@ -608,6 +618,7 @@ namespace Com.MyCompany.MyGame
             curTarget.code = code;
             curTarget.pos = pos;
             GameObject targetOBJ = Instantiate(Resources.Load(FilePaths.AISystemPath + "Target") as GameObject, curTarget.pos, transform.rotation);
+
             if (player != null)
             {
                 targetOBJ.transform.parent = player;
@@ -622,7 +633,12 @@ namespace Com.MyCompany.MyGame
             }
             stayDelay.Reset();
             stayDelay.Stop();
-            targetOBJ.GetComponent<Target>().SetTarget(transform.GetInstanceID(), curTarget.code);
+            targetOBJ.GetComponent<Target>().SetTarget(transform.GetInstanceID(), curTarget.code, this);
+        }
+        private void SetCurTarget(Transform tr, WeaponCode code)
+        {
+            curTarget.tr = tr;
+            SetCurTarget(code, tr.position);
         }
         private void _InitCurTarget()
         {
