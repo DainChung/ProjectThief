@@ -18,7 +18,6 @@ namespace Com.MyCompany.MyGame
         private Vector3 rayOrigin;
         private Vector3 rayDesti;
 
-        private Transform player;
         private PlayerController playerController;
         private Unit unit;
 
@@ -82,7 +81,7 @@ namespace Com.MyCompany.MyGame
 
         private void CheckEnemies()
         {
-            rayOrigin = transform.position + height;
+            rayOrigin = transform.parent.position + height;
             RaycastHit[] hits = Physics.SphereCastAll(rayOrigin, ValueCollections.canAssassinateDist, -transform.up, 0.1f, 1 << PhysicsLayers.Enemy);
 
             //가까운 거리에 Enemy 없음
@@ -99,6 +98,16 @@ namespace Com.MyCompany.MyGame
                     RaycastHit hit = new RaycastHit();
                     rayDesti = -rayOrigin + obj.transform.position;
 
+                    //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
+                    Debug.DrawRay(rayOrigin, rayDesti, Color.white);
+                    if (Physics.Raycast(rayOrigin, rayDesti, out hit) && hit.transform.gameObject.layer == PhysicsLayers.Structure)
+                    {
+                        if (obj.transform.GetComponent<EnemyController>().canAssassinate) playerController.SetIndicator("AssassinateIndicator", null);
+                        _canAssassinate = false;
+                        InitAssassinateTargetPos();
+                        continue;
+                    }
+
                     if (obj.transform.GetComponent<EnemyController>().canAssassinate)
                     {
                         if (obj.transform.GetComponent<Unit>().health > 0 && unit.health > 0) playerController.SetIndicator("AssassinateIndicator", obj.transform);
@@ -106,16 +115,7 @@ namespace Com.MyCompany.MyGame
                         _assassinateTarget = obj.transform;
                         break;
                     }
-                    else
-                        _assassinateTarget = null;
-                    //Debug.DrawRay(rayOrigin, rayDesti, Color.white, 1.0f);
-                    //Enemy와 Player 사이에 장애물이 있으면 암살 불가능
-                    if (Physics.Raycast(rayOrigin, rayDesti, out hit) && hit.transform.gameObject.layer == PhysicsLayers.Structure)
-                    {
-                        if(obj.transform.GetComponent<EnemyController>().canAssassinate) playerController.SetIndicator("AssassinateIndicator", null);
-                        _canAssassinate = false;
-                        InitAssassinateTargetPos();
-                    }
+                    else _assassinateTarget = null;
                 }
             }
         }

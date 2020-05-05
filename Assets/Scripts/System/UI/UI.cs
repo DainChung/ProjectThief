@@ -20,8 +20,13 @@ namespace Com.MyCompany.MyGame.UI
             //화면을 넘어가지 않도록 함
             float x = 2 * (Mathf.Clamp(destiPos.x, 0.05f, 0.95f) - 0.5f);
             float y = 2 * (Mathf.Clamp(destiPos.y, 0.05f, 0.95f) - 0.5f);
+            if (destiPos.z < 0) y = -0.95f;
             destiPos.Set(x * maxW, y * maxH, 0);
             transform.localPosition = destiPos;
+        }
+        protected virtual void Rotate(float destiRotEulerY)
+        {
+            transform.rotation = Quaternion.Euler(0, destiRotEulerY + 180, 0);
         }
 
         /// <summary>
@@ -32,6 +37,9 @@ namespace Com.MyCompany.MyGame.UI
         {
             UIRect[] uiRects = transform.GetComponents<UIRect>();
             UIWidgetContainer[] uiWidgetConts = transform.GetComponents<UIWidgetContainer>();
+
+            try { GetComponent<BoxCollider>().enabled = enable; }
+            catch (System.Exception) { }
 
             for (int i = 0; i < uiRects.Length; i++) uiRects[i].enabled = enable;
 
@@ -45,6 +53,9 @@ namespace Com.MyCompany.MyGame.UI
         {
             try{ transform.GetComponent<UIButton>().isEnabled = enable;}
             catch(System.Exception){ }
+
+            try { GetComponent<BoxCollider>().enabled = enable; }
+            catch (System.Exception) { }
         }
         /// <summary>
         /// transform이 NGUI Texture 또는 NGUI Unity2DSprite를 갖고 있어야 작동,

@@ -11,13 +11,16 @@ namespace Com.MyCompany.MyGame
         // Start is called before the first frame update
         void Start()
         {
-            player = GameObject.FindGameObjectWithTag("Player").transform;
-
+            player = GameObject.FindWithTag("Player").transform;
             destiPos = cameraPos;
+
+            maxDist = Vector3.Distance(cameraPos, Vector3.zero);
+            dist = maxDist;
         }
 
         void FixedUpdate()
         {
+            CheckStructure();
             //마우스를 움직이면 카메라 회전
             CameraRotation(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 

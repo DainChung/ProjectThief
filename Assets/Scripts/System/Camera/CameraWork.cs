@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using System.Windows.Forms;
+using Com.MyCompany.MyGame.Collections;
 
 namespace Com.MyCompany.MyGame
 {
@@ -21,22 +22,19 @@ namespace Com.MyCompany.MyGame
         protected Transform player;
         protected Vector3 destiPos;
         protected Vector3 v = Vector3.zero;
+        protected float maxDist;
+        protected float dist;
         #endregion
 
         #region Private Fields
-        private float dist;
-        #endregion
-
-        #region Public Methods
-
+        private Vector3 height = new Vector3(0, 1, 0);
         #endregion
 
         #region Protected Methods
 
         protected virtual void FollowPlayer()
         {
-            //카메라 위치 계산
-            dist = Vector3.Distance(cameraPos, Vector3.zero);
+            dist = Mathf.Clamp(dist, 0.5f, maxDist);
             float cameraYValue = Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.x);
 
             destiPos.Set(Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.y) * dist * cameraYValue,
@@ -44,10 +42,8 @@ namespace Com.MyCompany.MyGame
                         Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.y) * dist * cameraYValue);
 
             destiPos = player.position - destiPos;
-            destiPos.Set(destiPos.x, player.position.y + cameraPos.y * (1 + Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x) * 1.5f), destiPos.z);
+            destiPos.Set(destiPos.x, player.position.y + cameraPos.y * (1 + Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x) * 3f * (dist/maxDist)), destiPos.z);
 
-            //카메라 회전을 감안해서 플레이어 캐릭터를 따라다님 => Vector3.Lerp 말고 다른 방식으로 조작해야 카메라가 벽을 못 뚫게 할 수 있음
-            //Time.deltaTime * smooth * player.GetComponent<Unit>().speed
             transform.position = Vector3.SmoothDamp(transform.position, destiPos, ref v, smooth);
         }
 
@@ -65,14 +61,14 @@ namespace Com.MyCompany.MyGame
 
             Vector3 curEulerAngle = transform.eulerAngles;
 
-            //최대 회전 제한, 내려다 볼 수 있는 최대 각도 60도, 올려다 볼 수 있는 최소 각도 -25도, z축 회전 방지
+            //최대 회전 제한, 내려다 볼 수 있는 최대 각도 60도, 올려다 볼 수 있는 최소 각도 -15도, z축 회전 방지
             if (transform.eulerAngles.x > 60 && transform.eulerAngles.x < 90)
             {
                 transform.rotation = Quaternion.Euler(60f, curEulerAngle.y, 0);
             }
-            else if (transform.eulerAngles.x > 90 && transform.eulerAngles.x < 335)
+            else if (transform.eulerAngles.x > 90 && transform.eulerAngles.x < 345)
             {
-                transform.rotation = Quaternion.Euler(335f, curEulerAngle.y, 0);
+                transform.rotation = Quaternion.Euler(345f, curEulerAngle.y, 0);
             }
             //최대 각도, 최소 각도 도달 못해도 z축 회전하는 경우 방지
             else
@@ -81,6 +77,17 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        protected void CheckStructure()
+        {
+            Ray ray = new Ray(player.position + height, transform.position - player.position - height);
+            Debug.DrawRay(ray.origin, ray.direction * maxDist, Color.red);
+
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxDist * maxDist, 1 << PhysicsLayers.Structure);
+
+            dist = maxDist;
+            foreach (RaycastHit hit in hits)
+                if (dist > hit.distance - 0.5f) dist = hit.distance - 0.5f;
+        }
         #endregion
     }
 }

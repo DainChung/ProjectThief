@@ -34,7 +34,7 @@ namespace Com.MyCompany.MyGame
         //캐릭터가 바라보는 방향
         public enum LookDirState
         {
-            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, DIRECT,max
+            IDLE = 0, COVER, THROW, FINDPLAYER, AGENT, DIRECT, max
         }
 
         public enum Score
@@ -44,7 +44,6 @@ namespace Com.MyCompany.MyGame
 
         #endregion
 
-        #region Classes
         public class UnitStat
         {
             private string _unitCode;
@@ -76,7 +75,7 @@ namespace Com.MyCompany.MyGame
                 _maxHealth = hp;
                 _jumpPower = jump;
             }
-            public UnitStat(string code,float sp, float walkV, float coverV, float hp, float jump)
+            public UnitStat(string code, float sp, float walkV, float coverV, float hp, float jump)
             {
                 _unitCode = code;
                 _speed = sp;
@@ -93,7 +92,7 @@ namespace Com.MyCompany.MyGame
             }
             public UnitStat(string unitCode)
             {
-                SetUnitStat(DBIO.Read(unitCode));
+                SetUnitStat(UnitStatDB.GetUnitStat(unitCode));
             }
             private void SetUnitStat(UnitStat data)
             {
@@ -132,7 +131,20 @@ namespace Com.MyCompany.MyGame
                 _speed = val;
             }
         }
-        #endregion
+        public static class UnitStatDB
+        {
+            private static System.Collections.Generic.List<UnitStat> unitStats = DBIO.ReadAll("UnitStatDB.db");
+            private static System.Collections.Generic.Dictionary<string, int> codeDic = new System.Collections.Generic.Dictionary<string, int>();
+
+            public static UnitStat GetUnitStat(string unitCode)
+            {
+                if (codeDic.Count == 0)
+                    for (int i = 0; i < unitStats.Count; i++)
+                        codeDic.Add(unitStats[i].unitCode, i);
+
+                return unitStats[codeDic[unitCode]];
+            }
+        }
 
         public static class EnumCollections
         {

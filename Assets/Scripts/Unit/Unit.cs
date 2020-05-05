@@ -474,8 +474,7 @@ namespace Com.MyCompany.MyGame
                         unitStat.SetHealth(health - damage);
 
                         transform.LookAt(pos);
-                        if (!standingLayerAnimInfo.IsName("HitReaction"))
-                            animator.Play("HitReaction", AnimationLayers.Standing);
+                        if (!standingLayerAnimInfo.IsName("HitReaction")) animator.Play("HitReaction", AnimationLayers.Standing);
                         animator.SetBool("IsHit", true);
                         alertValue = AggroCollections.combatMin;
                         rb.AddForce(transform.forward * (-2), ForceMode.Impulse);
@@ -507,13 +506,15 @@ namespace Com.MyCompany.MyGame
                 unitAnimController.TurnOffAllLayers();
                 _curUnitState = UnitState.IDLE;
                 alertValue = 0;
+                try { GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true; }
+                catch (System.Exception) { }
 
                 Transform icon = transform.Find("Icon");
                 icon.GetComponent<SpriteRenderer>().enabled = false;
-                icon.GetChild(0).GetComponent<SpriteRenderer>().enabled = true;
-            }
+                icon.Find("DeathIcon").GetComponent<SpriteRenderer>().enabled = true;
 
-            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+                transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+            }
         }
 
         public void AttackDefault(bool isPlayer)

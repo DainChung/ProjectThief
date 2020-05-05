@@ -57,7 +57,8 @@ namespace Com.MyCompany.MyGame.UI
         {
             try
             {
-                base.OnOffUIButton(enable);
+                if (audioManager.GetComponent<UIManager>().buttonNameToString[transform.name] == "NULL") base.OnOffUIButton(false);
+                else base.OnOffUIButton(enable);
             }
             catch (System.Exception){}
             finally

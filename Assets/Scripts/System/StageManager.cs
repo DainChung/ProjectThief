@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 using Com.MyCompany.MyGame.Collections;
+using Com.MyCompany.MyGame.FileIO;
 
 
 namespace Com.MyCompany.MyGame.GameSystem
@@ -35,15 +38,6 @@ namespace Com.MyCompany.MyGame.GameSystem
             milliSec = (int)(t * 1000);
         }
 
-        //public GameTime(float t)
-        //{
-        //    min = (int)t;
-        //    t = (t % 1) * 60;
-        //    sec = (int)t;
-        //    t -= sec;
-        //    milliSec = (int)(t * 1000);
-        //}
-
         public new string ToString()
         {
             return string.Format("{0} : {1}.{2}", min.ToString(), sec.ToString(), milliSec.ToString());
@@ -72,6 +66,7 @@ namespace Com.MyCompany.MyGame.GameSystem
         private GameResult _gameResult;
 
         private System.Diagnostics.Stopwatch gameTimer;
+        //private List<UnitStat> unitStatDB = new List<UnitStat>();
 
         #endregion
 
@@ -87,9 +82,7 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         void Awake()
         {
-            //UnitStat workIt = FileIO.DBIO.Read("Hello");
-            GameResult hello = FileIO.DataIO.Read("TestStage");
-            MyDebug.Log(hello.gameTime.ToString() + ", " + hello.score);
+            //unitStatDB = DBIO.ReadAll("UnitStatDB.db");
         }
 
         // Start is called before the first frame update
@@ -132,6 +125,15 @@ namespace Com.MyCompany.MyGame.GameSystem
             _gameResult.score += amount;
             if (_gameResult.score > 3) _gameResult.score = 3;
         }
+
+        private string IndexToSceneName(int i)
+        {
+            string path = SceneUtility.GetScenePathByBuildIndex(i);
+            int s = path.LastIndexOf('/');
+            string name = path.Substring(s + 1);
+            int d = name.LastIndexOf('.');
+            return name.Substring(0, d);
+        }
         #endregion
 
         #region Public Methods
@@ -143,21 +145,30 @@ namespace Com.MyCompany.MyGame.GameSystem
             end[index].GetComponent<BoxCollider>().enabled = true;
             end[index].GetComponent<MeshRenderer>().enabled = true;
             end[index].GetChild(0).GetComponent<SpriteRenderer>().enabled = true;
+
+            GetComponent<UIManager>().SetIndicator("DestiIndicator", end[index]);
         }
         public string FindNextLevel()
         {
-            string curLevel = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            /*
-            if(NextLevel == null) this.enable = false;
-            else sceneName = FindNextLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-            */
-            return "Not Yet";
+            int curLevel = -1;
+            string[] s = SceneManager.GetActiveScene().name.Split('e');
+            int.TryParse(s[1], out curLevel);
+
+            string nextLevel = string.Format("Stage{0}", (curLevel+1));
+            string result = "NULL";
+
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+                if (nextLevel == IndexToSceneName(i))
+                    result = nextLevel;
+
+            return result;
         }
 
         public void LoadScene(string buttonName)
         {
-            Debug.Log(buttonName + " : " + GetComponent<UIManager>().buttonNameToString[buttonName]);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(GetComponent<UIManager>().buttonNameToString[buttonName], UnityEngine.SceneManagement.LoadSceneMode.Single);
+            string sceneName = GetComponent<UIManager>().buttonNameToString[buttonName];
+            Debug.Log(buttonName + " : " + sceneName);
+            if(sceneName != "NULL") SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
 
         public void UpdateScore(Score scoreCode)
@@ -180,17 +191,20 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public void GameClear()
         {
+            string curStage = SceneManager.GetActiveScene().name;
             gameTimer.Stop();
             _gameResult.gameTime = new GameTime(gameTimer);
             UpdateScore(3 - _gameResult.gameTime.time);
 
-            //bestRec = FileIO.DataIO.Read("ThisStage");
-            //if (_gameResult.score >= bestRec.score || _gameResult.gameTime.time <= bestRec.gameTime.time)
-            //{
-            //    FileIO.DataIO.Write(_gameResult);
-            //    SendMessage("GetBestRecord");
-            //}
-            SendMessage("ShowResultWindow", true);
+            bool isBest = false;
+            GameResult bestRecord = DataIO.Read("BestRecord.data", curStage);
+            if (_gameResult.score >= bestRecord.score || _gameResult.gameTime.time <= bestRecord.gameTime.time)
+            {
+                DataIO.Write("BestRecord.data", curStage, _gameResult.gameTime.time, _gameResult.score);
+                isBest = true;
+            }
+            GetComponent<UIManager>().ShowResultWindow(true, isBest);
+            GetComponent<UIManager>().SetIndicator("DestiIndicator", null);
         }
         #endregion
     }

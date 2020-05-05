@@ -220,6 +220,7 @@ GameObject:
   m_Component:
   - component: {fileID: 753902435}
   - component: {fileID: 753902436}
+  - component: {fileID: 5869912819977199361}
   m_Layer: 10
   m_Name: ALERTIcon
   m_TagString: Untagged
@@ -235,7 +236,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 753902434}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -245.00008}
+  m_LocalPosition: {x: 0, y: -0, z: -235.8}
   m_LocalScale: {x: 0.2777778, y: 50, z: 0.2777777}
   m_Children: []
   m_Father: {fileID: 7098759054640888880}
@@ -290,6 +291,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5869912819977199361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753902434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89132bec99b67f5419026d20d28caa92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1678566221
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,6 +313,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1678566222}
   - component: {fileID: 1678566223}
+  - component: {fileID: 4756316114283941783}
   m_Layer: 10
   m_Name: COMBATIcon
   m_TagString: Untagged
@@ -315,7 +329,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678566221}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -245.00008}
+  m_LocalPosition: {x: 0, y: -0, z: -235.8}
   m_LocalScale: {x: 0.2777778, y: 50, z: 0.2777777}
   m_Children: []
   m_Father: {fileID: 7098759054640888880}
@@ -370,6 +384,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4756316114283941783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1678566221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89132bec99b67f5419026d20d28caa92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2010139471
 GameObject:
   m_ObjectHideFlags: 0
@@ -1842,8 +1868,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5781894586840952343}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.043, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.112225495, z: 0.6}
+  m_LocalPosition: {x: 0, y: -0.058, z: 0}
+  m_LocalScale: {x: 0.6, y: 0.06299099, z: 0.6}
   m_Children: []
   m_Father: {fileID: 6150556912168944673}
   m_RootOrder: 5
@@ -2245,6 +2271,7 @@ MonoBehaviour:
   throwDestiPos: {fileID: 5781894587592942494}
   defaultAttack: {fileID: 424311161}
   assassinate: {fileID: 39382764}
+  unitCode: Enemy
 --- !u!114 &6150556912168944687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2263,11 +2290,7 @@ MonoBehaviour:
   lookDir: {x: 0, y: 0, z: 0}
   enemyRadar: {fileID: 9038843608279773064}
   checkStructure: {fileID: 2010139474}
-  patrolSpots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  patrolSpots: []
 --- !u!114 &6150556912168944686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3144,7 +3167,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3333641786024066037}
   - component: {fileID: 6859813095625045617}
-  - component: {fileID: 1002482373396792478}
+  - component: {fileID: 178104040}
   m_Layer: 21
   m_Name: DeathIcon
   m_TagString: Untagged
@@ -3215,7 +3238,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1002482373396792478
+--- !u!114 &178104040
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3412,15 +3435,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3adbd296348771143b89cb5ef3972404, type: 3}
---- !u!1 &5416481834475560347 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 3adbd296348771143b89cb5ef3972404,
-    type: 3}
-  m_PrefabInstance: {fileID: 4038278136164172946}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9038843608279773064 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 3adbd296348771143b89cb5ef3972404,
+    type: 3}
+  m_PrefabInstance: {fileID: 4038278136164172946}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5416481834475560347 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 3adbd296348771143b89cb5ef3972404,
     type: 3}
   m_PrefabInstance: {fileID: 4038278136164172946}
   m_PrefabAsset: {fileID: 0}

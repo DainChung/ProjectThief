@@ -207,11 +207,13 @@
      <Compile Include="Assets\Scripts\System\Collections.cs" />
      <Compile Include="Assets\Scripts\System\FileIO.cs" />
      <Compile Include="Assets\Scripts\System\FileManager.cs" />
+     <Compile Include="Assets\Scripts\System\SetStage.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
      <Compile Include="Assets\Scripts\System\Structure\Floor.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />
      <Compile Include="Assets\Scripts\System\Target.cs" />
-     <Compile Include="Assets\Scripts\System\UI\Icon.cs" />
+     <Compile Include="Assets\Scripts\System\UI\IconMainCamera.cs" />
+     <Compile Include="Assets\Scripts\System\UI\IconMiniMap.cs" />
      <Compile Include="Assets\Scripts\System\UI\Indicator.cs" />
      <Compile Include="Assets\Scripts\System\UI\UI.cs" />
      <Compile Include="Assets\Scripts\System\UI\UIController.cs" />

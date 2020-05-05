@@ -59,6 +59,7 @@ namespace Com.MyCompany.MyGame.GameSystem
             OnOffUI(true, "Button_Menu");
             OnOffUI(true, "Button_Inventory");
             OnOffUI(true, "Window_EquippedWeapon");
+            SetIndicator("DestiIndicator", GameObject.FindGameObjectWithTag("Gold").transform);
             ControlEquippedWeapon(WeaponCode.HAND);
 
             for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
@@ -72,15 +73,17 @@ namespace Com.MyCompany.MyGame.GameSystem
             uiTR.GetComponent<UIController>().OnOffAll(onoff);
         }
 
-        private IEnumerator ShowGameResult(GameResult gameResult)
+        private IEnumerator ShowGameResult(GameResult gameResult, bool isBestRecord)
         {
-            OnOffButtonAll(false, "Window_GameResult");
+            string window = "Window_GameResult";
+            OnOffUI(false, window, "BestText");
+            OnOffButtonAll(false, window);
 
             float addAmount = 0.008f;
             float score = gameResult.score;
 
-            SetUILabelText("Window_GameResult", ((int)(gameResult.score * 1000)).ToString(), "Score Value");
-            SetUILabelText("Window_GameResult", gameResult.gameTime.ToString(), "Time Value");
+            SetUILabelText(window, ((int)(gameResult.score * 1000)).ToString(), "Score Value");
+            SetUILabelText(window, gameResult.gameTime.ToString(), "Time Value");
 
             for (int i = 0; i < gameResultStars.Count; i++)
             {
@@ -96,7 +99,9 @@ namespace Com.MyCompany.MyGame.GameSystem
                 score--;
             }
 
-            OnOffButtonAll(true, "Window_GameResult");
+            if (isBestRecord) OnOffUI(true, window, "BestText");
+
+            OnOffButtonAll(true, window);
 
             yield break;
         }
@@ -104,7 +109,7 @@ namespace Com.MyCompany.MyGame.GameSystem
         /// 게임 결과창을 활성화
         /// </summary>
         /// <param name="isClear"> true = 클리어, false = Player 사망</param>
-        private void _ShowResultWindow(bool isClear)
+        private void _ShowResultWindow(bool isClear, bool isBestRecord)
         {
             OnOffButton(false, "Button_Inventory");
             OnOffButton(false, "Button_Menu");
@@ -114,7 +119,7 @@ namespace Com.MyCompany.MyGame.GameSystem
             {
                 OnOffUI(true, "Window_GameResult");
                 OnOffButtonAll(true, "Window_GameResult");
-                StartCoroutine(ShowGameResult(transform.GetComponent<StageManager>().gameResult));
+                StartCoroutine(ShowGameResult(transform.GetComponent<StageManager>().gameResult, isBestRecord));
             }
             else
             {
@@ -173,9 +178,9 @@ namespace Com.MyCompany.MyGame.GameSystem
             OnOffUI(false, "Window_Menu");
             player.GetComponent<Unit>().lockControl = onoff;
         }
-        public void ShowResultWindow(bool isClear)
+        public void ShowResultWindow(bool isClear, bool isBestRecord)
         {
-            _ShowResultWindow(isClear);
+            _ShowResultWindow(isClear, isBestRecord);
             Camera.main.GetComponent<CameraWork>().enabled = false;
         }
 
@@ -229,6 +234,14 @@ namespace Com.MyCompany.MyGame.GameSystem
             try
             {
                 OnOffUI(onoff, uiCam.Find(uiName));
+            }
+            catch (System.Exception) { }
+        }
+        public void OnOffUI(bool onoff, string windowName, string uiName)
+        {
+            try
+            {
+                uiCam.Find(windowName).Find(uiName).GetComponent<UIController>().OnOffAll(onoff);
             }
             catch (System.Exception) { }
         }

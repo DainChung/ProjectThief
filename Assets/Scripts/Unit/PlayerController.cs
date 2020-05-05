@@ -736,9 +736,10 @@ namespace Com.MyCompany.MyGame
                 if (uiManager.IsFullUIBasicSprite("NearestItemIndicator"))
                 {
                     pInventory.Add(nearestItem.GetItemCode());
+                    SetIndicator("NearestItemIndicator", null);
+                    if(nearestItem.GetItemCode() == ItemCode.GOLD) SetIndicator("DestiIndicator", null);
                     nearestItem.Init();
                     SendMessage("PlayAudio", "GetItem");
-                    uiManager.SetIndicator("NearestItemIndicator", null);
                 }
                 else
                     uiManager.FillAmountUIName("NearestItemIndicator", buttonDelay);
@@ -793,12 +794,12 @@ namespace Com.MyCompany.MyGame
                     if (!onoff)
                     {
                         nearestItem.Init();
-                        uiManager.SetIndicator("NearestItemIndicator", null);
+                        SetIndicator("NearestItemIndicator", null);
                     }
                     else
                     {
                         nearestItem.Set(other.GetComponent<Item>(), other.transform.position);
-                        uiManager.SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
+                        SetIndicator("NearestItemIndicator", nearestItem.GetItem().transform);
                     }
                 }
             }
@@ -813,7 +814,7 @@ namespace Com.MyCompany.MyGame
         public void ShowDeadWindow()
         {
             transform.Find("PlayerRadar").GetComponent<PlayerRadar>().enabled = false;
-            uiManager.ShowResultWindow(false);
+            uiManager.ShowResultWindow(false, false);
         }
 
         #endregion
