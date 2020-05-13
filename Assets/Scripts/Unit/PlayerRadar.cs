@@ -42,6 +42,7 @@ namespace Com.MyCompany.MyGame
 
         private void CheckStructure(Vector3 itemPos)
         {
+            //Debug.DrawRay(transform.position, (itemPos - transform.position) * (Vector3.Distance(itemPos, transform.position) -0.5f), Color.red);
             canGetItem = !(Physics.Raycast(transform.position, itemPos - transform.position, Vector3.Distance(itemPos, transform.position), 1 << PhysicsLayers.Structure));
         }
     }

@@ -25,7 +25,7 @@ namespace Com.MyCompany.MyGame.FileIO
             initData[0] = new UnitStat("DummyFast", 50, 0.41f, 0.31f, 5, 400);
             initData[1] = new UnitStat("Enemy", 20, 0.41f, 0.31f, 5, 400);
             initData[2] = new UnitStat("DummySlow", 10, 0.41f, 0.31f, 5, 400);
-            initData[3] = new UnitStat("Player", 20, 0.41f, 0.31f, 10, 400);
+            initData[3] = new UnitStat("Player", 200, 0.41f, 0.31f, 10, 300);
             initData[4] = new UnitStat("DummyTank", 20, 0.41f, 0.31f, 10, 400);
 
             return initData;
@@ -196,17 +196,28 @@ namespace Com.MyCompany.MyGame.FileIO
 
     public static class DataIO
     {
-        //private const string fileName = "BestRecord.data";
-
         private static void Write(string file)
         {
             string filePath = FilePaths.DataPath + "/" + file;
-            StringBuilder data = new StringBuilder();
+            //BestRecords.data 생성
+            if (file.Contains("Best"))
+            {
+                StringBuilder data = new StringBuilder();
 
-            data.AppendLine("TestScene,9999.99,0.000");
-            data.AppendLine("SecondStage,9999.99,0.000");
+                data.AppendLine("Stage1,9999.99,0.000");
+                data.AppendLine("Stage2,9999.99,0.000");
 
-            File.WriteAllText(filePath, data.ToString());
+                File.WriteAllText(filePath, data.ToString());
+            }
+            //SoundSetting.data 생성
+            else
+            {
+                StringBuilder data = new StringBuilder();
+
+                data.AppendLine("20");
+
+                File.WriteAllText(filePath, data.ToString());
+            }
         }
 
         public static void Write(string file, string stageName, float gameTime, float gameScore)
@@ -219,6 +230,27 @@ namespace Com.MyCompany.MyGame.FileIO
             {
                 if (allData[i].Contains(stageName)) writeData.AppendLine(string.Format("{0},{1},{2}", stageName, gameTime, gameScore));
                 else writeData.AppendLine(allData[i]);
+            }
+            File.WriteAllText(filePath, writeData.ToString());
+        }
+
+        /// <summary>
+        /// 파일의 특정 줄만 수정함
+        /// </summary>
+        /// <param name="file">파일이름</param>
+        /// <param name="data">저장할 데이터</param>
+        /// <param name="index">수정할 줄</param>
+        public static void Write(string file, string data, int index)
+        {
+            string filePath = FilePaths.DataPath + "/" + file;
+            StringBuilder writeData = new StringBuilder();
+            string[] allData = File.ReadAllLines(filePath);
+
+            for (int i = 0; i < allData.Length; i++)
+            {
+                if (index == i) allData[index] = data;
+
+                writeData.AppendLine(allData[i]);
             }
             File.WriteAllText(filePath, writeData.ToString());
         }
@@ -244,6 +276,25 @@ namespace Com.MyCompany.MyGame.FileIO
                     break;
                 }
             }
+
+            return result;
+        }
+        /// <summary>
+        /// 파일의 특정 줄만 읽음
+        /// </summary>
+        /// <param name="file">파일이름</param>
+        /// <param name="index">읽을 줄</param>
+        /// <returns></returns>
+        public static string Read(string file, int index)
+        {
+            string filePath = FilePaths.DataPath + "/" + file;
+            //파일이 없다면 만든다
+            if (!File.Exists(filePath)) Write(file);
+
+            string[] allData = File.ReadAllLines(filePath);
+            string result;
+
+            result = allData[index];
 
             return result;
         }

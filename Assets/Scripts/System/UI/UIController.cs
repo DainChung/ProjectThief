@@ -28,15 +28,21 @@ namespace Com.MyCompany.MyGame.UI
         }
 
         #region Public Methods
+        public void OffParent()
+        {
+            transform.parent.GetComponent<UIController>().OnOffAll(false);
+        }
+        public void OnParent()
+        {
+            transform.parent.GetComponent<UIController>().OnOffAll(true);
+        }
+
         public void OnOffAll(bool enable)
         {
             base.OnOffUI(enable);
             OnOffChildren(enable);
             if(enable) OnOffIcon();
-            try
-            {
-                transform.GetComponent<Indicator>().enabled = enable;
-            }
+            try{ transform.GetComponent<Indicator>().enabled = enable;}
             catch(System.NullReferenceException) { }
         }
 
@@ -131,16 +137,17 @@ namespace Com.MyCompany.MyGame.UI
             try
             {
                 if (transform.name != uiName) transform.Find(uiName).GetComponent<UIController>().SetText(text, uiName);
-                else base.SetText(text);
+                else
+                {
+                    if (text == "NULL") base.SetText(text, 45);
+                    else base.SetText(text);
+                }
             }
             catch (System.NullReferenceException)
             {
                 for (int i = 0; i < transform.childCount; i++)
                 {
-                    try
-                    {
-                        transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName);
-                    }
+                    try{ transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName);}
                     catch (System.NullReferenceException) { }
                 }
             }

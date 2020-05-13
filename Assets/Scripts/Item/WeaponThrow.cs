@@ -44,7 +44,7 @@ namespace Com.MyCompany.MyGame
                 {
                     lockAggro = true;
                     GameObject obj = Instantiate(Resources.Load(string.Format("{0}Aggro",FilePaths.weaponPath)) as GameObject, transform.position, transform.rotation) as GameObject;
-                    obj.GetComponent<Aggro>().SetCode(base._code, 60f);
+                    obj.GetComponent<Aggro>().SetCode(base._code, 0.5f);
                 }
 
                 PlayAudio();

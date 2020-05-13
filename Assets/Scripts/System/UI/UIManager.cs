@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
@@ -24,12 +25,15 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         void Awake()
         {
-            buttonNameToString.Add("Button_Home", "Home");
-            buttonNameToString.Add("Button_Retry", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            buttonNameToString.Add("Button_Home", "MainScene");
+            buttonNameToString.Add("Button_Retry", SceneManager.GetActiveScene().name);
             buttonNameToString.Add("Button_NextLevel", GetComponent<StageManager>().FindNextLevel());
             buttonNameToString.Add("Button_Menu", "Window_Menu");
             buttonNameToString.Add("Button_Inventory", "Window_Inventory");
             buttonNameToString.Add("Button_Setting", "Window_Setting");
+            buttonNameToString.Add("Button_Stages", "Window_Stage");
+            buttonNameToString.Add("Button_Stage1", "Stage1");
+            buttonNameToString.Add("Button_Stage2", "Stage2");
         }
 
         // Start is called before the first frame update
@@ -37,7 +41,8 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             uiCam = GameObject.Find("UICamera").transform;
 
-            player = GameObject.Find("Player");
+            if (SceneManager.GetActiveScene().name.Contains("Stage")) player = GameObject.Find("Player");
+
             InitUI();
         }
 
@@ -51,22 +56,36 @@ namespace Com.MyCompany.MyGame.GameSystem
         #region Private Methods
         private void InitUI()
         {
-            OnOffUI(false, uiCam);
+            string curScene = SceneManager.GetActiveScene().name;
 
-            FillAmountUIName("NearestItemIndicator", 0);
-            FillAmountUIName("AssassinateIndicator", 0);
-            OnOffUI(true, "Bar_HP");
-            OnOffUI(true, "Button_Menu");
-            OnOffUI(true, "Button_Inventory");
-            OnOffUI(true, "Window_EquippedWeapon");
-            SetIndicator("DestiIndicator", GameObject.FindGameObjectWithTag("Gold").transform);
-            ControlEquippedWeapon(WeaponCode.HAND);
-
-            for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
+            #region 게임 스테이지
+            if (curScene.Contains("Stage"))
             {
-                if (uiCam.Find("Window_GameResult").GetChild(i).name.Contains("Star"))
-                    gameResultStars.Add(uiCam.Find("Window_GameResult").GetChild(i).GetComponent<UI2DSprite>());
+                OnOffUI(false, uiCam);
+
+                FillAmountUIName("NearestItemIndicator", 0);
+                FillAmountUIName("AssassinateIndicator", 0);
+                OnOffUI(true, "Bar_HP");
+                OnOffUI(true, "Button_Menu");
+                OnOffUI(true, "Button_Inventory");
+                OnOffUI(true, "Window_EquippedWeapon");
+                SetIndicator("DestiIndicator", GameObject.FindGameObjectWithTag("Gold").transform);
+                ControlEquippedWeapon(WeaponCode.HAND);
+
+                for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
+                {
+                    if (uiCam.Find("Window_GameResult").GetChild(i).name.Contains("Star"))
+                        gameResultStars.Add(uiCam.Find("Window_GameResult").GetChild(i).GetComponent<UI2DSprite>());
+                }
             }
+            #endregion
+            #region 메인화면
+            else
+            {
+                OnOffUI(false, uiCam);
+                OnOffUIWindow(true, "Window_Menu");
+            }
+            #endregion
         }
         private void OnOffUI(bool onoff, Transform uiTR)
         {
@@ -127,9 +146,43 @@ namespace Com.MyCompany.MyGame.GameSystem
                 OnOffButtonAll(true, "Window_Dead");
             }
         }
+
+        private void SetMainStagesWindow()
+        {
+            for (int i = 1; i < 3; i++)
+            {
+                string stageName = string.Format("Stage{0}", i);
+                string nextStageName = string.Format("Stage{0}", i+1);
+                GameResult fileData = FileIO.DataIO.Read("BestRecord.data", stageName);
+                int score = (int)(fileData.score * 1000);
+
+                UIController ui = uiCam.Find("Window_Stage").Find(stageName).Find("Record").GetComponent<UIController>();
+
+                //클리어 한 적 없음
+                if (score == 0 && fileData.gameTime.minutes > 9000)
+                {
+                    ui.SetText("NULL", "BestTime");
+                    ui.SetText("NULL", "BestScore");
+                    //첫 스테이지가 아니면 잠금
+                    try { uiCam.Find("Window_Stage").Find(string.Format("Button_{0}", nextStageName)).GetComponent<UIController>().OnOffUIButton(false); }
+                    catch (System.Exception) { }
+                }
+                //클리어한 스테이지
+                else
+                {
+                    ui.SetText(fileData.gameTime.ToString(), "BestTime");
+                    ui.SetText(score.ToString(), "BestScore");
+                }
+            }
+        }
         #endregion
 
         #region Public Methods
+
+        public void SetUISliderValue(string windowName, string uiName, float v)
+        {
+            uiCam.Find(windowName).Find(uiName).GetComponent<UISlider>().value = Mathf.Clamp01(v);
+        }
 
         /// <summary>
         /// buttonName 버튼으로 특정 Window를 열 때 사용
@@ -140,16 +193,19 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             string windowName = buttonNameToString[buttonName];
 
+            uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
+            try { OnOffButton(!enable, buttonName); }
+            catch (System.Exception) { }
             if (windowName == "Window_Menu" || windowName == "Window_Inventory")
             {
                 Time.timeScale = (enable ? 0 : 1);
-                OnOffButton(!enable, "Button_Menu");
-                OnOffButton(!enable, "Button_Inventory");
+                try { OnOffButton(!enable, "Button_Menu"); }
+                catch { OnOffButton(!enable, "Window_Menu", buttonName); }
+                try { OnOffButton(!enable, "Button_Inventory"); }
+                catch (System.Exception) {}
             }
-            else if (windowName == "Window_Setting")
-                OnOffButton(!enable, "Window_Menu", "Button_Setting");
-
-            uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
+            else if (windowName == "Window_Setting") OnOffButton(!enable, "Window_Menu", "Button_Setting");
+            else if (windowName == "Window_Stage") SetMainStagesWindow();
         }
 
         public void OnOffUIWindow(bool enable, string windowName)

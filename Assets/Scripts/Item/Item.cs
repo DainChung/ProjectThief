@@ -13,14 +13,18 @@ namespace Com.MyCompany.MyGame
 
         void Start()
         {
-            if (transform.CompareTag("Gold"))
-                _code = ItemCode.GOLD;
+            if (transform.CompareTag("Gold")) _code = ItemCode.GOLD;
         }
 
         public void SetItem(WeaponCode weaponCode)
         {
             if (_code == ItemCode.max)
                 _code = EnumCollections.ConvertWeaponToItem(weaponCode);
+        }
+        public void SetItem(ItemCode itemCode)
+        {
+            if (_code == ItemCode.max)
+                _code = itemCode;
         }
     }
 }

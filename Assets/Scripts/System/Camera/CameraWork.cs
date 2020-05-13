@@ -34,16 +34,7 @@ namespace Com.MyCompany.MyGame
 
         protected virtual void FollowPlayer()
         {
-            dist = Mathf.Clamp(dist, 0.5f, maxDist);
-            float cameraYValue = Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.x);
-
-            destiPos.Set(Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.y) * dist * cameraYValue,
-                        0f,
-                        Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.y) * dist * cameraYValue);
-
-            destiPos = player.position - destiPos;
-            destiPos.Set(destiPos.x, player.position.y + cameraPos.y * (1 + Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x) * 3f * (dist/maxDist)), destiPos.z);
-
+            destiPos = GetPositionBYDist(dist);
             transform.position = Vector3.SmoothDamp(transform.position, destiPos, ref v, smooth);
         }
 
@@ -79,15 +70,35 @@ namespace Com.MyCompany.MyGame
 
         protected void CheckStructure()
         {
-            Ray ray = new Ray(player.position + height, transform.position - player.position - height);
-            Debug.DrawRay(ray.origin, ray.direction * maxDist, Color.red);
-
-            RaycastHit[] hits = Physics.RaycastAll(ray, maxDist * maxDist, 1 << PhysicsLayers.Structure);
+            Ray ray = new Ray(player.position + height, GetPositionBYDist(maxDist) - player.position - height);
+            Debug.DrawRay(player.position + height, GetPositionBYDist(maxDist) - player.position - height);
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxDist, 1 << PhysicsLayers.Structure);
 
             dist = maxDist;
             foreach (RaycastHit hit in hits)
                 if (dist > hit.distance - 0.5f) dist = hit.distance - 0.5f;
         }
+        #endregion
+
+        #region Private Methods
+
+        private Vector3 GetPositionBYDist(float distance)
+        {
+            Vector3 result = Vector3.zero;
+
+            distance = Mathf.Clamp(distance, 0.5f, maxDist);
+            float cameraYValue = Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.x);
+
+            result.Set(Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.y) * distance * cameraYValue,
+                        0f,
+                        Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.y) * distance * cameraYValue);
+
+            result = player.position - result;
+            result.Set(result.x, player.position.y + cameraPos.y * (1 + Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x) * 3f * (distance / maxDist)), result.z);
+
+            return result;
+        }
+
         #endregion
     }
 }

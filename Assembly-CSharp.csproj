@@ -209,6 +209,8 @@
      <Compile Include="Assets\Scripts\System\FileManager.cs" />
      <Compile Include="Assets\Scripts\System\SetStage.cs" />
      <Compile Include="Assets\Scripts\System\StageManager.cs" />
+     <Compile Include="Assets\Scripts\System\Structure\ControlledStructure.cs" />
+     <Compile Include="Assets\Scripts\System\Structure\Door.cs" />
      <Compile Include="Assets\Scripts\System\Structure\Floor.cs" />
      <Compile Include="Assets\Scripts\System\Structure\WallEnd.cs" />
      <Compile Include="Assets\Scripts\System\Target.cs" />

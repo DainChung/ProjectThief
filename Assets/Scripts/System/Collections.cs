@@ -11,7 +11,7 @@ namespace Com.MyCompany.MyGame
         #region Enums
         public enum ItemCode
         {
-            GOLD = 0, CAN, CHEESE, SMOKE, max
+            GOLD = 0, CAN, CHEESE, SMOKE, STRUCTURE, max
         }
 
         //Enemy가 추적할 때 사용하기도 함
@@ -176,7 +176,7 @@ namespace Com.MyCompany.MyGame
 
         public static class ValueCollections
         {
-            private static int[] _itemMaxAmount = { 50, 30, 20 };
+            private static int[] _itemMaxAmount = { 50, 30, 20, -1 };
             public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
 
             #region Weapons Init Values

@@ -15,7 +15,7 @@ namespace Com.MyCompany.MyGame.UI
 
         void FixedUpdate()
         {
-            Rotate(mainCamTransform.rotation.eulerAngles.y);
+            RotateY(mainCamTransform.rotation.eulerAngles.y);
         }
     }
 }

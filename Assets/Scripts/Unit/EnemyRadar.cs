@@ -76,8 +76,7 @@ namespace Com.MyCompany.MyGame
                 {
                     try
                     {
-                        checkStructure.CheckStructure(hit.transform.position);
-                        if (unit.curUnitState != UnitState.INSMOKE && !checkStructure.isThereStructure)
+                        if (unit.curUnitState != UnitState.INSMOKE && !(checkStructure.CheckStructureRay(hit.transform.position)))
                         {
                             if (unit.alertValue > 0.15f) unit.curLookDir = LookDirState.FINDPLAYER;
                             //플레이어가 인지 범위 밖으로 갔다가 다시 들어오면 DecreaseAlertValue 코루틴을 정지한다.

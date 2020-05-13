@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 33836576201162556}
   - component: {fileID: 23814098243212856}
   - component: {fileID: 5077937894099930802}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cabinet_04_snaps001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_NavMeshLayer: 1
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!4 &4759334854888036
 Transform:
@@ -67,6 +67,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0

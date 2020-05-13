@@ -17,8 +17,10 @@ namespace Com.MyCompany.MyGame.GameSystem
         // Start is called before the first frame update
         void Start()
         {
-            audioSettings.GetFloat("AllVolume", out _audioVolume);
-            //나중에 파일에서 읽어올 것
+            float.TryParse(FileIO.DataIO.Read("SoundSetting.data", 0), out _audioVolume);
+            audioSettings.SetFloat("AllVolume", _audioVolume);
+            GetComponent<UIManager>().SetUISliderValue("Window_Setting", "Sound Slider", (_audioVolume + 80)/100);
+
             audioDic.Add("CAN", "metalPot3");
             audioDic.Add("CHEESE", "bookClose");
             audioDic.Add("SMOKE", "Smoke Grenade");
@@ -48,6 +50,11 @@ namespace Com.MyCompany.MyGame.GameSystem
             float value = enable ? 20 : -80;
             audioSettings.SetFloat("AllVolume", value);
             audioSettings.GetFloat("AllVolume", out _audioVolume);
+        }
+
+        public void SaveSoundSetting()
+        {
+            FileIO.DataIO.Write("SoundSetting.data", _audioVolume.ToString(), 0);
         }
     }
 }

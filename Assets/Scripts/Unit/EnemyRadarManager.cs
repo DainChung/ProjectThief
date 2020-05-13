@@ -63,22 +63,6 @@ namespace Com.MyCompany.MyGame
                                 unit.alertValue = AggroCollections.combatMin;
                                 unit.AlertManager();
                             }
-
-                            //int index = 0;
-
-                            //while (index < other.transform.childCount)
-                            //{
-                            //    if (other.transform.GetChild(index).name == "Target(Clone)")
-                            //    {
-                            //        try
-                            //        {
-                            //            if (enemy.transform.GetInstanceID() == other.transform.GetChild(index).GetComponent<Target>().ID)
-                            //                Destroy(other.transform.GetChild(index).gameObject);
-                            //            index++;
-                            //        }
-                            //        catch (System.Exception) { }
-                            //    }
-                            //}
                             break;
                     }
                 }

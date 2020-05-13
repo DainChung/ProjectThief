@@ -18,6 +18,7 @@ TagManager:
   - UI
   - UIWindow
   - Enemy
+  - Out
   layers:
   - Default
   - TransparentFX

@@ -9,11 +9,6 @@ using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.Exceptions;
 using Com.MyCompany.MyGame.GameSystem;
 
-/*  Line Renderer 제어하는 스크립트를 Unit.cs로 옮길 것
- *  Stopwatch도 Unit.cs로 옮길 것
- *  AttackThrow와 관련 함수를 모두 Unit.cs로 옮길 것
- *  => 적 캐릭터도 AttackThrow함수를 이용할 수 있도록 변경할 것.
-     */
 namespace Com.MyCompany.MyGame
 {
     public class Unit : MonoBehaviour
@@ -311,9 +306,13 @@ namespace Com.MyCompany.MyGame
             defaultAttack.InitAttackCollider(1);
             assassinate.InitAttackCollider(-1);
 
-            rb = GetComponent<Rigidbody>();
-            GetComponent<CapsuleCollider>().enabled = true;
-            rb.useGravity = true;
+            try
+            {
+                GetComponent<CapsuleCollider>().enabled = true;
+                rb = GetComponent<Rigidbody>();
+                rb.useGravity = true;
+            }
+            catch (System.Exception) { }
         }
 
         void FixedUpdate()
@@ -394,14 +393,10 @@ namespace Com.MyCompany.MyGame
                 unitAnimHelper.isWallClose = false;
 
             if (other.CompareTag("WallRightEnd"))
-            {
                 animator.SetBool("IsWallRightEnd", false);
-            }
 
             if (other.CompareTag("WallLeftEnd"))
-            {
                 animator.SetBool("IsWallLeftEnd", false);
-            }
         }
 
         #endregion
@@ -439,9 +434,13 @@ namespace Com.MyCompany.MyGame
 
         public void Dead()
         {
-            GetComponent<CapsuleCollider>().enabled = false;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().useGravity = false;
+            try
+            {
+                GetComponent<CapsuleCollider>().enabled = false;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().useGravity = false;
+            }
+            catch (System.Exception) { }
 
             if (transform.CompareTag("Player")) SendMessage("ShowDeadWindow");
             else if (transform.gameObject.layer == PhysicsLayers.Enemy)
@@ -477,16 +476,11 @@ namespace Com.MyCompany.MyGame
                         if (!standingLayerAnimInfo.IsName("HitReaction")) animator.Play("HitReaction", AnimationLayers.Standing);
                         animator.SetBool("IsHit", true);
                         alertValue = AggroCollections.combatMin;
-                        rb.AddForce(transform.forward * (-2), ForceMode.Impulse);
+                        try { rb.AddForce(transform.forward * (-2), ForceMode.Impulse); }
+                        catch (Exception) { }
 
-                        try
-                        {
-                            transform.GetComponent<EnemyController>().EnemyAlertManager();
-                        }
-                        catch (NullReferenceException)
-                        {
-                            AlertManager();
-                        }
+                        try{ transform.GetComponent<EnemyController>().EnemyAlertManager();}
+                        catch (NullReferenceException){AlertManager();}
                         _lockControl = true;
                     }
                 }
@@ -506,7 +500,7 @@ namespace Com.MyCompany.MyGame
                 unitAnimController.TurnOffAllLayers();
                 _curUnitState = UnitState.IDLE;
                 alertValue = 0;
-                try { GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true; }
+                try { if(GetComponent<UnityEngine.AI.NavMeshAgent>().enabled) GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true; }
                 catch (System.Exception) { }
 
                 Transform icon = transform.Find("Icon");
@@ -541,7 +535,8 @@ namespace Com.MyCompany.MyGame
                     EnableDefaultAttack(true);
 
                     //위치 제어
-                    rb.AddForce(transform.forward * 2, ForceMode.Impulse);
+                    try { rb.AddForce(transform.forward * 2, ForceMode.Impulse); }
+                    catch (System.Exception) { GetComponent<CharacterController>().Move(transform.forward * Time.deltaTime); }
                 }
                 //간헐적으로 attackSW[0]가 영구적으로 중지되는 버그 방지
                 else if (!swManager.IsRunningSW(0))
@@ -555,7 +550,7 @@ namespace Com.MyCompany.MyGame
             Vector3 wallPos = WallTransform().position;
             Vector3 wallRight = WallTransform().right;
 
-            float colliderHeight = transform.GetComponent<CapsuleCollider>().center.y;
+            float colliderHeight = GetComponent<CharacterController>().center.y;//transform.GetComponent<CapsuleCollider>().center.y;
 
             float newX, newZ;
             float alpha, beta;
@@ -583,7 +578,7 @@ namespace Com.MyCompany.MyGame
             if (isCovering)
             {
                 //Collider를 조금 이동시켜서 애니메이션이 자연스럽게 보이도록 한다
-                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, colliderHeight, 0.7f);
+                GetComponent<CharacterController>().center = new Vector3(0, colliderHeight, 0.7f);
 
                 Vector3 newVector = new Vector3(newX, transform.position.y, newZ);
 
@@ -599,7 +594,10 @@ namespace Com.MyCompany.MyGame
             }
             //엄폐를 해제하면 Collider 위치를 초기화한다.
             else
-                transform.GetComponent<CapsuleCollider>().center = new Vector3(0, colliderHeight, 0);
+            {
+                GetComponent<CharacterController>().center = new Vector3(0, colliderHeight, 0);
+            }
+            GetComponent<CapsuleCollider>().center = GetComponent<CharacterController>().center;
 
             yield break;
         }

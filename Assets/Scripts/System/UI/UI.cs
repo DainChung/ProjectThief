@@ -24,9 +24,9 @@ namespace Com.MyCompany.MyGame.UI
             destiPos.Set(x * maxW, y * maxH, 0);
             transform.localPosition = destiPos;
         }
-        protected virtual void Rotate(float destiRotEulerY)
+        protected virtual void RotateY(float destiRotEulerY)
         {
-            transform.rotation = Quaternion.Euler(0, destiRotEulerY + 180, 0);
+            transform.rotation = Quaternion.Euler(0, destiRotEulerY, 0);
         }
 
         /// <summary>
@@ -46,15 +46,34 @@ namespace Com.MyCompany.MyGame.UI
             for (int j = 0; j < uiWidgetConts.Length; j++)
             {
                 uiWidgetConts[j].enabled = enable;
-                OnOffUIButton(enable);
+                try { OnOffUIButton(enable);}
+                catch (System.Exception) { }
             }
         }
         public virtual void OnOffUIButton(bool enable)
         {
-            try{ transform.GetComponent<UIButton>().isEnabled = enable;}
-            catch(System.Exception){ }
-
-            try { GetComponent<BoxCollider>().enabled = enable; }
+            try
+            {
+                GetComponent<UIButton>().isEnabled = enable;
+                GetComponent<BoxCollider>().enabled = enable;
+            }
+            catch (System.Exception) { }
+        }
+        public virtual void OnOffUIButtonAuto()
+        {
+            try
+            {
+                if (GetComponent<UIButton>().isEnabled)
+                {
+                    GetComponent<UIButton>().isEnabled = false;
+                    GetComponent<BoxCollider>().enabled = false;
+                }
+                else
+                {
+                    GetComponent<UIButton>().isEnabled = true;
+                    GetComponent<BoxCollider>().enabled = true;
+                }
+            }
             catch (System.Exception) { }
         }
         /// <summary>
@@ -87,6 +106,11 @@ namespace Com.MyCompany.MyGame.UI
 
         public virtual void SetText(string text)
         {
+            transform.GetComponent<UILabel>().text = text;
+        }
+        public virtual void SetText(string text, int size)
+        {
+            transform.GetComponent<UILabel>().fontSize = size;
             transform.GetComponent<UILabel>().text = text;
         }
         public virtual string GetText()

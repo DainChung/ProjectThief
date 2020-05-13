@@ -15,7 +15,16 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
-            if (_enemy.curTargetPos != transform.position) Destroy(this);
+            if (_enemy.curTargetPos != transform.position) Destroy(gameObject);
+        }
+
+        void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Out"))
+            {
+                _enemy.InitCurTarget();
+                Destroy(gameObject);
+            }
         }
 
         void DelayDestroy()

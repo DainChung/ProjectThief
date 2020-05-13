@@ -524,14 +524,19 @@ namespace Com.MyCompany.MyGame
                     isMovingNow = true;
                     if (checkStructure.isThereStructure)
                     {
+                        if (!agent.enabled) agent.enabled = true;
                         unit.curLookDir = LookDirState.AGENT;
                         agent.SetDestination(playerPosition);
                     }
                     else
                     {
+                        if (agent.enabled)
+                        {
+                            agent.ResetPath();
+                            agent.enabled = false;
+                        }
                         unit.curLookDir = LookDirState.FINDPLAYER;
                         rb.velocity = transform.forward * enemySpeed * 0.15f;
-                        agent.ResetPath();
                     }
                 }
                 else if (_doesReachToTarget)
@@ -560,15 +565,21 @@ namespace Com.MyCompany.MyGame
                     isMovingNow = true;
                     if (checkStructure.isThereStructure)
                     {
+                        if (!agent.enabled) agent.enabled = true;
+
                         unit.curLookDir = LookDirState.AGENT;
                         agent.SetDestination(curTarget.pos);
                     }
                     else
                     {
+                        if (agent.enabled)
+                        {
+                            agent.ResetPath();
+                            agent.enabled = false;
+                        }
                         unit.curLookDir = LookDirState.IDLE;
                         LookDir();
                         rb.velocity = transform.forward * enemySpeed * 0.15f;
-                        agent.ResetPath();
                     }
                 }
                 else if (_doesReachToTarget)
@@ -648,8 +659,8 @@ namespace Com.MyCompany.MyGame
                 curTarget.tr = null;
                 curTarget.pos = ValueCollections.initPos;
             }
+            if (agent.enabled) agent.ResetPath();
             isMovingNow = false;
-            agent.ResetPath();
             stayDelay.Reset();
             stayDelay.Stop();
         }
@@ -667,9 +678,12 @@ namespace Com.MyCompany.MyGame
 
             try
             {
-                transform.Find("Icon").GetChild(1).GetComponent<SpriteRenderer>().enabled = false;
-                transform.Find("Icon").GetChild(2).GetComponent<SpriteRenderer>().enabled = false;
-                icon = transform.Find("Icon").Find(iconName).GetComponent<SpriteRenderer>();
+                if(unit.curUnitState == UnitState.ALERT)
+                    transform.Find("COMBATIcon").GetComponent<SpriteRenderer>().enabled = false;
+                else if(unit.curUnitState == UnitState.COMBAT)
+                    transform.Find("ALERTIcon").GetComponent<SpriteRenderer>().enabled = false;
+
+                icon = transform.Find(iconName).GetComponent<SpriteRenderer>();
                 icon.enabled = true;
             }
             catch (System.Exception) { yield break; }
@@ -700,9 +714,14 @@ namespace Com.MyCompany.MyGame
                 unit.animator.Play("Eat Cheese", AnimationLayers.Standing);
                 unit.lockControl = true;
             }
+            else if (unit.curUnitState == UnitState.COMBAT && !checkStructure.isThereStructure)
+                unit.curLookDir = LookDirState.FINDPLAYER;
 
-            agent.ResetPath();
-            agent.velocity = Vector3.zero;
+            if (agent.enabled)
+            {
+                agent.ResetPath();
+                agent.velocity = Vector3.zero;
+            }
             _doesReachToTarget = false;
             isMovingNow = false;
             canIAttack = true;
@@ -740,7 +759,7 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-                agent.ResetPath();
+                if(agent.enabled) agent.ResetPath();
                 if(code == WeaponCode.SMOKE) EnemyAlertManager(UnitState.INSMOKE);
                 else EnemyAlertManager();
             }

@@ -286,3 +286,4 @@ C:\Users\Dian\Downloads\백업폴더\개발\개발관련백업\Unity\2020\Projec
 C:\Users\Dian\Downloads\백업폴더\개발\개발관련백업\Unity\2020\ProjectThief\obj\Debug\Assembly-CSharp-firstpass.csprojResolveAssemblyReference.cache
 C:\Users\Dian\Downloads\백업폴더\개발\개발관련백업\Unity\2020\ProjectThief\obj\Debug\Assembly-CSharp-firstpass.dll
 C:\Users\Dian\Downloads\백업폴더\개발\개발관련백업\Unity\2020\ProjectThief\obj\Debug\Assembly-CSharp-firstpass.pdb
+C:\Users\Dian\Downloads\백업폴더\개발\개발관련백업\Unity\2020\ProjectThief\Temp\bin\Debug\Mono.Data.Sqlite.dll

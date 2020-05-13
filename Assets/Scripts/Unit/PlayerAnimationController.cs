@@ -53,9 +53,9 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
-        void ControlPlayerAnimation()
+        void ChangeUnitPose(UnitPose curPose)
         {
-            switch (unit.curUnitPose)
+            switch (curPose)
             {
                 #region MOD_WALK
                 case UnitPose.MOD_WALK:
@@ -194,6 +194,29 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+        }
+
+        void ControlPlayerAnimation()
+        {
+            ChangeUnitPose(unit.curUnitPose);
+
+            if (!unit.IsWallClose() && animator.GetBool("IsCovering"))
+            {
+                if (animator.GetBool("IsCrouchMode"))
+                {
+                    unitAnimController.CoverCrouchPoseTONewPose(UnitPose.MOD_CROUCH);
+                    collider.center = new Vector3(0, crouchColliderHeight / 2, 0f);
+                    collider.height = crouchColliderHeight;
+                    player.SetBYCurUnitPose();
+                }
+                else
+                {
+                    unitAnimController.TurnOffAllLayers();
+                    collider.center = new Vector3(0, standColliderHeight / 2, 0f);
+                    collider.height = standColliderHeight;
+                    player.SetBYCurUnitPose();
+                }
+            }
 
             if (unit.IsOnFloor())
             {
@@ -227,7 +250,6 @@ namespace Com.MyCompany.MyGame
                     #region Control Cover Move Animation
                     case UnitPose.MOD_COVERSTAND:
                     case UnitPose.MOD_COVERCROUCH:
-
                         if (unit.IsWallClose())
                         {
                             animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));

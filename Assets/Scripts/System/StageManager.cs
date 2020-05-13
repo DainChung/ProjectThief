@@ -80,41 +80,32 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         #region MonoBehaviour Callbacks
 
-        void Awake()
-        {
-            //unitStatDB = DBIO.ReadAll("UnitStatDB.db");
-        }
-
         // Start is called before the first frame update
         void Start()
         {
             Time.timeScale = 1;
-            //treasure = GameObject.FindGameObjectWithTag("Treasure");
 
-            //gameEvent.showUI += ShowUIHandler;
-
-            //플레이어 캐릭터를 시작 지점으로 옮김
-            GameObject.FindGameObjectWithTag("Player").transform.position = start.position;
-
-            //탈출 지점을 숨김
-            foreach (Transform endArea in end)
+            try
             {
-                endArea.GetComponent<MeshRenderer>().enabled = false;
-                endArea.GetComponent<BoxCollider>().enabled = false;
-                endArea.GetChild(0).GetComponent<SpriteRenderer>().enabled = false;
+                //플레이어 캐릭터를 시작 지점으로 옮김
+                GameObject.FindGameObjectWithTag("Player").transform.position = start.position;
+                //탈출 지점을 숨김
+                foreach (Transform endArea in end)
+                {
+                    endArea.GetComponent<BoxCollider>().enabled = false;
+                    endArea.GetChild(0).GetComponent<SpriteRenderer>().enabled = false;
+                }
+
+                _gameResult.score = 0.0f;
+
+                gameTimer = new System.Diagnostics.Stopwatch();
+                gameTimer.Start();
             }
-
-            _gameResult.score = 0.0f;
-
-            gameTimer = new System.Diagnostics.Stopwatch();
-            gameTimer.Start();
-        }
-
-        void Update()
-        {
-            if (Input.GetButtonDown("TEST"))
+            //메인화면
+            catch (System.Exception)
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("TestScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+                //ReadBestScore
+                //Send to Text
             }
         }
         #endregion
@@ -123,7 +114,7 @@ namespace Com.MyCompany.MyGame.GameSystem
         private void UpdateScore(float amount)
         {
             _gameResult.score += amount;
-            if (_gameResult.score > 3) _gameResult.score = 3;
+            _gameResult.score = Mathf.Clamp(_gameResult.score, 0, 3);
         }
 
         private string IndexToSceneName(int i)
@@ -143,7 +134,6 @@ namespace Com.MyCompany.MyGame.GameSystem
             Random.InitState((int)Time.unscaledTime);
             int index = Random.Range(0, end.Length);
             end[index].GetComponent<BoxCollider>().enabled = true;
-            end[index].GetComponent<MeshRenderer>().enabled = true;
             end[index].GetChild(0).GetComponent<SpriteRenderer>().enabled = true;
 
             GetComponent<UIManager>().SetIndicator("DestiIndicator", end[index]);
@@ -194,7 +184,7 @@ namespace Com.MyCompany.MyGame.GameSystem
             string curStage = SceneManager.GetActiveScene().name;
             gameTimer.Stop();
             _gameResult.gameTime = new GameTime(gameTimer);
-            UpdateScore(3 - _gameResult.gameTime.time);
+            UpdateScore(3 - _gameResult.gameTime.time/2);
 
             bool isBest = false;
             GameResult bestRecord = DataIO.Read("BestRecord.data", curStage);
@@ -205,6 +195,11 @@ namespace Com.MyCompany.MyGame.GameSystem
             }
             GetComponent<UIManager>().ShowResultWindow(true, isBest);
             GetComponent<UIManager>().SetIndicator("DestiIndicator", null);
+        }
+
+        public void ExitGame()
+        {
+            Application.Quit();
         }
         #endregion
     }

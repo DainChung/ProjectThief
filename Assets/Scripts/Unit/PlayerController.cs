@@ -229,6 +229,10 @@ namespace Com.MyCompany.MyGame
                 catch (System.Exception)
                 { }
             }
+            /// <summary>
+            /// Item을 즉시 삭제함
+            /// </summary>
+            /// <returns></returns>
             public ItemCode GetItemCode()
             {
                 ItemCode result = ItemCode.max;
@@ -263,14 +267,17 @@ namespace Com.MyCompany.MyGame
         private Quaternion destiRotation;
         private Vector3 lookDir;
         private Vector3 destiPos;
+        private CharacterController charController;
+        private Vector3 moveDir = Vector3.zero;
 
-        private Rigidbody rb;
-        #endregion
+        private float mass = 1f;
+        private Vector3 gravity = new Vector3(0, -9.8f, 0);
+            #endregion
 
             #region 애니메이션
         private Animator animator;
         private PlayerAnimationController playerAnimController;
-        #endregion
+            #endregion
 
             #region 무기 및 공격
         private WeaponCode curWeapon = WeaponCode.HAND;
@@ -321,11 +328,11 @@ namespace Com.MyCompany.MyGame
             GameObject m = GameObject.FindWithTag("Manager");
             stageManager = m.GetComponent<StageManager>();
             uiManager = m.GetComponent<UIManager>();
-            rb = GetComponent<Rigidbody>();
             animator = unit.animator;
 
             mainCameraTransform = Camera.main.transform;
             miniMapcam = GameObject.Find("MinimapCamera").GetComponent<MinimapCameraWork>();
+            charController = GetComponent<CharacterController>();
             lookDir = mainCameraTransform.forward + transform.position;
 
             playerSpeed = unit.speed;
@@ -339,6 +346,8 @@ namespace Com.MyCompany.MyGame
 
         void FixedUpdate()
         {
+            if (!unit.IsOnFloor()) moveDir += gravity * mass * Time.deltaTime;
+            else moveDir.Set(moveDir.x, 0f, moveDir.z);
             //움직임이 허용된 상태에서만 조작 가능
             if (!unit.lockControl)
             {
@@ -427,19 +436,13 @@ namespace Com.MyCompany.MyGame
                         default:
                             break;
                     }
-
-                    //과도한 미끄러짐 방지
-                    rb.velocity *= 0.97f;
                     #endregion
                 }
 
                 LookDir();
                 ControlGetItem();
             }
-
-            //UnityEngine.Debug.Log("Aggro: " + aggro);
-            //플레이어가 의도하지 않은 회전 방지           
-            rb.angularVelocity = Vector3.zero;
+            charController.Move(moveDir * Time.deltaTime);
         }
 
         void OnTriggerEnter(Collider other)
@@ -448,15 +451,26 @@ namespace Com.MyCompany.MyGame
             {
                 try
                 {
+                    if (other.name.Contains("Stairs")) mass = 10f;
+                    else mass = 1f;
                     miniMapcam.ChangeFloor(other.GetComponent<Floor>().floor);
                 }
-                catch (System.Exception){ }
+                catch (System.Exception) { }
             }
 
             if (other.CompareTag("EndArea"))
             {
                 Time.timeScale = 0;
                 GameObject.FindWithTag("Manager").GetComponent<StageManager>().GameClear();
+            }
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Floor"))
+            {
+                if (other.name.Contains("Stairs")) mass = 10f;
+                else mass = 1f;
             }
         }
 
@@ -474,6 +488,7 @@ namespace Com.MyCompany.MyGame
         //플레이어 캐릭터가 특정 방향을 바라보게 하는 함수
         void LookDir()
         {
+            if (animator.GetBool("IsCovering")) unit.curLookDir = LookDirState.COVER;
             switch (unit.curLookDir)
             {
                 case LookDirState.IDLE:
@@ -489,7 +504,6 @@ namespace Com.MyCompany.MyGame
                     lookDir = transform.position + transform.forward;
                     break;
             }
-
             lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
             transform.LookAt(lookDir, Vector3.up);
             //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지, freezeRotation으로 제어 안 됨
@@ -561,7 +575,7 @@ namespace Com.MyCompany.MyGame
             //일정 거리 이내가 될 때까지
             while (unit.assassinate.enableCollider)
             {
-                rb.AddForce(transform.forward * unit.walkSpeed);
+                charController.Move(transform.forward * unit.walkSpeed * Time.deltaTime);
                 yield return null;
             }
             SendMessage("EnableAudio", true);
@@ -617,34 +631,20 @@ namespace Com.MyCompany.MyGame
             unit.curLookDir = LookDirState.IDLE;
 
             //플레이어 캐릭터 이동
-            if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
-            {
-                destiPos = transform.forward * playerSpeed;
-
-                rb.AddForce(destiPos);
-            }
+            if (Input.GetButton("Vertical") || Input.GetButton("Horizontal")) moveDir = transform.forward * playerSpeed * Time.deltaTime;
+            else moveDir.Set(0, moveDir.y, 0);
 
             //점프할 때
             if (animator.GetBool("IsRunMode"))
-            {
-                if (Input.GetButtonDown("Jump"))
-                {
-                    destiPos = transform.up * unit.jumpPower;
-
-                    rb.AddForce(destiPos);
-                }
-            }
+                if (Input.GetButtonDown("Jump")) moveDir += transform.up * unit.jumpPower * Time.deltaTime;//charController.Move(transform.up * unit.jumpPower * Time.deltaTime);
         }
         //조준 상태일 때의 조작
         private void ControlThrowMove()
         {
             //플레이어 캐릭터 이동
             if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
-            {
-                destiPos = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")) * playerSpeed;
-
-                rb.AddForce(destiPos);
-            }
+                moveDir = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")) * playerSpeed * Time.deltaTime;
+            else moveDir.Set(0, moveDir.y, 0);
         }
 
         //엄폐 상태일 때의 조작
@@ -661,21 +661,21 @@ namespace Com.MyCompany.MyGame
                 //벽 우측 끝 도달 && 우측으로 계속 이동하려는 경우
                 if (animator.GetBool("IsWallRightEnd") && Input.GetAxis("Horizontal") > 0)
                 {
+                    moveDir.Set(0, 0, 0);
                     //아무것도 하지 않음
                 }
                 //벽 좌측 끝 도달 && 좌측으로 계속 이동하려는 경우
                 else if (animator.GetBool("IsWallLeftEnd") && Input.GetAxis("Horizontal") < 0)
                 {
+                    moveDir.Set(0, 0, 0);
                     //아무것도 하지 않음
                 }
                 //일반적인 상황 OR 벽 우측 끝에서 좌측으로 이동 OR 벽 좌측 끝에서 우측으로 이동
                 else
-                {
-                    destiPos = -transform.right * Input.GetAxis("Horizontal") * playerSpeed;
-
-                    rb.velocity = destiPos;
-                }
+                    moveDir = -transform.right * Input.GetAxis("Horizontal") * playerSpeed * Time.deltaTime;
             }
+            else
+                moveDir.Set(0, 0, 0);
 
             //우측 끝에서 우측 이동 버튼을 다시 누르면 엄폐물 이동 수행
             if (animator.GetBool("IsWallRightEnd"))
@@ -735,9 +735,12 @@ namespace Com.MyCompany.MyGame
             {
                 if (uiManager.IsFullUIBasicSprite("NearestItemIndicator"))
                 {
-                    pInventory.Add(nearestItem.GetItemCode());
                     SetIndicator("NearestItemIndicator", null);
-                    if(nearestItem.GetItemCode() == ItemCode.GOLD) SetIndicator("DestiIndicator", null);
+                    if (nearestItem.GetItem().code == ItemCode.GOLD) SetIndicator("DestiIndicator", null);
+
+                    if (nearestItem.GetItem().code == ItemCode.STRUCTURE) nearestItem.GetItem().transform.GetComponent<ControlledStructure>().UseStructure();
+                    else pInventory.Add(nearestItem.GetItemCode());
+
                     nearestItem.Init();
                     SendMessage("PlayAudio", "GetItem");
                 }

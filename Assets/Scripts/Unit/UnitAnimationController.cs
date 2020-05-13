@@ -244,7 +244,7 @@ namespace Com.MyCompany.MyGame
         }
         
         //자연스러운 Standing -> Crouch, Player 전용
-        public void SmoothCrouching(CapsuleCollider collider, float crouchColliderHeight,PlayerController player)
+        public void SmoothCrouching(CapsuleCollider collider, float crouchColliderHeight, PlayerController player)
         {
             float layerWeight = _animator.GetLayerWeight(AnimationLayers.Crouch);
             
@@ -427,6 +427,7 @@ namespace Com.MyCompany.MyGame
         /// </summary>
         public void TurnOffAllLayers()
         {
+            
             _animator.SetLayerWeight(AnimationLayers.Crouch, 0);
             _animator.SetLayerWeight(AnimationLayers.CoverStanding, 0);
             _animator.SetLayerWeight(AnimationLayers.CoverCrouch, 0);
