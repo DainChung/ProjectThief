@@ -219,60 +219,43 @@ namespace Com.MyCompany.MyGame
             }
 
             if (unit.IsOnFloor())
+                ControlPlayerMoveAnimation();
+        }
+
+        private void ControlPlayerMoveAnimation()
+        {
+            switch (unit.curUnitPose)
             {
-                switch (unit.curUnitPose)
-                {
-                    #region Control Basic Move Animation
-                    case UnitPose.MOD_WALK:
-                    case UnitPose.MOD_RUN:
-                    case UnitPose.MOD_CROUCH:
-
-                        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
-                        {
-                            if (Input.GetButton("Vertical"))
-                            {
-                                animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
-                            }
-                            else if (Input.GetButton("Horizontal"))
-                            {
-                                animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-                            }
-                            else
-                            {
-                                animator.SetFloat("TurnRight", 0);
-                                animator.SetFloat("MoveSpeed", 0);
-                            }
-                        }
-
-                        break;
-                    #endregion
-
-                    #region Control Cover Move Animation
-                    case UnitPose.MOD_COVERSTAND:
-                    case UnitPose.MOD_COVERCROUCH:
-                        if (unit.IsWallClose())
-                        {
-                            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-
-                            // 양수면 오른쪽, 음수면 왼쪽
-                            animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
-
-                            if (animator.GetFloat("TurnRight") > 0)
-                                animator.SetBool("LookRight", true);
-                            else if (animator.GetFloat("TurnRight") < 0)
-                                animator.SetBool("LookRight", false);
-                        }
-
-                        break;
-                    #endregion
-
-                    case UnitPose.MOD_ATTACK:
+                case UnitPose.MOD_WALK:
+                case UnitPose.MOD_RUN:
+                case UnitPose.MOD_CROUCH:
+                    if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
+                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical") + Input.GetAxis("Horizontal")));
+                    else
+                    {
+                        animator.SetFloat("TurnRight", 0);
                         animator.SetFloat("MoveSpeed", 0);
-                        break;
+                    }
+                    break;
+                case UnitPose.MOD_COVERSTAND:
+                case UnitPose.MOD_COVERCROUCH:
+                    if (unit.IsWallClose())
+                    {
+                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
+                        animator.SetFloat("TurnRight", Input.GetAxis("Horizontal")); // 양수면 오른쪽, 음수면 왼쪽
 
-                    default:
-                        break;
-                }
+                        if (animator.GetFloat("TurnRight") > 0)
+                            animator.SetBool("LookRight", true);
+                        else if (animator.GetFloat("TurnRight") < 0)
+                            animator.SetBool("LookRight", false);
+                    }
+
+                    break;
+                case UnitPose.MOD_ATTACK:
+                    animator.SetFloat("MoveSpeed", 0);
+                    break;
+                default:
+                    break;
             }
         }
 

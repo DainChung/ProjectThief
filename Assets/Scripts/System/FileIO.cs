@@ -2,11 +2,9 @@
 using System.Data;
 using System.IO;
 using System.Collections.Generic;
-using UnityEngine;
 
 using Mono.Data.Sqlite;
 
-using Com.MyCompany.MyGame;
 using Com.MyCompany.MyGame.GameSystem;
 using Com.MyCompany.MyGame.Collections;
 

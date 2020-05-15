@@ -228,10 +228,13 @@ namespace Com.MyCompany.MyGame
         private bool _canAssassinate = false;
 
         private Transform player = null;
-        private Vector3 playerPosition { get { return (player == null) ? ValueCollections.initPos : player.position; } }
+        private Vector3 playerPosition { get { return (player == null) ? ValueCollections.initPos : new Vector3(player.position.x, transform.position.y, player.position.z); } }
 
         private Unit.StopwatchManager behaveSWManager;
         private int patrolSpotIndex = 0;
+
+        private MeshCollider enemyRadarCollider;
+        private SpriteRenderer[] icons = new SpriteRenderer[2];
 
         #endregion
 
@@ -284,10 +287,13 @@ namespace Com.MyCompany.MyGame
             agent.speed = 0;
             checkStructure.enabled = true;
 
+            enemyRadarCollider = enemyRadar.GetComponent<MeshCollider>();
+            icons[0] = transform.Find("ALERTIcon").GetComponent<SpriteRenderer>();
+            icons[1] = transform.Find("COMBATIcon").GetComponent<SpriteRenderer>();
             _InitCurTarget();
         }
         
-        void FixedUpdate()
+        void Update()
         {
             if (!unit.lockControl)
             {
@@ -356,7 +362,16 @@ namespace Com.MyCompany.MyGame
             switch (unit.curLookDir)
             {
                 case LookDirState.FINDPLAYER:
-                    player = GameObject.FindWithTag("Player").transform;
+                    try
+                    {
+                        player = GameObject.FindWithTag("Player").transform;
+                    }
+                    catch (System.NullReferenceException)
+                    {
+                        unit.curUnitState = UnitState.IDLE;
+                        EnemyAlertManager();
+                        break;
+                    }
                     transform.LookAt(playerPosition);
                     break;
                 case LookDirState.AGENT:
@@ -372,6 +387,9 @@ namespace Com.MyCompany.MyGame
                         unit.curLookDir = LookDirState.FINDPLAYER;
                     break;
             }
+
+            //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지
+            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
         private void AI()
@@ -379,28 +397,28 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitState)
             {
                 case UnitState.IDLE:
-                    if (!enemyRadar.GetComponent<MeshCollider>().enabled) enemyRadar.GetComponent<MeshCollider>().enabled = true;
+                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
                     Patrol();
                     break;
                 case UnitState.ALERT:
-                    if (!enemyRadar.GetComponent<MeshCollider>().enabled) enemyRadar.GetComponent<MeshCollider>().enabled = true;
+                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
 
                     if (queue.Count() == 0) Alert();
                     else ChaseTargetBYQueue();
                     break;
                 case UnitState.COMBAT:
-                    if (!enemyRadar.GetComponent<MeshCollider>().enabled) enemyRadar.GetComponent<MeshCollider>().enabled = true;
+                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
                     Combat();
                     break;
                 case UnitState.CHEESE:
-                    if (!enemyRadar.GetComponent<MeshCollider>().enabled) enemyRadar.GetComponent<MeshCollider>().enabled = true;
+                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
                     ChaseTargetBYQueue();
                     break;
                 case UnitState.INSMOKE:
                     ChaseTargetBYQueue();
                     if (curTarget.code == WeaponCode.max)
                     {
-                        enemyRadar.GetComponent<MeshCollider>().enabled = true;
+                        enemyRadarCollider.enabled = true;
                         unit.curUnitState = UnitState.ALERT;
                     }
                     break;
@@ -597,7 +615,7 @@ namespace Com.MyCompany.MyGame
             catch (AIsCloseToB)
             {
                 Stop();
-                if(unit.curUnitState == UnitState.INSMOKE) enemyRadar.GetComponent<MeshCollider>().enabled = true;
+                if(unit.curUnitState == UnitState.INSMOKE) enemyRadarCollider.enabled = true;
             }
         }
 
@@ -671,27 +689,29 @@ namespace Com.MyCompany.MyGame
             canIAttack = true;
         }
 
-        private IEnumerator ShowIcon()
+        private void ShowIcon()
         {
-            string iconName = string.Format("{0}Icon", unit.curUnitState.ToString());
-            SpriteRenderer icon = null;
-
-            try
+            if (unit.curUnitState == UnitState.ALERT)
             {
-                if(unit.curUnitState == UnitState.ALERT)
-                    transform.Find("COMBATIcon").GetComponent<SpriteRenderer>().enabled = false;
-                else if(unit.curUnitState == UnitState.COMBAT)
-                    transform.Find("ALERTIcon").GetComponent<SpriteRenderer>().enabled = false;
-
-                icon = transform.Find(iconName).GetComponent<SpriteRenderer>();
-                icon.enabled = true;
+                icons[0].enabled = true;
+                icons[1].enabled = false;
             }
-            catch (System.Exception) { yield break; }
-            yield return new WaitForSeconds(3.0f);
-            try { icon.enabled = false; }
-            catch (System.Exception) { }
 
-            yield break;
+            switch (unit.curUnitState)
+            {
+                case UnitState.ALERT:
+                    icons[0].enabled = true;
+                    icons[1].enabled = false;
+                    break;
+                case UnitState.COMBAT:
+                    icons[0].enabled = false;
+                    icons[1].enabled = true;
+                    break;
+                default:
+                    icons[0].enabled = false;
+                    icons[1].enabled = false;
+                    break;
+            }
         }
 
         #endregion
@@ -773,7 +793,7 @@ namespace Com.MyCompany.MyGame
         public void EnemyAlertManager()
         {
             unit.AlertManager();
-            StartCoroutine(ShowIcon());
+            ShowIcon();
 
             switch (unit.curUnitState)
             {
@@ -799,8 +819,8 @@ namespace Com.MyCompany.MyGame
         public void EnemyAlertManager(UnitState state)
         {
             unit.AlertManager();
-            StartCoroutine(ShowIcon());
             unit.curUnitState = state;
+            ShowIcon();
 
             switch (unit.curUnitState)
             {

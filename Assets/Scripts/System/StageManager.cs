@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using System.Collections;
 using System.Collections.Generic;
 
 using Com.MyCompany.MyGame.Collections;
@@ -66,7 +67,7 @@ namespace Com.MyCompany.MyGame.GameSystem
         private GameResult _gameResult;
 
         private System.Diagnostics.Stopwatch gameTimer;
-        //private List<UnitStat> unitStatDB = new List<UnitStat>();
+        private UIManager uiManager;
 
         #endregion
 
@@ -83,6 +84,7 @@ namespace Com.MyCompany.MyGame.GameSystem
         // Start is called before the first frame update
         void Start()
         {
+            uiManager = GetComponent<UIManager>();
             Time.timeScale = 1;
 
             try
@@ -101,12 +103,7 @@ namespace Com.MyCompany.MyGame.GameSystem
                 gameTimer = new System.Diagnostics.Stopwatch();
                 gameTimer.Start();
             }
-            //메인화면
-            catch (System.Exception)
-            {
-                //ReadBestScore
-                //Send to Text
-            }
+            catch (System.Exception){}
         }
         #endregion
 
@@ -124,6 +121,21 @@ namespace Com.MyCompany.MyGame.GameSystem
             string name = path.Substring(s + 1);
             int d = name.LastIndexOf('.');
             return name.Substring(0, d);
+        }
+
+        private IEnumerator LoadSceneAync(string scene)
+        {
+            AsyncOperation loading = SceneManager.LoadSceneAsync(scene);
+
+            while (!loading.isDone)
+            {
+                //로딩 관련 Slider와 텍스쳐를 띄움
+                Debug.Log(loading.progress);
+                //progress에 따라 로딩 바를 채움
+                yield return null;
+            }
+
+            yield break;
         }
         #endregion
 
@@ -156,9 +168,8 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public void LoadScene(string buttonName)
         {
-            string sceneName = GetComponent<UIManager>().buttonNameToString[buttonName];
-            Debug.Log(buttonName + " : " + sceneName);
-            if(sceneName != "NULL") SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+            string sceneName = uiManager.buttonNameToString[buttonName];
+            if (sceneName != "NULL") StartCoroutine(LoadSceneAync(sceneName));
         }
 
         public void UpdateScore(Score scoreCode)
@@ -184,17 +195,17 @@ namespace Com.MyCompany.MyGame.GameSystem
             string curStage = SceneManager.GetActiveScene().name;
             gameTimer.Stop();
             _gameResult.gameTime = new GameTime(gameTimer);
-            UpdateScore(3 - _gameResult.gameTime.time/2);
+            UpdateScore(3 - _gameResult.gameTime.time);
 
             bool isBest = false;
             GameResult bestRecord = DataIO.Read("BestRecord.data", curStage);
-            if (_gameResult.score >= bestRecord.score || _gameResult.gameTime.time <= bestRecord.gameTime.time)
+            if (_gameResult.score > bestRecord.score || _gameResult.gameTime.time < bestRecord.gameTime.time)
             {
                 DataIO.Write("BestRecord.data", curStage, _gameResult.gameTime.time, _gameResult.score);
                 isBest = true;
             }
-            GetComponent<UIManager>().ShowResultWindow(true, isBest);
-            GetComponent<UIManager>().SetIndicator("DestiIndicator", null);
+            uiManager.ShowResultWindow(true, isBest);
+            uiManager.SetIndicator("DestiIndicator", null);
         }
 
         public void ExitGame()

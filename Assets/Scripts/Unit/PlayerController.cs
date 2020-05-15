@@ -250,6 +250,10 @@ namespace Com.MyCompany.MyGame
                 //if(_item != null) MyDebug.Log("ID: " + _item.GetInstanceID() + ", code: " + _item.code + ", Dist: " + _dist);
                 return _item;
             }
+            public ControlledStructure GetStructure()
+            {
+                return _item.GetComponent<ControlledStructure>();
+            }
             public void Init()
             {
                 _item = null;
@@ -261,7 +265,6 @@ namespace Com.MyCompany.MyGame
 
         #region Private Fields
 
-            #region 기본 이동 및 물리
         private float playerSpeed;
         private Transform mainCameraTransform;
         private Quaternion destiRotation;
@@ -272,27 +275,17 @@ namespace Com.MyCompany.MyGame
 
         private float mass = 1f;
         private Vector3 gravity = new Vector3(0, -9.8f, 0);
-            #endregion
 
-            #region 애니메이션
         private Animator animator;
         private PlayerAnimationController playerAnimController;
-            #endregion
 
-            #region 무기 및 공격
         private WeaponCode curWeapon = WeaponCode.HAND;
-
         private Vector3 throwRotEuler = Vector3.zero;
-            #endregion
 
-            #region 어그로 관련 변수
         //높을수록 적캐릭터에게 쉽게 들킨다.
         private float aggroValue;
-        
-            #endregion
 
         private Unit unit;
-        private CameraWork cam;
         private MinimapCameraWork miniMapcam;
         private Inventory pInventory;
 
@@ -339,9 +332,9 @@ namespace Com.MyCompany.MyGame
 
             //인벤토리 초기화
             pInventory = new Inventory(uiManager);
-            pInventory.Add(ItemCode.CAN, 50);
-            pInventory.Add(ItemCode.CHEESE, 30);
-            pInventory.Add(ItemCode.SMOKE, 20);
+            pInventory.Add(ItemCode.CAN, 5);
+            pInventory.Add(ItemCode.CHEESE, 3);
+            pInventory.Add(ItemCode.SMOKE, 2);
         }
 
         void FixedUpdate()
@@ -351,64 +344,10 @@ namespace Com.MyCompany.MyGame
             //움직임이 허용된 상태에서만 조작 가능
             if (!unit.lockControl)
             {
-                #region Control.Weapon: 조작에 따라 무기 변경
-
-                if (Input.GetButtonDown("Weapon1"))
-                {
-                    curWeapon = WeaponCode.HAND;
-                    unit.throwLine.HideLines();
-                    playerAnimController.unitAnimController.TurnOffAllLayers();
-                    playerSpeed = unit.speed;
-                    uiManager.ControlEquippedWeapon(curWeapon);
-                    SendMessage("PlayAudio", "ChangeWeapon");
-                }
-                else if (Input.GetButtonDown("Weapon2"))
-                {
-                    curWeapon = WeaponCode.CAN;
-                    uiManager.ControlEquippedWeapon(curWeapon);
-                    SendMessage("PlayAudio", "ChangeWeapon");
-                }
-                else if (Input.GetButtonDown("Weapon3"))
-                {
-                    curWeapon = WeaponCode.CHEESE;
-                    uiManager.ControlEquippedWeapon(curWeapon);
-                    SendMessage("PlayAudio", "ChangeWeapon");
-                }
-                else if (Input.GetButtonDown("Weapon4"))
-                {
-                    curWeapon = WeaponCode.SMOKE;
-                    unit.throwLine.HideLines();
-                    playerSpeed = unit.speed;
-                    playerAnimController.unitAnimController.TurnOffAllLayers();
-                    uiManager.ControlEquippedWeapon(curWeapon);
-                    SendMessage("PlayAudio", "ChangeWeapon");
-                }
-
-                #endregion
-
-                //ControlCover(), ControlBase()에 나누어 넣을 예정
-                #region Control.Crouch: 조작에 따라 속도와 Collider를 관리
-                //걷기 <-> 달리기 전환 이거나 서기 <-> 숙이기 전환
-                if (Input.GetButtonDown("Walk") || Input.GetButtonDown("Crouch"))
-                {
-                    if (!animator.GetBool("IsCrouchMode"))
-                    {
-                        if (animator.GetBool("IsRunMode"))
-                            playerSpeed = unit.speed;
-                        else
-                            playerSpeed = unit.walkSpeed;
-                    }
-                    else
-                    {
-                        playerSpeed = unit.walkSpeed;
-                    }
-                }
-                #endregion
-
+                ChangeWeapon();
                 //바닥 위에 있을 때
                 if (unit.IsOnFloor())
                 {
-                    #region Control.Move & AttackThrow
                     switch (unit.curUnitPose)
                     {
                         case UnitPose.MOD_WALK:
@@ -424,19 +363,15 @@ namespace Com.MyCompany.MyGame
                         case UnitPose.MOD_THROW:
                             ControlThrowMove();
                             ControlAttack();
-                            SetBYCurUnitPose();
                             break;
                         case UnitPose.MOD_THROWEND:
-                            ControlAttack();
-                            SetBYCurUnitPose();
-                            break;
                         case UnitPose.MOD_ATTACK:
                             ControlAttack();
                             break;
                         default:
                             break;
                     }
-                    #endregion
+                    SetBYCurUnitPose();
                 }
 
                 LookDir();
@@ -464,7 +399,6 @@ namespace Com.MyCompany.MyGame
                 GameObject.FindWithTag("Manager").GetComponent<StageManager>().GameClear();
             }
         }
-
         void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Floor"))
@@ -478,14 +412,11 @@ namespace Com.MyCompany.MyGame
 
         #region Private Methods
 
-        //카메라가 보고 있는 방향을 전방으로 정함
         void SetLookDir(float vertical, float horizontal)
         {
             lookDir = (vertical * mainCameraTransform.forward) + (horizontal * mainCameraTransform.right) + transform.position;
             lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
         }
-
-        //플레이어 캐릭터가 특정 방향을 바라보게 하는 함수
         void LookDir()
         {
             if (animator.GetBool("IsCovering")) unit.curLookDir = LookDirState.COVER;
@@ -506,13 +437,80 @@ namespace Com.MyCompany.MyGame
             }
             lookDir.Set(lookDir.x, transform.position.y, lookDir.z);
             transform.LookAt(lookDir, Vector3.up);
-            //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지, freezeRotation으로 제어 안 됨
+            //플레이어가 낙하할 때 x축 또는 z축이 회전하는 현상 방지
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         }
 
-        /// <summary>
-        /// 일반 공격
-        /// </summary>
+        private void ChangeWeapon()
+        {
+            if (Input.GetButtonDown("Weapon1"))
+            {
+                curWeapon = WeaponCode.HAND;
+                unit.throwLine.HideLines();
+                playerAnimController.unitAnimController.TurnOffAllLayers();
+                playerSpeed = unit.speed;
+                uiManager.ControlEquippedWeapon(curWeapon);
+                SendMessage("PlayAudio", "ChangeWeapon");
+            }
+            else if (Input.GetButtonDown("Weapon2"))
+            {
+                curWeapon = WeaponCode.CAN;
+                uiManager.ControlEquippedWeapon(curWeapon);
+                SendMessage("PlayAudio", "ChangeWeapon");
+            }
+            else if (Input.GetButtonDown("Weapon3"))
+            {
+                curWeapon = WeaponCode.CHEESE;
+                uiManager.ControlEquippedWeapon(curWeapon);
+                SendMessage("PlayAudio", "ChangeWeapon");
+            }
+            else if (Input.GetButtonDown("Weapon4"))
+            {
+                curWeapon = WeaponCode.SMOKE;
+                unit.throwLine.HideLines();
+                playerSpeed = unit.speed;
+                playerAnimController.unitAnimController.TurnOffAllLayers();
+                uiManager.ControlEquippedWeapon(curWeapon);
+                SendMessage("PlayAudio", "ChangeWeapon");
+            }
+        }
+        private void ControlAttack()
+        {
+            unit.swManager.SWDelayManager();
+
+            switch (curWeapon)
+            {
+                //비무장, 아무것도 할 수 없음
+                case WeaponCode.HAND:
+                    AttackDefault();
+                    AttackAssassinate();
+                    break;
+                case WeaponCode.CAN:
+                    AttackAssassinate();
+                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
+                        AttackThrow();
+                    break;
+                case WeaponCode.CHEESE:
+                    AttackAssassinate();
+                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
+                        AttackThrow();
+                    break;
+                //플레이어 위치에서 사용
+                case WeaponCode.SMOKE:
+                    AttackAssassinate();
+                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
+                    {
+                        if (Input.GetButtonDown("Fire1") && unit.swManager.SWDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
+                        {
+                            unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
+                            pInventory.Remove((int)curWeapon);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
         private void AttackDefault()
         {
             if (Input.GetButtonDown("Fire1"))
@@ -524,10 +522,6 @@ namespace Com.MyCompany.MyGame
                 unit.curLookDir = LookDirState.max;
             }
         }
-
-        /// <summary>
-        /// 암살, 비전투 상태에서만 가능
-        /// </summary>
         private void AttackAssassinate()
         {
             switch (unit.curUnitState)
@@ -552,6 +546,7 @@ namespace Com.MyCompany.MyGame
 
                     break;
                 default:
+                    if (checkCameraCollider.assassinateEnemy == null) unit.curUnitState = UnitState.IDLE;
                     break;
             }
         }
@@ -559,23 +554,24 @@ namespace Com.MyCompany.MyGame
         {
             try
             {
-                checkCameraCollider.assassinateTarget.GetComponent<EnemyController>().assassinateTargetted = true;
+                checkCameraCollider.assassinateEnemy.assassinateTargetted = true;
             }
             catch (System.NullReferenceException) { yield break; }
             transform.LookAt(checkCameraCollider.assassinateTargetPos);
 
             SendMessage("EnableAudio", false);
             unit.curUnitPose = UnitPose.MOD_ATTACK;
+            unit.unitAnimController.SetCurrentAnimLayer(AnimationLayers.Assassinate);
             unit.lockControl = true;
-            unit.assassinate.enableCollider = true;
-            unit.EnableAssassinate(true);
+            unit.attackCollider.InitAttackCollider(-1);
+            unit.EnableAttackCollider(true);
 
             SendMessage("OffIndicator", "AssassinateIndicator");
 
             //일정 거리 이내가 될 때까지
-            while (unit.assassinate.enableCollider)
+            while (unit.attackCollider.enableCollider)
             {
-                charController.Move(transform.forward * unit.walkSpeed * Time.deltaTime);
+                charController.Move(transform.forward * unit.walkSpeed * Time.deltaTime * 0.01f);
                 yield return null;
             }
             SendMessage("EnableAudio", true);
@@ -586,11 +582,12 @@ namespace Com.MyCompany.MyGame
             checkCameraCollider.InitCanAssassinate();
             checkCameraCollider.InitAssassinateTargetPos();
 
+            unit.curUnitPose = UnitPose.MOD_RUN;
+            SetBYCurUnitPose();
+            unit.unitAnimController.SetCurrentAnimLayer();
             unit.lockControl = false;
             yield break;
         }
-
-        //마우스 좌측을 길게 눌러서 조준후 발사 => 소음을 발생시켜 주의분산
         private void AttackThrow()
         {
             if (unit.swManager.SWDelayDone(curWeapon))
@@ -625,7 +622,6 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        //일반적인 움직임 조작
         private void ControlMove()
         {
             unit.curLookDir = LookDirState.IDLE;
@@ -636,9 +632,8 @@ namespace Com.MyCompany.MyGame
 
             //점프할 때
             if (animator.GetBool("IsRunMode"))
-                if (Input.GetButtonDown("Jump")) moveDir += transform.up * unit.jumpPower * Time.deltaTime;//charController.Move(transform.up * unit.jumpPower * Time.deltaTime);
+                if (Input.GetButtonDown("Jump")) moveDir += transform.up * unit.jumpPower * Time.deltaTime;
         }
-        //조준 상태일 때의 조작
         private void ControlThrowMove()
         {
             //플레이어 캐릭터 이동
@@ -646,89 +641,16 @@ namespace Com.MyCompany.MyGame
                 moveDir = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")) * playerSpeed * Time.deltaTime;
             else moveDir.Set(0, moveDir.y, 0);
         }
-
-        //엄폐 상태일 때의 조작
-        //플레이어 속도는 unit.coverSpeed로 고정됨
         private void ControlCover()
         {
-            //벽 같은 엄폐물에 엄폐했을 때 Vector3값 일부분과 바라보는 방향 고정
-
             unit.curLookDir = LookDirState.COVER;
 
-            //엄폐 상태일 때 가능한 조작 사용
             if (Input.GetButton("Horizontal"))
-            {
-                //벽 우측 끝 도달 && 우측으로 계속 이동하려는 경우
-                if (animator.GetBool("IsWallRightEnd") && Input.GetAxis("Horizontal") > 0)
-                {
-                    moveDir.Set(0, 0, 0);
-                    //아무것도 하지 않음
-                }
-                //벽 좌측 끝 도달 && 좌측으로 계속 이동하려는 경우
-                else if (animator.GetBool("IsWallLeftEnd") && Input.GetAxis("Horizontal") < 0)
-                {
-                    moveDir.Set(0, 0, 0);
-                    //아무것도 하지 않음
-                }
-                //일반적인 상황 OR 벽 우측 끝에서 좌측으로 이동 OR 벽 좌측 끝에서 우측으로 이동
-                else
-                    moveDir = -transform.right * Input.GetAxis("Horizontal") * playerSpeed * Time.deltaTime;
-            }
+                moveDir = -transform.right * Input.GetAxis("Horizontal") * playerSpeed * Time.deltaTime;
             else
                 moveDir.Set(0, 0, 0);
-
-            //우측 끝에서 우측 이동 버튼을 다시 누르면 엄폐물 이동 수행
-            if (animator.GetBool("IsWallRightEnd"))
-            {
-                if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") > 0)
-                    StartCoroutine(unit.MoveEndToEnd(true));
-            }
-            //좌측 끝에서 좌측 이동 버튼을 다시 누르면 엄폐물 이동 수행
-            else if (animator.GetBool("IsWallLeftEnd"))
-            {
-                if (Input.GetButtonDown("Horizontal") && Input.GetAxis("Horizontal") < 0)
-                    StartCoroutine(unit.MoveEndToEnd(false));
-            }
         }
-        //공격에 관한 조작
-        private void ControlAttack()
-        {
-            unit.swManager.SWDelayManager();
 
-            switch (curWeapon)
-            {
-                //비무장, 아무것도 할 수 없음
-                case WeaponCode.HAND:
-                    AttackDefault();
-                    AttackAssassinate();
-                    break;
-                case WeaponCode.CAN:
-                    AttackAssassinate();
-                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
-                        AttackThrow();
-                    break;
-                case WeaponCode.CHEESE:
-                    AttackAssassinate();
-                    if(unit.curUnitPose != UnitPose.MOD_CROUCH)
-                        AttackThrow();
-                    break;
-                //플레이어 위치에서 사용
-                case WeaponCode.SMOKE:
-                    AttackAssassinate();
-                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
-                    {
-                        if (Input.GetButtonDown("Fire1") && unit.swManager.SWDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
-                        {
-                            unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
-                            pInventory.Remove((int)curWeapon);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        //아이템을 주울때
         private void ControlGetItem()
         {
             if (Input.GetButton("GetItem") && (nearestItem.GetItem() != null))
@@ -738,7 +660,7 @@ namespace Com.MyCompany.MyGame
                     SetIndicator("NearestItemIndicator", null);
                     if (nearestItem.GetItem().code == ItemCode.GOLD) SetIndicator("DestiIndicator", null);
 
-                    if (nearestItem.GetItem().code == ItemCode.STRUCTURE) nearestItem.GetItem().transform.GetComponent<ControlledStructure>().UseStructure();
+                    if (nearestItem.GetItem().code == ItemCode.STRUCTURE) nearestItem.GetStructure().UseStructure();
                     else pInventory.Add(nearestItem.GetItemCode());
 
                     nearestItem.Init();

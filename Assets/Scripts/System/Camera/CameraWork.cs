@@ -77,6 +77,8 @@ namespace Com.MyCompany.MyGame
             dist = maxDist;
             foreach (RaycastHit hit in hits)
                 if (dist > hit.distance - 0.5f) dist = hit.distance - 0.5f;
+
+            dist = Mathf.Clamp(dist, 0.8f, maxDist);
         }
         #endregion
 

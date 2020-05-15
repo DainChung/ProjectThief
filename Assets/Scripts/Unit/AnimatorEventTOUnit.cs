@@ -20,14 +20,14 @@ namespace Com.MyCompany.MyGame
 
         public void DisableAssassinate()
         {
-            unit.EnableAssassinate(false);
+            unit.EnableAttackCollider(false);
             unit.lockControl = false;
 
             unit.swManager.RestartSW((int)WeaponCode.HAND);
         }
         public void DisableAttackDefault()
         {
-            unit.EnableDefaultAttack(false);
+            unit.EnableAttackCollider(false);
             unit.swManager.RestartSW((int)WeaponCode.HAND);
             unit.swManager.attackCountDelay.Restart();
             unit.curUnitPose = UnitPose.MOD_RUN;

@@ -49,7 +49,7 @@ namespace Com.MyCompany.MyGame.GameSystem
         // Update is called once per frame
         void Update()
         {
-           
+            if (Input.GetButtonDown("Inventory")) uiCam.Find("Button_Inventory").GetComponent<UIButton>().SendMessage("OnClick");
         }
         #endregion
 

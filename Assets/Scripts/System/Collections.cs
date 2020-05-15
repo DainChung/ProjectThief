@@ -176,7 +176,7 @@ namespace Com.MyCompany.MyGame
 
         public static class ValueCollections
         {
-            private static int[] _itemMaxAmount = { 50, 30, 20, -1 };
+            private static int[] _itemMaxAmount = { 5, 3, 2, -1 };
             public static int[] itemMaxAmount { get { return _itemMaxAmount; } }
 
             #region Weapons Init Values
@@ -499,9 +499,11 @@ namespace Com.MyCompany.MyGame
             {
                 if (animInfo.IsName(animName) && boolVal) throw new FreezingUnitException();
             }
-            public static void ValidateFreezingUnitAttackException(bool isLocked, AnimatorStateInfo animInfo, string animName, bool isAttack)
+            public static void ValidateFreezingAttackException(bool isLocked, AnimatorStateInfo animInfo, int currentAnimLayer)
             {
-                if (!animInfo.IsTag("Attack") && ((isLocked && !animInfo.IsName(animName) || isAttack))) throw new FreezingUnitException();
+                if (currentAnimLayer == Com.MyCompany.MyGame.Collections.AnimationLayers.Standing)
+                    if(animInfo.IsName("Idle 0-0") && isLocked)
+                        throw new FreezingUnitException();
             }
             public static void ValidateAnimationIsPlayingException(AnimatorStateInfo animInfo, string animName)
             {

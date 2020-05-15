@@ -109,45 +109,9 @@ namespace Com.MyCompany.MyGame
                     break;
                 #endregion
 
-                    //개발중
-                #region MOD_COVERSTAND(미정)
-                case UnitPose.MOD_COVERSTAND:
-                    break;
-                #endregion
-
-                    //개발중
-                #region MOD_COVERCROUCH(미정)
-                case UnitPose.MOD_COVERCROUCH:
-                    break;
-                #endregion
-
-                    //개발중
-                #region MOD_THROW(== UnitState.COMBAT)
-                case UnitPose.MOD_THROW:
-                    if (unit.IsOnFloor())
-                    {
-                        ////조준하는 동안 이동 애니메이션 제어
-                        //animator.SetFloat("MoveSpeed", enemyVerticalMove);
-                        //animator.SetFloat("TurnRight", enemyHorizontalMove);
-
-                        //Animation Layer 제어
-                        unitAnimController.ControlThrowLayer();
-                    }
-                    break;
-                #endregion
-
-                    //개발중
-                    //Mixamo의 Drunk 시리즈를 사용할 것
                 #region MOD_INSMOKE(== UnitState.INSMOKE)
                 case UnitPose.MOD_INSMOKE:
                     animator.SetFloat("MoveSpeed", enemy.moveSpeed);
-                    break;
-                #endregion
-
-                    //개발중
-                    //Mixamo에서 Sleep 관련 애니메이션을 찾을 것
-                #region MOD_SLEEP( == UnitState.SLEEP)
-                case UnitPose.MOD_SLEEP:
                     break;
                 #endregion
 
@@ -166,65 +130,19 @@ namespace Com.MyCompany.MyGame
             {
                 switch (unit.curUnitPose)
                 {
-                    //개발 중
-                    #region Control Basic Move Animation
                     case UnitPose.MOD_WALK:
                         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
-                        {
                             animator.SetFloat("MoveSpeed", enemy.moveSpeed);
-                            //Debug.Log("animator:" + animator.GetFloat("MoveSpeed") + ", enemyController: " + enemy.moveSpeed);
-                        }
                         break;
                     case UnitPose.MOD_RUN:
                     case UnitPose.MOD_CROUCH:
-
                         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Landing"))
-                        {
                             animator.SetFloat("MoveSpeed", enemy.moveSpeed);
-                            //        if (Input.GetButton("Vertical"))
-                            //        {
-                            //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")));
-                            //        }
-                            //        else if (Input.GetButton("Horizontal"))
-                            //        {
-                            //            animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-                            //        }
-                            //        else
-                            //        {
-                            //            animator.SetFloat("TurnRight", 0);
-                            //            animator.SetFloat("MoveSpeed", 0);
-                            //        }
-                        }
 
                         break;
-                    #endregion
-
-                    //개발 중(미정)
-                    #region Control Cover Move Animation
-                    //case UnitPose.MOD_COVERSTAND:
-                    //case UnitPose.MOD_COVERCROUCH:
-
-                    //    if (unit.IsWallClose())
-                    //    {
-                    //        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Horizontal")));
-
-                    //        // 양수면 오른쪽, 음수면 왼쪽
-                    //        animator.SetFloat("TurnRight", Input.GetAxis("Horizontal"));
-
-                    //        if (animator.GetFloat("TurnRight") > 0)
-                    //            animator.SetBool("LookRight", true);
-                    //        else if (animator.GetFloat("TurnRight") < 0)
-                    //            animator.SetBool("LookRight", false);
-                    //    }
-
-                    //    break;
-                    #endregion
-
-                    #region MOD_ATTACK
                     case UnitPose.MOD_ATTACK:
                         animator.SetFloat("MoveSpeed", enemy.moveSpeed);
                         break;
-                    #endregion
 
                     default:
                         break;

@@ -31,7 +31,7 @@ namespace Com.MyCompany.MyGame
             CameraRotation();
         }
 
-        protected void FollowPlayer()
+        protected override void FollowPlayer()
         {
             destiPos.Set(player.position.x, cameraPos.y, player.position.z);
             transform.position = Vector3.SmoothDamp(transform.position, destiPos, ref v, smooth);

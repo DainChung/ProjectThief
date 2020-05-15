@@ -24,6 +24,7 @@ namespace Com.MyCompany.MyGame.GameSystem
                 if (audioSource.clip.name != name) audioSource.clip = audioClips[audioNameDic[name]];
             }
             catch (System.Exception) { audioSource.clip = audioClips[audioNameDic[name]]; }
+
             if (name == "Hit") audioSource.time = 0.55f;
             else audioSource.time = 0f;
 

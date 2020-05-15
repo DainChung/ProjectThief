@@ -41,9 +41,9 @@ namespace Com.MyCompany.MyGame
             _currentAnimLayer = AnimationLayers.Standing;
         }
 
-        #region Private Methods
+        #region Public Methods
 
-        private void SetCurrentAnimLayer()
+        public void SetCurrentAnimLayer()
         {
             switch (_unit.curUnitPose)
             {
@@ -74,9 +74,10 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        #endregion
-
-        #region Public Methods
+        public void SetCurrentAnimLayer(int layer)
+        {
+            _currentAnimLayer = layer;
+        }
 
         public void WalkPoseTONewPose(UnitPose newPose)
         {
@@ -306,9 +307,7 @@ namespace Com.MyCompany.MyGame
                 SetCurrentAnimLayer();
             }
             else if (layerWeight > 0 && layerWeight <= 1 && !_animator.GetBool("IsCrouchMode"))
-            {
                 _animator.SetLayerWeight(AnimationLayers.Crouch, 1);
-            }
         }
 
         //자연스러운 Crouch -> Standing, Player전용
@@ -441,6 +440,7 @@ namespace Com.MyCompany.MyGame
             _animator.SetBool("IsThrowMode", false);
             _animator.SetBool("ReadyAssassinateAnim", false);
             _animator.SetBool("ThrowItem", false);
+            _animator.SetBool("IsFalling", false);
 
             _unit.curUnitPose = UnitPose.MOD_RUN;
             SetCurrentAnimLayer();

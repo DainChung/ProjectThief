@@ -39,71 +39,72 @@ namespace Com.MyCompany.MyGame
             }
 
             //탄도방정식을 이용하여 궤적을 그릴 수 있도록 Vector3 값을 반환한다.
-            //cosY와 z 값을 변화시켜 모든 방향에 대해 탄도 궤적을 그리도록 변경할 것
-            private Vector3 GetThrowLinePoint(float theta, float t, Vector3 throwPos, float eulerAngleY)
+            //theta : 발사각도
+            //t : 시간
+            //eulerAngleY : 캐릭터가 바라보는 방향
+            private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
             {
                 float cosY = Mathf.Cos(eulerAngleY * Mathf.Deg2Rad);
                 float sinY = Mathf.Sin(eulerAngleY * Mathf.Deg2Rad);
                 float cosEuler = Mathf.Cos(theta);
                 float sinEuler = Mathf.Sin(theta);
 
+                //시간 t로 x, y, z 값을 구한다.
                 float x = cosEuler * sinY * throwPower * t;
-                float y = (0.95f * throwPower * sinEuler - 0.5f * gravity * t * 1.09f) * t;  //0.95f, 1.09f는 임의로 추가한 계수, 이렇게 해야 궤적이 비슷해짐
+                float y = (0.95f * throwPower * sinEuler - 0.545f * gravity * t) * t;
                 float z = cosEuler * cosY * throwPower * t;
 
-                return (new Vector3(x, y, z) + throwPos);
+                return new Vector3(x, y, z);
             }
 
-            //무언가를 던질때 궤적을 보여줌
-            //예상 착탄지점을 원으로 표시해줄것 & 투척 후 선을 안 보이게 처리할 것
             public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
             {
-                if (!lineRenderer.enabled)
+                if (!lineRenderer.enabled) //조준할 때만 LineRenderer를 활성화합니다.
                 {
                     lineRenderer.enabled = true;
-                    throwDestiPos.GetComponent<MeshRenderer>().enabled = true;
+                    throwDestiPos.GetComponent<MeshRenderer>().enabled = true; //착탄지점을 보여줍니다.
                 }
 
-                theta = -(theta) * Mathf.Deg2Rad;
+                theta = -(theta) * Mathf.Deg2Rad; //발사각도
 
-                //t가 0보다 조금 더 커야 궤적이 비슷해짐
-                float t = 0.08f;
+                float t = 0.08f; //탄도방정식에 넣을 변수 t
 
                 for (int index = 0; index < lineRenderer.positionCount; index++)
                 {
-                    lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, throwPos, eulerAngleY));
+                    lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, eulerAngleY) + throwPos);
 
-                    if (index != 0)
-                    {
-                        RaycastHit hit = new RaycastHit();
-
-                        //충돌이 발생한 부분부터 생략한다.
-                        if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
-                        {
-                            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Structure") || hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))
-                            {
-                                //착탄 지점 표시(나중에 투명하게 변경하거나 평면 원으로 표시할것)
-                                throwDestiPos.position = hit.point;
-
-                                lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
-                                for (int i = index; i < lineRenderer.positionCount; i++)
-                                    lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
-
-                                break;
-                            }
-                        }
-                    }
+                    //구조물과 닿는 지점부터 계산을 생략합니다.
+                    if (index != 0 && CheckObject(index)) break;
 
                     t += 0.1f;
                 }
             }
 
-            //궤적 숨기기
             public void HideLines()
             {
                 lineRenderer.enabled = false;
                 throwDestiPos.GetComponent<SphereCollider>().enabled = false;
                 throwDestiPos.GetComponent<MeshRenderer>().enabled = false;
+            }
+
+            private bool CheckObject(int index)
+            {
+                RaycastHit hit = new RaycastHit();
+                if (Physics.Linecast(lineRenderer.GetPosition(index - 1), lineRenderer.GetPosition(index), out hit))
+                {
+                    if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Structure") || hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+                    {
+                        throwDestiPos.position = hit.point;
+
+                        lineRenderer.SetPosition(index, lineRenderer.GetPosition(index));
+                        for (int i = index; i < lineRenderer.positionCount; i++)
+                            lineRenderer.SetPosition(i, lineRenderer.GetPosition(index));
+
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
 
@@ -225,13 +226,6 @@ namespace Com.MyCompany.MyGame
 
         #region Private Fields
 
-        private UnitStat unitStat;
-        private bool _lockControl = false;
-
-        //조준 후 발사되지 않는 경우 발사하도록 제어
-        private bool _readyToThrowItem = false;
-        //동시에 두번 발사 되는 현상 방지
-        private bool _doubleThrowLock = false;
 
         //발사각
         private Quaternion throwRot = new Quaternion();
@@ -239,95 +233,104 @@ namespace Com.MyCompany.MyGame
         private UnitAnimationHelper unitAnimHelper = new UnitAnimationHelper();
         private Rigidbody rb;
 
-        //Player => Enemy에게 얼마나 들켰는지에 대한 정보
-        //Enemy => 주변을 경계하는 정도
+        private AnimatorStateInfo currentLayerAnimInfo;
+
+        //조준 후 발사되지 않는 경우 발사하도록 제어
+        private bool _readyToThrowItem = false;
+        //동시에 두번 발사 되는 현상 방지
+        private bool _doubleThrowLock = false;
+
+        private bool _lockControl = false;  //true면 유닛이 행동을 못하게 한다.
+        private UnitStat unitStat;
+
         private UnitState _curUnitState = UnitState.IDLE;
         private LookDirState _curLookDir = LookDirState.IDLE;
 
-        private AnimatorStateInfo currentLayerAnimInfo;
+        private CapsuleCollider collider;
+        private CharacterController charController;
+        private StageManager stageManager;
 
         #endregion
 
         #region Public Fields
 
-        //UnitStat구조체를 만들것
-        public float speed { get { return unitStat.speed; } set { unitStat.SetSpeed(value); } }
-        public float walkSpeed { get { return unitStat.walkSpeed; } }
-        public float coverSpeed { get { return unitStat.coverSpeed; } }
-        public float health { get { return unitStat.health; } }
-        public float maxHealth { get { return unitStat.MaxHealth; } }
-        public float jumpPower { get { return unitStat.jumpPower; } }
+        public float speed      { get { return unitStat.speed; } }      //기본 이동속도
+        public float walkSpeed  { get { return unitStat.walkSpeed; } }  //걷기 이동속도
+        public float coverSpeed { get { return unitStat.coverSpeed; } } //엄폐 이동속도
+        public float health     { get { return unitStat.health; } }     //현재 체력
+        public float maxHealth  { get { return unitStat.MaxHealth; } }  //최대 체력
+        public float jumpPower  { get { return unitStat.jumpPower; } }  //점프력
 
-        public bool lockControl { get{ return _lockControl; } set { _lockControl = value; } }
-
-        public bool readyToThrowItem { get { return _readyToThrowItem; } }
-        public bool doubleThrowLock { get { return _doubleThrowLock; } }
-
-        public UnitState curUnitState { get { return _curUnitState; } set { _curUnitState = value; } }
-        public LookDirState curLookDir { get { return _curLookDir; } set { _curLookDir = value; } }
-        public AnimatorStateInfo standingLayerAnimInfo{ get { return animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing); }}
-
-        [HideInInspector]   public UnitPose curUnitPose = UnitPose.MOD_RUN;
-        [HideInInspector]   public float alertValue = 0.0f;
+        public UnitState curUnitState //유닛의 상태
+        {
+            get { return _curUnitState; }
+            set { _curUnitState = value; }
+        }
+        public LookDirState curLookDir //유닛이 바라볼 방향
+        {
+            get { return _curLookDir; }
+            set { _curLookDir = value; }
+        }
 
         public Animator animator;
         public Transform throwDestiPos;
 
-        public ThrowLineRenderer throwLine;
-        public StopwatchManager swManager;
+        public AttackCollider attackCollider; //공격할 때 사용하는 Collider
 
-        //공격 판정에 필요한 콜라이더
-        public AttackCollider defaultAttack;
-        public AttackCollider assassinate;
+        public string unitCode; //유닛의 코드
 
         public UnitAnimationController unitAnimController;
+        public ThrowLineRenderer throwLine; //물건을 던질 때 예상되는 궤적을 그린다.
+        public StopwatchManager swManager;  //각 행동마다 딜레이를 주는 Stopwatch들을 관리한다.
 
-        public string unitCode;
+        [HideInInspector] public UnitPose curUnitPose = UnitPose.MOD_RUN;
+        [HideInInspector] public float alertValue = 0.0f;
 
+        public bool readyToThrowItem { get { return _readyToThrowItem; } }
+        public bool doubleThrowLock { get { return _doubleThrowLock; } }
+        public AnimatorStateInfo standingLayerAnimInfo  { get { return animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing); }}
+        public bool lockControl { get { return _lockControl; } set { _lockControl = value; } }
         #endregion
 
         #region MonoBehaviour Callbacks
         void Awake()
         {
             unitStat = new UnitStat(unitCode);
-            //unitStat = new UnitStat(20, 0.41f, 0.31f, 7, 400);
+            unitAnimController = new UnitAnimationController(this, animator);
 
             long[] delays = { 200, 2000, 3000, 4000, 1000};
             swManager = new StopwatchManager(delays, 4);
-
-            unitAnimController = new UnitAnimationController(this, animator);
         }
 
         void Start()
         {
-            throwLine = new ThrowLineRenderer(throwDestiPos, transform.GetComponent<LineRenderer>());
+            throwLine = new ThrowLineRenderer(throwDestiPos, GetComponent<LineRenderer>());
             throwLine.HideLines();
 
-            defaultAttack.InitAttackCollider(1);
-            assassinate.InitAttackCollider(-1);
+            attackCollider.InitAttackCollider(1);
+
+            try { charController = GetComponent<CharacterController>(); }
+            catch (System.Exception) { }
 
             try
             {
-                GetComponent<CapsuleCollider>().enabled = true;
+                collider = GetComponent<CapsuleCollider>();
+                collider.enabled = true;
                 rb = GetComponent<Rigidbody>();
                 rb.useGravity = true;
             }
             catch (System.Exception) { }
         }
 
-        void FixedUpdate()
+        void Update()
         {
-            if (animator.GetInteger("AttackCount") == 0 && swManager.AttackCountDelayDone())    animator.SetInteger("AttackCount", 1);
-
             if (health > 0)
             {
-                //추락, 착륙시 변수 제어
                 if (IsOnFloor())
                 {
                     try
                     {
-                        ValidateException.ValidateFreezingUnitAttackException(_lockControl, unitAnimController.currentAnimStateInfo, "Walking", animator.GetBool("IsAttack"));
-                        ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), unitAnimController.currentAnimStateInfo, "HitReaction");
+                        CheckExeption();
                         switch (curUnitPose)
                         {
                             case UnitPose.MOD_FALL:
@@ -337,15 +340,10 @@ namespace Com.MyCompany.MyGame
                                 break;
                         }
                     }
-                    catch (FreezingUnitException)
-                    {
-                        UnFreezeUnit();
-                    }
+                    catch (FreezingUnitException){ UnFreezeUnit(); }
                 }
                 else
-                {
                     Fall();
-                }
             }
         }
 
@@ -360,19 +358,19 @@ namespace Com.MyCompany.MyGame
                 unitAnimHelper.wallTransform = other.transform;
             }
 
-            if (other.CompareTag("WallRightEnd") && unitAnimHelper.isWallClose)
-            {
-                animator.SetBool("IsWallRightEnd", true);
-                unitAnimHelper.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
-                unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
-            }
+            //if (other.CompareTag("WallRightEnd") && unitAnimHelper.isWallClose)
+            //{
+            //    animator.SetBool("IsWallRightEnd", true);
+            //    unitAnimHelper.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+            //    unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
+            //}
 
-            if (other.CompareTag("WallLeftEnd") && unitAnimHelper.isWallClose)
-            {
-                animator.SetBool("IsWallLeftEnd", true);
-                unitAnimHelper.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
-                unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
-            }
+            //if (other.CompareTag("WallLeftEnd") && unitAnimHelper.isWallClose)
+            //{
+            //    animator.SetBool("IsWallLeftEnd", true);
+            //    unitAnimHelper.nearWallEndPos = other.GetComponent<WallEnd>().nearWallEndPos;
+            //    unitAnimHelper.wallEndToEndPos = other.GetComponent<WallEnd>().wallEndToEndPos;
+            //}
         }
         void OnTriggerStay(Collider other)
         {
@@ -386,17 +384,17 @@ namespace Com.MyCompany.MyGame
         }
         void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Floor"))
+            if (other.CompareTag("Floor") && transform.CompareTag("Player"))
                 unitAnimHelper.isOnFloor = false;
 
             if (other.CompareTag("Wall"))
                 unitAnimHelper.isWallClose = false;
 
-            if (other.CompareTag("WallRightEnd"))
-                animator.SetBool("IsWallRightEnd", false);
+            //if (other.CompareTag("WallRightEnd"))
+            //    animator.SetBool("IsWallRightEnd", false);
 
-            if (other.CompareTag("WallLeftEnd"))
-                animator.SetBool("IsWallLeftEnd", false);
+            //if (other.CompareTag("WallLeftEnd"))
+            //    animator.SetBool("IsWallLeftEnd", false);
         }
 
         #endregion
@@ -405,6 +403,22 @@ namespace Com.MyCompany.MyGame
 
         private IEnumerator DelayPlayDeadAnim(int damage)
         {
+            unitAnimController.TurnOffAllLayers();
+            _curUnitState = UnitState.IDLE;
+            alertValue = 0;
+            try
+            {
+                if (GetComponent<UnityEngine.AI.NavMeshAgent>().enabled)
+                    GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true;
+            }
+            catch (System.Exception) { }
+
+            Transform icon = transform.Find("Icon");
+            icon.GetComponent<SpriteRenderer>().enabled = false;
+            icon.Find("DeathIcon").GetComponent<SpriteRenderer>().enabled = true;
+
+            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+
             if (gameObject.layer == PhysicsLayers.Enemy)
             {
                 Stopwatch delay = new Stopwatch();
@@ -427,7 +441,11 @@ namespace Com.MyCompany.MyGame
             curUnitPose = UnitPose.MOD_RUN;
             curLookDir = LookDirState.IDLE;
         }
-
+        private void CheckExeption()
+        {
+            ValidateException.ValidateFreezingAttackException(_lockControl, unitAnimController.currentAnimStateInfo, unitAnimController.currentAnimLayer);
+            ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), unitAnimController.currentAnimStateInfo, "HitReaction");
+        }
         #endregion
 
         #region Public Methods
@@ -436,9 +454,9 @@ namespace Com.MyCompany.MyGame
         {
             try
             {
-                GetComponent<CapsuleCollider>().enabled = false;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().useGravity = false;
+                collider.enabled = false;
+                rb.velocity = Vector3.zero;
+                rb.useGravity = false;
             }
             catch (System.Exception) { }
 
@@ -452,13 +470,12 @@ namespace Com.MyCompany.MyGame
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
         }
-
         public void HitHealth(float damage, Vector3 pos)
         {
-            //일반 공격(damage > 0)
             if (IsOnFloor() && health > 0)
             {
                 _curUnitState = UnitState.COMBAT;
+                //일반 공격(damage > 0)
                 if (damage > 0)
                 {
                     if (damage >= health)
@@ -476,15 +493,13 @@ namespace Com.MyCompany.MyGame
                         if (!standingLayerAnimInfo.IsName("HitReaction")) animator.Play("HitReaction", AnimationLayers.Standing);
                         animator.SetBool("IsHit", true);
                         alertValue = AggroCollections.combatMin;
-                        try { rb.AddForce(transform.forward * (-2), ForceMode.Impulse); }
-                        catch (Exception) { }
 
-                        try{ transform.GetComponent<EnemyController>().EnemyAlertManager();}
-                        catch (NullReferenceException){AlertManager();}
+                        try { transform.GetComponent<EnemyController>().EnemyAlertManager(); }
+                        catch (NullReferenceException) { AlertManager(); }
                         _lockControl = true;
                     }
                 }
-                //암살(damage < 0), Player만 사용가능
+                //암살(damage < 0), 암살은 Player만 사용가능
                 else
                 {
                     GameObject.Find("Manager").GetComponent<StageManager>().UpdateScore(Score.ASSASSINATE);
@@ -492,22 +507,8 @@ namespace Com.MyCompany.MyGame
                     StartCoroutine(DelayPlayDeadAnim((int)damage));
                 }
 
-                if (transform.CompareTag("Player")) SendMessage("UpdateHPBar", unitStat.hpRatio);                    
-            }
-
-            if (health == 0)
-            {
-                unitAnimController.TurnOffAllLayers();
-                _curUnitState = UnitState.IDLE;
-                alertValue = 0;
-                try { if(GetComponent<UnityEngine.AI.NavMeshAgent>().enabled) GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true; }
-                catch (System.Exception) { }
-
-                Transform icon = transform.Find("Icon");
-                icon.GetComponent<SpriteRenderer>().enabled = false;
-                icon.Find("DeathIcon").GetComponent<SpriteRenderer>().enabled = true;
-
-                transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+                if (transform.CompareTag("Player"))
+                    SendMessage("UpdateHPBar", unitStat.hpRatio);                    
             }
         }
 
@@ -532,25 +533,25 @@ namespace Com.MyCompany.MyGame
                     curUnitPose = UnitPose.MOD_ATTACK;
 
                     //조작 제어
-                    EnableDefaultAttack(true);
+                    attackCollider.InitAttackCollider(1);
+                    EnableAttackCollider(true);
 
-                    //위치 제어
-                    try { rb.AddForce(transform.forward * 2, ForceMode.Impulse); }
-                    catch (System.Exception) { GetComponent<CharacterController>().Move(transform.forward * Time.deltaTime); }
+                    ////위치 제어
+                    //try { rb.AddForce(transform.forward * 2, ForceMode.Impulse); }
+                    //catch (System.Exception) { GetComponent<CharacterController>().Move(transform.forward * Time.deltaTime); }
                 }
-                //간헐적으로 attackSW[0]가 영구적으로 중지되는 버그 방지
+                //attackSW[0]가 영구적으로 중지되는 경우 방지
                 else if (!swManager.IsRunningSW(0))
                     swManager.RestartSW(0);
             }
         }
 
-            #region 엄폐 시 벽으로 밀착
         public IEnumerator SetCoverPosition(bool isCovering)
         {
             Vector3 wallPos = WallTransform().position;
             Vector3 wallRight = WallTransform().right;
 
-            float colliderHeight = GetComponent<CharacterController>().center.y;//transform.GetComponent<CapsuleCollider>().center.y;
+            float colliderHeight = charController.center.y;//transform.GetComponent<CapsuleCollider>().center.y;
 
             float newX, newZ;
             float alpha, beta;
@@ -578,7 +579,7 @@ namespace Com.MyCompany.MyGame
             if (isCovering)
             {
                 //Collider를 조금 이동시켜서 애니메이션이 자연스럽게 보이도록 한다
-                GetComponent<CharacterController>().center = new Vector3(0, colliderHeight, 0.7f);
+                charController.center = new Vector3(0, colliderHeight, 0.7f);
 
                 Vector3 newVector = new Vector3(newX, transform.position.y, newZ);
 
@@ -595,54 +596,12 @@ namespace Com.MyCompany.MyGame
             //엄폐를 해제하면 Collider 위치를 초기화한다.
             else
             {
-                GetComponent<CharacterController>().center = new Vector3(0, colliderHeight, 0);
+                charController.center = new Vector3(0, colliderHeight, 0);
             }
-            GetComponent<CapsuleCollider>().center = GetComponent<CharacterController>().center;
+            collider.center = charController.center;
 
             yield break;
         }
-
-        //모퉁이에서 엄폐한 상태로 이동할 때 사용
-        public IEnumerator MoveEndToEnd(bool goRight)
-        {
-            float freezeY = transform.position.y;
-            Vector3 freezeHeight = transform.position;
-            Vector3 newLook = transform.right;
-
-            Vector3 destiPos = unitAnimHelper.nearWallEndPos;
-            Vector3 subDestiPos = unitAnimHelper.wallEndToEndPos;
-
-            if (goRight) newLook *= -1;
-
-            //이동할 때 조작 방지
-            _lockControl = true;
-
-            transform.LookAt(transform.position + newLook, Vector3.up);
-
-            //중간 지점까지 이동
-            while (Vector3.Distance(transform.position, subDestiPos) >= 0.1)
-            {
-                transform.position = Vector3.Lerp(transform.position, subDestiPos, Time.deltaTime * 10);
-
-                freezeHeight.Set(transform.position.x, freezeY, transform.position.z);
-                transform.position = freezeHeight;
-                yield return null;
-            }
-
-            //목표 지점까지 이동
-            while (Vector3.Distance(transform.position, destiPos) >= 0.1)
-            {
-                transform.position = Vector3.Lerp(transform.position, destiPos, Time.deltaTime * 10);
-
-                freezeHeight.Set(transform.position.x, freezeY, transform.position.z);
-                transform.position = freezeHeight;
-                yield return null;
-            }
-
-            _lockControl = false;
-            yield break;
-        }
-            #endregion
 
             #region 던지기 동작 및 기능 제어
 
@@ -765,22 +724,23 @@ namespace Com.MyCompany.MyGame
         #endregion
 
         //공격 판정 콜라이더 제어
-        public void EnableDefaultAttack(bool enable)
+        public void EnableAttackCollider(bool enable)
         {
-            defaultAttack.enableCollider = enable;
-        }
-        public void EnableAssassinate(bool enable)
-        {
-            float val = (enable ? 1.0f : 0.0f);
-            if (!enable)
-            {
-                animator.Play("Walk", AnimationLayers.Assassinate, 0);
-                animator.SetBool("ReadyAssassinateAnim", false);
-            }
+            attackCollider.enableCollider = enable;
 
-            animator.SetLayerWeight(AnimationLayers.Assassinate, val);
-            animator.SetFloat("AssassinateAnimSpeed", val);
-            assassinate.enableCollider = enable;
+            if (attackCollider.damage < 0)
+            {
+                float val = (enable ? 1.0f : 0.0f);
+                if (!enable)
+                {
+                    animator.Play("Walk", AnimationLayers.Assassinate, 0);
+                    animator.SetBool("ReadyAssassinateAnim", false);
+                }
+
+                animator.SetLayerWeight(AnimationLayers.Assassinate, val);
+                animator.SetFloat("AssassinateAnimSpeed", val);
+                attackCollider.enableCollider = enable;
+            }
         }
 
         //캐릭터가 추락 중일 때
