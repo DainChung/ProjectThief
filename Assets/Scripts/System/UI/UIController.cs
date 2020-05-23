@@ -39,11 +39,15 @@ namespace Com.MyCompany.MyGame.UI
 
         public void OnOffAll(bool enable)
         {
-            base.OnOffUI(enable);
-            OnOffChildren(enable);
-            if(enable) OnOffIcon();
-            try{ transform.GetComponent<Indicator>().enabled = enable;}
-            catch(System.NullReferenceException) { }
+            try
+            {
+                base.OnOffUI(enable);
+                OnOffChildren(enable);
+                if (enable) OnOffIcon();
+                try { transform.GetComponent<Indicator>().enabled = enable; }
+                catch (System.NullReferenceException) { }
+            }
+            catch (System.Exception) { }
         }
 
         public void OnOffChildren(bool enable)

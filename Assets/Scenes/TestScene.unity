@@ -12702,6 +12702,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17a1b66111ca26344bc1695d7280e959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiCam: {fileID: 146996320}
 --- !u!114 &1849783380
 MonoBehaviour:
   m_ObjectHideFlags: 0

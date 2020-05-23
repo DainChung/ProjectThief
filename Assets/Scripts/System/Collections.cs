@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.FileIO;
@@ -133,8 +134,8 @@ namespace Com.MyCompany.MyGame
         }
         public static class UnitStatDB
         {
-            private static System.Collections.Generic.List<UnitStat> unitStats = DBIO.ReadAll("UnitStatDB.db");
-            private static System.Collections.Generic.Dictionary<string, int> codeDic = new System.Collections.Generic.Dictionary<string, int>();
+            private static List<UnitStat> unitStats = DBIO.ReadAll("UnitStatDB.db");
+            private static Dictionary<string, int> codeDic = new Dictionary<string, int>();
 
             public static UnitStat GetUnitStat(string unitCode)
             {
@@ -143,6 +144,40 @@ namespace Com.MyCompany.MyGame
                         codeDic.Add(unitStats[i].unitCode, i);
 
                 return unitStats[codeDic[unitCode]];
+            }
+        }
+
+        public static class MyMath
+        {
+            private static Dictionary<int, float> sinDB = new Dictionary<int, float>();
+
+            public static float Sin(float degree)
+            {
+                int index = (int)(degree + 0.5f);
+
+                if (index < 0) index += 360;
+                else if (index >= 360) index -= 360;
+
+                try { return sinDB[index]; }
+                catch (System.Exception)
+                {
+                    sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
+                    return sinDB[index];
+                }
+            }
+            public static float Cos(float degree)
+            {
+                int index = (int)(degree + 0.5f);
+
+                if (index < -90) index += 360;
+                else if (index >= 270) index -= 360;
+
+                try { return sinDB[index + 90]; }
+                catch (System.Exception)
+                {
+                    sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
+                    return sinDB[index + 90];
+                }
             }
         }
 

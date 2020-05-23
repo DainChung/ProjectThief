@@ -3,6 +3,8 @@ using System.Data;
 using System.IO;
 using System.Collections.Generic;
 
+using UnityEngine;
+
 using Mono.Data.Sqlite;
 
 using Com.MyCompany.MyGame.GameSystem;
@@ -194,25 +196,27 @@ namespace Com.MyCompany.MyGame.FileIO
 
     public static class DataIO
     {
-        private static void Write(string file)
+        public static void Write(string file)
         {
             string filePath = FilePaths.DataPath + "/" + file;
+            StringBuilder data = new StringBuilder();
             //BestRecords.data 생성
             if (file.Contains("Best"))
             {
-                StringBuilder data = new StringBuilder();
-
                 data.AppendLine("Stage1,9999.99,0.000");
                 data.AppendLine("Stage2,9999.99,0.000");
-
                 File.WriteAllText(filePath, data.ToString());
             }
             //SoundSetting.data 생성
-            else
+            else if (file.Contains("Sound"))
             {
-                StringBuilder data = new StringBuilder();
-
                 data.AppendLine("20");
+                File.WriteAllText(filePath, data.ToString());
+            }
+            else if (file == "sin.data")
+            {
+                for (int i = 0; i < 360; i++)
+                    data.AppendLine(string.Format("{0}", Mathf.Sin(i * Mathf.Deg2Rad)));
 
                 File.WriteAllText(filePath, data.ToString());
             }
@@ -293,6 +297,32 @@ namespace Com.MyCompany.MyGame.FileIO
             string result;
 
             result = allData[index];
+
+            return result;
+        }
+
+        public static string[] ReadAll(string file)
+        {
+            string filePath = FilePaths.DataPath + "/" + file;
+            //파일이 없다면 만든다
+            if (!File.Exists(filePath)) Write(file);
+
+            return File.ReadAllLines(filePath);
+        }
+    }
+
+    public static class ParseData
+    {
+        public static Dictionary<int, float> String2Dic(string[] data)
+        {
+            Dictionary<int, float> result = new Dictionary<int, float>();
+            float value = 0;
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                float.TryParse(data[i], out value);
+                result.Add(i, value);
+            }
 
             return result;
         }

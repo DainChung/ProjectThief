@@ -15,6 +15,8 @@ namespace Com.MyCompany.MyGame
         public float smooth;
 
         public float rotationSpeed;
+        public float zoomSpeed;
+        public const float minDist = 0.5f;
 
         #endregion
 
@@ -28,9 +30,16 @@ namespace Com.MyCompany.MyGame
 
         #region Private Fields
         private Vector3 height = new Vector3(0, 1, 0);
+        private float _maxDist;
         #endregion
 
         #region Protected Methods
+
+        protected void Start()
+        {
+            _maxDist = maxDist;
+            dist = maxDist;
+        }
 
         protected virtual void FollowPlayer()
         {
@@ -80,6 +89,13 @@ namespace Com.MyCompany.MyGame
 
             dist = Mathf.Clamp(dist, 0.8f, maxDist);
         }
+
+        protected void Zoom(float scroll)
+        {
+            maxDist -= scroll * Time.deltaTime * zoomSpeed;
+            maxDist = Mathf.Clamp(maxDist, minDist, _maxDist);
+            cameraPos = cameraPos.normalized * maxDist;
+        }
         #endregion
 
         #region Private Methods
@@ -88,7 +104,7 @@ namespace Com.MyCompany.MyGame
         {
             Vector3 result = Vector3.zero;
 
-            distance = Mathf.Clamp(distance, 0.5f, maxDist);
+            distance = Mathf.Clamp(distance, minDist, maxDist);
             float cameraYValue = Mathf.Cos(Mathf.Deg2Rad * transform.eulerAngles.x);
 
             result.Set(Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.y) * distance * cameraYValue,

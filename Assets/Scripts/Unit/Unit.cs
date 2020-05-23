@@ -44,19 +44,17 @@ namespace Com.MyCompany.MyGame
             //eulerAngleY : 캐릭터가 바라보는 방향
             private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
             {
-                float cosY = Mathf.Cos(eulerAngleY * Mathf.Deg2Rad);
-                float sinY = Mathf.Sin(eulerAngleY * Mathf.Deg2Rad);
-                float cosEuler = Mathf.Cos(theta);
-                float sinEuler = Mathf.Sin(theta);
-
                 //시간 t로 x, y, z 값을 구한다.
-                float x = cosEuler * sinY * throwPower * t;
-                float y = (0.95f * throwPower * sinEuler - 0.545f * gravity * t) * t;
-                float z = cosEuler * cosY * throwPower * t;
+                float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
+                float y = (0.95f * throwPower * MyMath.Sin(theta) - 0.545f * gravity * t) * t;
+                float z = MyMath.Cos(theta) * MyMath.Cos(eulerAngleY) * throwPower * t;
 
                 return new Vector3(x, y, z);
             }
 
+            //theta : 발사각도
+            //t : 시간
+            //eulerAngleY : 캐릭터가 바라보는 방향
             public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
             {
                 if (!lineRenderer.enabled) //조준할 때만 LineRenderer를 활성화합니다.
@@ -65,7 +63,7 @@ namespace Com.MyCompany.MyGame
                     throwDestiPos.GetComponent<MeshRenderer>().enabled = true; //착탄지점을 보여줍니다.
                 }
 
-                theta = -(theta) * Mathf.Deg2Rad; //발사각도
+                theta *= (-1); //발사각도
 
                 float t = 0.08f; //탄도방정식에 넣을 변수 t
 
@@ -782,16 +780,15 @@ namespace Com.MyCompany.MyGame
                 AlertManager();
             }
         }
-        //alertValue에 따라 curUnitState를 변경
+        /// <summary>
+        /// alertValue에 따라 curUnitState를 변경
+        /// </summary>
         public void AlertManager()
         {
-            //curUnitState = UnitState.IDLE
             if (alertValue < AggroCollections.alertMin)
                 curUnitState = UnitState.IDLE;
-            //curUnitState = UnitState.ALERT
             else if (alertValue >= AggroCollections.alertMin && alertValue < AggroCollections.combatMin)
                 curUnitState = UnitState.ALERT;
-            //curUnitState = UnitState.COMBAT
             else if (alertValue >= AggroCollections.combatMin && alertValue < AggroCollections.combatMin + 1)
                 curUnitState = UnitState.COMBAT;
             else
@@ -799,6 +796,8 @@ namespace Com.MyCompany.MyGame
                 alertValue = AggroCollections.combatMin + 1;
                 curUnitState = UnitState.COMBAT;
             }
+
+            curUnitState = UnitState.IDLE;
         }
 
         #endregion

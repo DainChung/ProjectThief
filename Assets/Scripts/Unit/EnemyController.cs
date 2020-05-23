@@ -397,8 +397,9 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitState)
             {
                 case UnitState.IDLE:
-                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
-                    Patrol();
+                    //if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
+                    //Patrol();
+                    isMovingNow = false;
                     break;
                 case UnitState.ALERT:
                     if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
@@ -536,7 +537,7 @@ namespace Com.MyCompany.MyGame
         {
             try
             {
-                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 1.2f);
+                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.7f);
                 if (!_doesReachToTarget)
                 {
                     isMovingNow = true;
@@ -561,6 +562,7 @@ namespace Com.MyCompany.MyGame
                 {
                     unit.AttackDefault(false);
                     isMovingNow = false;
+                    ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.7f);
                     _doesReachToTarget = false;
                 }
             }

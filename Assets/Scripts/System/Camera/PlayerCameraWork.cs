@@ -8,14 +8,16 @@ namespace Com.MyCompany.MyGame
 {
     public class PlayerCameraWork : CameraWork
     {
+        private float _maxDist;
+
         // Start is called before the first frame update
-        void Start()
+        new void Start()
         {
             player = GameObject.FindWithTag("Player").transform;
             destiPos = cameraPos;
 
             maxDist = Vector3.Distance(cameraPos, Vector3.zero);
-            dist = maxDist;
+            base.Start();
         }
 
         void FixedUpdate()
@@ -26,6 +28,8 @@ namespace Com.MyCompany.MyGame
 
             //플레이어 캐릭터를 따라다님
             FollowPlayer();
+
+            Zoom(Input.mouseScrollDelta.y);
         }
     }
 }

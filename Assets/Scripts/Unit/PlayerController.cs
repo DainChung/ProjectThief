@@ -317,6 +317,7 @@ namespace Com.MyCompany.MyGame
         {
             nearestItem = new NearestItem(transform);
             unit = GetComponent<Unit>();
+
             playerAnimController = GetComponent<PlayerAnimationController>();
             GameObject m = GameObject.FindWithTag("Manager");
             stageManager = m.GetComponent<StageManager>();

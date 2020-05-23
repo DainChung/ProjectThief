@@ -230,7 +230,7 @@ namespace Com.MyCompany.MyGame
                 case UnitPose.MOD_RUN:
                 case UnitPose.MOD_CROUCH:
                     if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
-                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical") + Input.GetAxis("Horizontal")));
+                        animator.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal")));
                     else
                     {
                         animator.SetFloat("TurnRight", 0);

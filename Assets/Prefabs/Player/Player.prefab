@@ -725,7 +725,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
-  m_Center: {x: 0, y: -2, z: 0}
+  m_Center: {x: 0, y: -1.5, z: 0}
 --- !u!82 &2445684652060867336
 AudioSource:
   m_ObjectHideFlags: 0
@@ -857,7 +857,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
-  m_Center: {x: 0, y: 1, z: 1.5}
+  m_Center: {x: 0, y: 1.5, z: 1.5}
 --- !u!135 &291526139
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -870,7 +870,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
-  m_Center: {x: 0, y: 1, z: -1.5}
+  m_Center: {x: 0, y: 1.5, z: -1.5}
 --- !u!135 &291526140
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -883,7 +883,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
-  m_Center: {x: -1.5, y: 1, z: 0}
+  m_Center: {x: -1.5, y: 1.5, z: 0}
 --- !u!135 &291526141
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -896,7 +896,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1
-  m_Center: {x: 1.5, y: 1, z: 0}
+  m_Center: {x: 1.5, y: 1.5, z: 0}
 --- !u!64 &1500988833
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1096,7 +1096,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: d7a7dc56d219f0d4a82f262309eb286a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.9999807
+      value: -3.1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d7a7dc56d219f0d4a82f262309eb286a,
         type: 3}

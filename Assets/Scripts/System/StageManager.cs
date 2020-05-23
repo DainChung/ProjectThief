@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.FileIO;
-
+using Com.MyCompany.MyGame.UI;
 
 namespace Com.MyCompany.MyGame.GameSystem
 {
@@ -68,7 +67,6 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         private System.Diagnostics.Stopwatch gameTimer;
         private UIManager uiManager;
-
         #endregion
 
         #region Public Fields
@@ -80,6 +78,11 @@ namespace Com.MyCompany.MyGame.GameSystem
         #endregion
 
         #region MonoBehaviour Callbacks
+
+        void Awake()
+        {
+            DataIO.Write("sin.data");
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -125,13 +128,14 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         private IEnumerator LoadSceneAync(string scene)
         {
+            UIController windowLoading = uiManager.GetUIController("Window_Loading");
+            windowLoading.OnOffAll(true);
             AsyncOperation loading = SceneManager.LoadSceneAsync(scene);
 
             while (!loading.isDone)
             {
-                //로딩 관련 Slider와 텍스쳐를 띄움
-                Debug.Log(loading.progress);
-                //progress에 따라 로딩 바를 채움
+                windowLoading.SetFillAmount(loading.progress, "LoadingForeground");
+                windowLoading.SetText(string.Format("{0}%", loading.progress * 100), "Value");
                 yield return null;
             }
 

@@ -11,17 +11,17 @@ namespace Com.MyCompany.MyGame.GameSystem
     public class UIManager : MonoBehaviour
     {
         #region Private Values
-        private Transform uiCam;
         private List<UI2DSprite> gameResultStars = new List<UI2DSprite>();
 
         private GameObject player;
         #endregion
 
         #region Public Values
+        public Transform uiCam;
         [HideInInspector]   public Dictionary<string, string> buttonNameToString = new Dictionary<string, string>();
         #endregion
 
-        #region MonoBehaviour
+        #region MonoBehaviour Callbacks
 
         void Awake()
         {
@@ -39,8 +39,6 @@ namespace Com.MyCompany.MyGame.GameSystem
         // Start is called before the first frame update
         void Start()
         {
-            uiCam = GameObject.Find("UICamera").transform;
-
             if (SceneManager.GetActiveScene().name.Contains("Stage")) player = GameObject.Find("Player");
 
             InitUI();
@@ -69,6 +67,7 @@ namespace Com.MyCompany.MyGame.GameSystem
                 OnOffUI(true, "Button_Menu");
                 OnOffUI(true, "Button_Inventory");
                 OnOffUI(true, "Window_EquippedWeapon");
+                OnOffUI(true, "Window_MiniMap");
                 SetIndicator("DestiIndicator", GameObject.FindGameObjectWithTag("Gold").transform);
                 ControlEquippedWeapon(WeaponCode.HAND);
 
@@ -84,6 +83,7 @@ namespace Com.MyCompany.MyGame.GameSystem
             {
                 OnOffUI(false, uiCam);
                 OnOffUIWindow(true, "Window_Menu");
+                OnOffUIWindow(true, "BackGround");
             }
             #endregion
         }
@@ -210,7 +210,8 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public void OnOffUIWindow(bool enable, string windowName)
         {
-            uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
+            try{uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);}
+            catch (System.Exception) { }
         }
 
         public void SetUILabelText(string uiName, string text)
@@ -225,6 +226,7 @@ namespace Com.MyCompany.MyGame.GameSystem
             }
             catch (System.NullReferenceException)
             {
+                //uiCam이 정의되지 않았을 때
                 GameObject.Find("UICamera").transform.Find(windowName).GetComponent<UIController>().SetText(text, uiName);
             }
         }
@@ -251,9 +253,10 @@ namespace Com.MyCompany.MyGame.GameSystem
             float r = index + 1;
             float t = 0.0175f;
 
+            float playerMaxHP = player.GetComponent<Unit>().maxHealth;
             while (GetHPBarFillAmount(index) > ratio)
             {
-                DecreaseHPBar(r * (1 - Mathf.Cos(t)) / player.GetComponent<Unit>().maxHealth, ratio, index);
+                DecreaseHPBar(r * (1 - Mathf.Cos(t)) / playerMaxHP, ratio, index);
                 t += 0.01f;
                 yield return null;
             }
@@ -400,6 +403,11 @@ namespace Com.MyCompany.MyGame.GameSystem
                 }
             }
             catch(System.Exception){ }
+        }
+
+        public UIController GetUIController(string windowName)
+        {
+            return uiCam.Find(windowName).GetComponent<UIController>();
         }
 
         //uiName이 켜진 상태인지 아닌지 확인
