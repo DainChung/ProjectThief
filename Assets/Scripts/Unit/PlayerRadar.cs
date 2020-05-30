@@ -28,7 +28,10 @@ namespace Com.MyCompany.MyGame
             if (other.gameObject.layer == PhysicsLayers.Item)
             {
                 CheckStructure(other.transform.position);
-                playerController.SetNeareastItem(other, canGetItem);
+                if(other.name.Contains("Door"))
+                    playerController.SetNeareastItem(other, true);
+                else
+                    playerController.SetNeareastItem(other, canGetItem);
             }
         }
         void OnTriggerExit(Collider other)
@@ -42,7 +45,7 @@ namespace Com.MyCompany.MyGame
 
         private void CheckStructure(Vector3 itemPos)
         {
-            //Debug.DrawRay(transform.position, (itemPos - transform.position) * (Vector3.Distance(itemPos, transform.position) -0.5f), Color.red);
+            //Debug.DrawRay(transform.position, (itemPos - transform.position) * Vector3.Distance(itemPos, transform.position), Color.red);
             canGetItem = !(Physics.Raycast(transform.position, itemPos - transform.position, Vector3.Distance(itemPos, transform.position), 1 << PhysicsLayers.Structure));
         }
     }

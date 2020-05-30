@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.GameSystem;
+using Com.MyCompany.MyGame.UI;
 
 namespace Com.MyCompany.MyGame
 { 
@@ -54,7 +53,7 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-                ShowInvnetory();
+                ShowInvnetory((WeaponCode)item);
             }
             public void Add(ItemCode item)
             { 
@@ -79,68 +78,9 @@ namespace Com.MyCompany.MyGame
                         break;
                 }
 
-                ShowInvnetory();
-            }
-            public void Add(int index)
-            {
-                index--;
-
-                if (_items[index] + 1 > maxAmount[index])
-                    _items[index] = maxAmount[index];
-                else
-                    _items[index]++;
-
-                ShowInvnetory();
+                ShowInvnetory((WeaponCode)item);
             }
 
-            public void Remove(ItemCode item, int amount)
-            {
-                switch (item)
-                {
-                    case ItemCode.CAN:
-                    case ItemCode.CHEESE:
-                    case ItemCode.SMOKE:
-
-                        int index = (int)(item) - 1;
-
-                        if (amount > 0)
-                        {
-                            if (_items[index] - amount < 0)
-                                _items[index] = 0;
-                            else
-                                _items[index] -= amount;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                ShowInvnetory();
-            }
-            public void Remove(ItemCode item)
-            {
-                switch (item)
-                {
-                    case ItemCode.CAN:
-                    case ItemCode.CHEESE:
-                    case ItemCode.SMOKE:
-
-                        int index = (int)(item) - 1;
-
-                        if (_items[index] - 1 < 0)
-                            _items[index] = 0;
-                        else
-                            _items[index]--;
-                        break;
-                    case ItemCode.GOLD:
-                        _takeGold = false;
-                        break;
-                    default:
-                        break;
-                }
-
-                ShowInvnetory();
-            }
             public void Remove(int index)
             {
                 index--;
@@ -150,7 +90,7 @@ namespace Com.MyCompany.MyGame
                 else
                     _items[index]--;
 
-                ShowInvnetory();
+                ShowInvnetory((WeaponCode)(index + 1));
             }
 
             public bool CheckWeapon(WeaponCode weapon)
@@ -170,18 +110,25 @@ namespace Com.MyCompany.MyGame
                         break;
                 }
 
-                if (!result)
-                    UnityEngine.Debug.Log("Not Enough " + weapon.ToString());
-
                 return result;
             }
-            public void ShowInvnetory()
+            public void ShowInvnetory(WeaponCode weapon)
             {
-                uiManager.SetUILabelText("Window_Inventory", (takeGold ? "1" : "0"), "Treasure Value");
-                uiManager.SetUILabelText("Window_Inventory", items[0].ToString(), "Can Value");
-                uiManager.SetUILabelText("Window_Inventory", items[1].ToString(), "Cheese Value");
-                uiManager.SetUILabelText("Window_Inventory", items[2].ToString(), "Smoke Value");
-                //UnityEngine.Debug.Log("[ShowInventory] GOLD: " + _takeGold + ", CAN: " + _items[0] + ", CHEESE: " + _items[1] + ", SMOKE: " + _items[2]);
+                UIController inventory = uiManager.GetUIController("Window_Inventory");
+                inventory.SetText((takeGold ? "1" : "0"), "Treasure Value");
+                inventory.SetText(items[0].ToString(), "Can Value");
+                inventory.SetText(items[1].ToString(), "Cheese Value");
+                inventory.SetText(items[2].ToString(), "Smoke Value");
+
+                if (CheckWeapon(weapon))
+                {
+                    uiManager.SetColorUIName("Window_EquippedWeapon", Color.white, weapon);
+                }
+                else
+                {
+                    uiManager.SetFillAmountUIName("Window_EquippedWeapon", 1, weapon);
+                    uiManager.SetColorUIName("Window_EquippedWeapon", Color.red, weapon);
+                }
             }
         }
 
@@ -239,10 +186,22 @@ namespace Com.MyCompany.MyGame
                 try
                 {
                     result = _item.code;
-                    DestroyImmediate(_item.gameObject);
+                    switch (result)
+                    {
+                        case ItemCode.GOLD:
+                            Destroy(_item.gameObject);
+                            break;
+                        case ItemCode.CAN:
+                        case ItemCode.CHEESE:
+                            _item.gameObject.SetActive(false);
+                            break;
+                        default:
+                            break;
+                    }
                     Init();
+
                 }
-                catch (System.Exception) { }
+                catch (System.Exception e){ MyDebug.Log(this.ToString() + " : " + e); }
                 return result;
             }
             public Item GetItem()
@@ -385,12 +344,7 @@ namespace Com.MyCompany.MyGame
         {
             if (other.CompareTag("Floor"))
             {
-                try
-                {
-                    if (other.name.Contains("Stairs")) mass = 10f;
-                    else mass = 1f;
-                    miniMapcam.ChangeFloor(other.GetComponent<Floor>().floor);
-                }
+                try { miniMapcam.ChangeFloor(other.GetComponent<Floor>().floor); }
                 catch (System.Exception) { }
             }
 
@@ -474,6 +428,9 @@ namespace Com.MyCompany.MyGame
                 uiManager.ControlEquippedWeapon(curWeapon);
                 SendMessage("PlayAudio", "ChangeWeapon");
             }
+
+            if (pInventory.CheckWeapon(curWeapon))
+                uiManager.SetFillAmountUIName("Window_EquippedWeapon", unit.swManager.GetTime(curWeapon), curWeapon);
         }
         private void ControlAttack()
         {
@@ -505,6 +462,7 @@ namespace Com.MyCompany.MyGame
                         {
                             unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
                             pInventory.Remove((int)curWeapon);
+                            uiManager.ControlEquippedWeaponCoolTime(curWeapon);
                         }
                     }
                     break;
@@ -521,6 +479,7 @@ namespace Com.MyCompany.MyGame
                     transform.LookAt(checkCameraCollider.assassinateTargetPos);
                 unit.AttackDefault(true);
                 unit.curLookDir = LookDirState.max;
+                uiManager.ControlEquippedWeaponCoolTime(curWeapon);
             }
         }
         private void AttackAssassinate()
@@ -537,7 +496,7 @@ namespace Com.MyCompany.MyGame
                             if(uiManager.IsFullUIBasicSprite("AssassinateIndicator"))
                                 StartCoroutine(AssassinateMove());
                             else
-                                uiManager.FillAmountUIName("AssassinateIndicator", buttonDelay);
+                                uiManager.FillAmountUIName("AssassinateIndicator", buttonDelay * 2);
                         }
                         else
                             uiManager.SetFillAmountUIName("AssassinateIndicator", 0);
@@ -602,6 +561,7 @@ namespace Com.MyCompany.MyGame
                     unit.AttackPhaseThrow(throwPos.position, curWeapon, ref playerSpeed);
                     pInventory.Remove((int)curWeapon);
                     animator.SetBool("ThrowItemCode", true);
+                    uiManager.ControlEquippedWeaponCoolTime(curWeapon);
                 }
             }
             //Throw 애니메이션이 재생 중
@@ -659,10 +619,13 @@ namespace Com.MyCompany.MyGame
                 if (uiManager.IsFullUIBasicSprite("NearestItemIndicator"))
                 {
                     SetIndicator("NearestItemIndicator", null);
-                    if (nearestItem.GetItem().code == ItemCode.GOLD) SetIndicator("DestiIndicator", null);
+                    if (nearestItem.GetItem().code == ItemCode.GOLD)
+                        SetIndicator("DestiIndicator", null);
 
-                    if (nearestItem.GetItem().code == ItemCode.STRUCTURE) nearestItem.GetStructure().UseStructure();
-                    else pInventory.Add(nearestItem.GetItemCode());
+                    if (nearestItem.GetItem().code == ItemCode.STRUCTURE)
+                        nearestItem.GetStructure().UseStructure();
+                    else
+                        pInventory.Add(nearestItem.GetItemCode());
 
                     nearestItem.Init();
                     SendMessage("PlayAudio", "GetItem");

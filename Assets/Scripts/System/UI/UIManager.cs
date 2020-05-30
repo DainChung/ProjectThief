@@ -69,6 +69,8 @@ namespace Com.MyCompany.MyGame.GameSystem
                 OnOffUI(true, "Window_EquippedWeapon");
                 OnOffUI(true, "Window_MiniMap");
                 SetIndicator("DestiIndicator", GameObject.FindGameObjectWithTag("Gold").transform);
+                SetIndicator("AssassinateIndicator", null);
+                SetIndicator("NearestItemIndicator", null);
                 ControlEquippedWeapon(WeaponCode.HAND);
 
                 for (int i = 0; i < uiCam.Find("Window_GameResult").childCount; i++)
@@ -279,7 +281,25 @@ namespace Com.MyCompany.MyGame.GameSystem
             finally
             {
                 windowInventory.GetComponent<UIController>().OnOffChildren(false);
-                windowInventory.Find(curWeapon.ToString()).GetComponent<UIController>().OnOffUI(true);
+                UIController curWeaponIcon = windowInventory.Find(curWeapon.ToString()).GetComponent<UIController>();
+                curWeaponIcon.OnOffUI(true);
+                curWeaponIcon.OnOffChildren(curWeaponIcon.GetFillAmount("CoolTime") != 0);
+            }
+        }
+        public void ControlEquippedWeaponCoolTime(WeaponCode curWeapon)
+        {
+            UIController curWeaponIcon = null;
+            try
+            {
+                curWeaponIcon = uiCam.Find("Window_EquippedWeapon").Find(curWeapon.ToString()).GetComponent<UIController>();
+            }
+            catch (System.NullReferenceException)
+            {
+                curWeaponIcon = GameObject.Find("UICamera").transform.Find("Window_EquippedWeapon").Find(curWeapon.ToString()).GetComponent<UIController>();
+            }
+            finally
+            {
+                curWeaponIcon.OnOffChildren(true);
             }
         }
 
@@ -379,6 +399,10 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             uiCam.Find(windowName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
         }
+        public void SetFillAmountUIName(string windowName, float setValue, WeaponCode weaponCode)
+        {
+            uiCam.Find(windowName).Find(weaponCode.ToString()).GetComponent<UIController>().SetFillAmount(setValue);
+        }
         public void FillAmountUIName(string windowName, float amount, string uiName)
         {
             uiCam.Find(windowName).GetComponent<UIController>().FillAmount(amount, uiName);
@@ -388,17 +412,22 @@ namespace Com.MyCompany.MyGame.GameSystem
             return (uiCam.Find(windowName).GetComponent<UIController>().GetFillAmount(uiName) >= 1);
         }
 
+        public void SetColorUIName(string windowName, Color color, WeaponCode weaponCode)
+        {
+            uiCam.Find(windowName).Find(weaponCode.ToString()).GetComponent<UIController>().SetColor(color);
+        }
+
         public void SetIndicator(string uiName, Transform target)
         {
-            OnOffUI((target != null), uiName);
+            Indicator indicator = uiCam.Find(uiName).GetComponent<Indicator>();
+            OnOffUI((target != null), indicator.transform);
 
             try
             {
-                if (uiCam.Find(uiName).GetComponent<Indicator>().target.GetInstanceID() != target.GetInstanceID())
-                    uiCam.Find(uiName).GetComponent<Indicator>().target = target;
+                indicator.target = target;
                 if (target == null)
                 {
-                    uiCam.Find(uiName).GetComponent<Indicator>().target = null;
+                    indicator.target = null;
                     SetFillAmountUIName(uiName, 0);
                 }
             }
@@ -408,6 +437,10 @@ namespace Com.MyCompany.MyGame.GameSystem
         public UIController GetUIController(string windowName)
         {
             return uiCam.Find(windowName).GetComponent<UIController>();
+        }
+        public UIController GetUIController(string windowName, string uiName)
+        {
+            return uiCam.Find(windowName).Find(uiName).GetComponent<UIController>();
         }
 
         //uiName이 켜진 상태인지 아닌지 확인

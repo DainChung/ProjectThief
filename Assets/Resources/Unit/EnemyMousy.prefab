@@ -736,7 +736,7 @@ Transform:
   m_GameObject: {fileID: 1140034203320418059}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.1, z: 0}
-  m_LocalScale: {x: 3, y: 0.044999998, z: 3}
+  m_LocalScale: {x: 3, y: 0.2, z: 3}
   m_Children: []
   m_Father: {fileID: 6150556912168944673}
   m_RootOrder: 4
@@ -814,7 +814,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 6150556912168944687}
-  enemyRadar: {fileID: 4470834327601326396}
+  eye: {fileID: 4470834327601326396}
 --- !u!1 &1501703517504789808
 GameObject:
   m_ObjectHideFlags: 0
@@ -1121,7 +1121,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2772748400546974850}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.1, z: 0}
+  m_LocalPosition: {x: 0, y: -0.061, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 5893673809752058171}
@@ -1640,6 +1640,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radarValue: 10
+  collider: {fileID: 0}
   eyes: {fileID: 8946021664990976102}
   checkStructure: {fileID: 2010139474}
 --- !u!1 &5514417104108375904
@@ -2076,6 +2077,7 @@ MonoBehaviour:
   unitCode: Enemy
   curUnitPose: 1
   alertValue: 0
+  debugState: 0
 --- !u!114 &6150556912168944687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2092,7 +2094,8 @@ MonoBehaviour:
   throwPos: {fileID: 5781894586358001035}
   assassinateTargetted: 0
   lookDir: {x: 0, y: 0, z: 0}
-  enemyRadar: {fileID: 9038843608279773064}
+  enemyRadar: {fileID: 6309409433292491501}
+  enemyEye: {fileID: 2520040589070361654}
   checkStructure: {fileID: 2010139474}
   patrolSpots:
   - {fileID: 0}

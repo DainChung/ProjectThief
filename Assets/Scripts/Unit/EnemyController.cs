@@ -7,7 +7,6 @@ using UnityEngine.AI;
 
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.Exceptions;
-using Com.MyCompany.MyGame.GameSystem;
 
 namespace Com.MyCompany.MyGame
 {
@@ -233,7 +232,6 @@ namespace Com.MyCompany.MyGame
         private Unit.StopwatchManager behaveSWManager;
         private int patrolSpotIndex = 0;
 
-        private MeshCollider enemyRadarCollider;
         private SpriteRenderer[] icons = new SpriteRenderer[2];
 
         #endregion
@@ -251,7 +249,8 @@ namespace Com.MyCompany.MyGame
         [HideInInspector] public TargetManager targetMng = new TargetManager();
         [HideInInspector] public bool assassinateTargetted = false;
         [HideInInspector] public Vector3 lookDir = new Vector3();
-        public Transform enemyRadar;
+        public MeshCollider enemyRadar;
+        public MeshCollider enemyEye;
         //assassinateTargetted가 true면 무조건 false 반환
         public bool canAssassinate { get { return (assassinateTargetted ? false : _canAssassinate); } set { _canAssassinate = value; } }
 
@@ -287,7 +286,6 @@ namespace Com.MyCompany.MyGame
             agent.speed = 0;
             checkStructure.enabled = true;
 
-            enemyRadarCollider = enemyRadar.GetComponent<MeshCollider>();
             icons[0] = transform.Find("ALERTIcon").GetComponent<SpriteRenderer>();
             icons[1] = transform.Find("COMBATIcon").GetComponent<SpriteRenderer>();
             _InitCurTarget();
@@ -297,6 +295,13 @@ namespace Com.MyCompany.MyGame
         {
             if (!unit.lockControl)
             {
+                //if (unit.curUnitState == UnitState.COMBAT)
+                //{
+                //    isMovingNow = false;
+                //    unit.AttackDefault(false);
+                //}
+                //else
+                //    isMovingNow = true;
                 if (unit.health > 0)
                     AI();
             }
@@ -309,7 +314,9 @@ namespace Com.MyCompany.MyGame
             {
                 try
                 {
-                    if (other.GetComponent<Target>().code == WeaponCode.CHEESE)
+                    Target t = other.transform.GetComponent<Target>();
+
+                    if (t.code == WeaponCode.CHEESE)
                     {
                         RaycastHit[] hits = Physics.SphereCastAll(transform.position, 7f, transform.forward, 0.01f, 1 << PhysicsLayers.Item);
 
@@ -325,11 +332,12 @@ namespace Com.MyCompany.MyGame
                                 _InitCurTarget();
                                 curTarget.tr = hitTR;
                                 curTarget.pos = hitTR.position;
+
+                                enemyEye.enabled = false;
                             }
                         }
                     }
-
-                    if (transform.GetInstanceID() == other.transform.GetComponent<Target>().ID)
+                    if (transform.GetInstanceID() == t.ID && t.code != WeaponCode.PLAYER)
                     {
                         _doesReachToTarget = true;
                         Destroy(other.transform.gameObject);
@@ -397,29 +405,27 @@ namespace Com.MyCompany.MyGame
             switch (unit.curUnitState)
             {
                 case UnitState.IDLE:
-                    //if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
-                    //Patrol();
-                    isMovingNow = false;
+                    if (!enemyRadar.enabled) enemyRadar.enabled = true;
+                    Patrol();
                     break;
                 case UnitState.ALERT:
-                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
+                    if (!enemyRadar.enabled) enemyRadar.enabled = true;
 
                     if (queue.Count() == 0) Alert();
                     else ChaseTargetBYQueue();
                     break;
                 case UnitState.COMBAT:
-                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
+                    if (!enemyRadar.enabled) enemyRadar.enabled = true;
                     Combat();
                     break;
                 case UnitState.CHEESE:
-                    if (!enemyRadarCollider.enabled) enemyRadarCollider.enabled = true;
                     ChaseTargetBYQueue();
                     break;
                 case UnitState.INSMOKE:
                     ChaseTargetBYQueue();
                     if (curTarget.code == WeaponCode.max)
                     {
-                        enemyRadarCollider.enabled = true;
+                        enemyRadar.enabled = true;
                         unit.curUnitState = UnitState.ALERT;
                     }
                     break;
@@ -535,41 +541,30 @@ namespace Com.MyCompany.MyGame
 
         private void CombatMove()
         {
-            try
+            if (!_doesReachToTarget)
             {
-                ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.7f);
-                if (!_doesReachToTarget)
+                isMovingNow = true;
+                if (checkStructure.isThereStructure)
                 {
-                    isMovingNow = true;
-                    if (checkStructure.isThereStructure)
-                    {
-                        if (!agent.enabled) agent.enabled = true;
-                        unit.curLookDir = LookDirState.AGENT;
-                        agent.SetDestination(playerPosition);
-                    }
-                    else
-                    {
-                        if (agent.enabled)
-                        {
-                            agent.ResetPath();
-                            agent.enabled = false;
-                        }
-                        unit.curLookDir = LookDirState.FINDPLAYER;
-                        rb.velocity = transform.forward * enemySpeed * 0.15f;
-                    }
+                    if (!agent.enabled) agent.enabled = true;
+                    unit.curLookDir = LookDirState.AGENT;
+                    agent.SetDestination(playerPosition);
                 }
-                else if (_doesReachToTarget)
+                else
                 {
-                    unit.AttackDefault(false);
-                    isMovingNow = false;
-                    ValidateException.CheckAIsCloseToB(transform.position, curTarget.pos, 0.7f);
-                    _doesReachToTarget = false;
+                    if (agent.enabled)
+                    {
+                        agent.ResetPath();
+                        agent.enabled = false;
+                    }
+                    unit.curLookDir = LookDirState.FINDPLAYER;
+                    rb.velocity = transform.forward * enemySpeed * 0.15f;
                 }
             }
-            catch (AIsCloseToB)
+            else
             {
-                Stop();
-                stayDelay.Stop();
+                unit.AttackDefault(false);
+                isMovingNow = false;
             }
             rb.velocity *= 0.9f;
         }
@@ -617,7 +612,7 @@ namespace Com.MyCompany.MyGame
             catch (AIsCloseToB)
             {
                 Stop();
-                if(unit.curUnitState == UnitState.INSMOKE) enemyRadarCollider.enabled = true;
+                if(unit.curUnitState == UnitState.INSMOKE) enemyRadar.enabled = true;
             }
         }
 
@@ -728,16 +723,28 @@ namespace Com.MyCompany.MyGame
 
         public void Stop()
         {
-            if (unit.curUnitState == UnitState.EAT && curTarget.tr != null)
+            switch (unit.curUnitState)
             {
-                DestroyImmediate(curTarget.tr.gameObject);
-                //줍는 애니메이션 수행
-                unit.animator.SetInteger("DeadAnim", -2);
-                unit.animator.Play("Eat Cheese", AnimationLayers.Standing);
-                unit.lockControl = true;
+                case UnitState.EAT:
+                    if (curTarget.tr != null)
+                    {
+                        DisposeCheese();
+                        //줍는 애니메이션 수행
+                        unit.animator.SetInteger("DeadAnim", -2);
+                        unit.animator.Play("Eat Cheese", AnimationLayers.Standing);
+                        unit.lockControl = true;
+                    }
+                    break;
+                case UnitState.COMBAT:
+                    if(!checkStructure.isThereStructure)
+                        unit.curLookDir = LookDirState.FINDPLAYER;
+                    break;
+                case UnitState.IDLE:
+                    patrolSpotIndex++;
+                    break;
+                default:
+                    break;
             }
-            else if (unit.curUnitState == UnitState.COMBAT && !checkStructure.isThereStructure)
-                unit.curLookDir = LookDirState.FINDPLAYER;
 
             if (agent.enabled)
             {
@@ -748,8 +755,6 @@ namespace Com.MyCompany.MyGame
             isMovingNow = false;
             canIAttack = true;
             _InitCurTarget();
-
-            patrolSpotIndex++;
         }
         public void Detect(WeaponCode code, Transform tr, Vector3 pos)
         {
@@ -781,9 +786,13 @@ namespace Com.MyCompany.MyGame
                     default:
                         break;
                 }
-                if(agent.enabled) agent.ResetPath();
-                if(code == WeaponCode.SMOKE) EnemyAlertManager(UnitState.INSMOKE);
-                else EnemyAlertManager();
+                if(agent.enabled)
+                    agent.ResetPath();
+
+                if(code == WeaponCode.SMOKE)
+                    EnemyAlertManager(UnitState.INSMOKE);
+                else
+                    EnemyAlertManager();
             }
         }
 
@@ -795,7 +804,6 @@ namespace Com.MyCompany.MyGame
         public void EnemyAlertManager()
         {
             unit.AlertManager();
-            ShowIcon();
 
             switch (unit.curUnitState)
             {
@@ -804,6 +812,10 @@ namespace Com.MyCompany.MyGame
                     enemySpeed = unit.walkSpeed * 1.5f;
                     break;
                 case UnitState.INSMOKE:
+                    agent.speed = 2.0f;
+                    enemySpeed = unit.walkSpeed * 1.3f;
+                    enemyEye.enabled = false;
+                    break;
                 case UnitState.ALERT:
                     agent.speed = 2.0f;
                     enemySpeed = unit.walkSpeed * 1.3f;
@@ -814,15 +826,22 @@ namespace Com.MyCompany.MyGame
                     agent.speed = 2.7f;
                     enemySpeed = unit.speed * 1.5f;
                     break;
+                case UnitState.CHEESE:
+                case UnitState.EAT:
+                    agent.speed = 2.7f;
+                    enemySpeed = unit.speed * 1.5f;
+                    enemyEye.enabled = false;
+                    break;
                 default:
                     break;
             }
+
+            ShowIcon();
         }
         public void EnemyAlertManager(UnitState state)
         {
             unit.AlertManager();
             unit.curUnitState = state;
-            ShowIcon();
 
             switch (unit.curUnitState)
             {
@@ -844,6 +863,13 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
+
+            ShowIcon();
+        }
+
+        public void DisposeCheese()
+        {
+            curTarget.tr.GetComponent<WeaponThrow>().DisposeImmediately();
         }
 
         #endregion

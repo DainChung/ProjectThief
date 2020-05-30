@@ -21,7 +21,8 @@ namespace Com.MyCompany.MyGame
         }
         public override void UseStructure()
         {
-            if (!triggered) StartCoroutine(OpenClose());
+            if (!triggered)
+                StartCoroutine(OpenClose());
         }
 
         private IEnumerator OpenClose()

@@ -93,7 +93,7 @@ namespace Com.MyCompany.MyGame
         protected void Zoom(float scroll)
         {
             maxDist -= scroll * Time.deltaTime * zoomSpeed;
-            maxDist = Mathf.Clamp(maxDist, minDist, _maxDist);
+            //maxDist = Mathf.Clamp(maxDist, minDist, _maxDist);
             cameraPos = cameraPos.normalized * maxDist;
         }
         #endregion

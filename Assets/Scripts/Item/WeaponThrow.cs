@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
 
@@ -7,15 +8,13 @@ namespace Com.MyCompany.MyGame
     public class WeaponThrow : Weapon
     {
         private const float throwPower = 12f;
-        private bool lockAggro = false;
+        private GameObject aggroObj;
+        private Aggro aggro;
 
         public float timeValue;
+        public bool lockAggro = false;
 
-        public new void SetCode(WeaponCode code)
-        {
-            base.SetCode(code);
-            transform.GetComponent<Item>().SetItem(code);
-        }
+        public WeaponCode code;
 
         void Awake()
         {
@@ -23,12 +22,9 @@ namespace Com.MyCompany.MyGame
             base.time = timeValue;
         }
 
-        // Start is called before the first frame update
         void Start()
         {
-            base.rb.AddForce(transform.forward * throwPower, ForceMode.Impulse);
-            //생성 몇 초 후 자동 파괴
-            Destroy(gameObject, base.time);
+            Init();
         }
 
         void FixedUpdate()
@@ -43,12 +39,60 @@ namespace Com.MyCompany.MyGame
                 if (!lockAggro)
                 {
                     lockAggro = true;
-                    GameObject obj = Instantiate(Resources.Load(string.Format("{0}Aggro",FilePaths.weaponPath)) as GameObject, transform.position, transform.rotation) as GameObject;
-                    obj.GetComponent<Aggro>().SetCode(base._code, 0.5f);
+                    PoolAggro();
                 }
 
                 PlayAudio();
             }
+        }
+
+
+        public void Init()
+        {
+            base.SetCode(code);
+            base.SetAudio();
+            transform.GetComponent<Item>().SetItem(code);
+            SetAggro();
+        }
+        public void SetAggro()
+        {
+            aggroObj = transform.Find("WeaponAggro").gameObject;
+
+            aggro = aggroObj.GetComponent<Aggro>();
+            aggroObj.SetActive(false);
+            aggro.SetCode(base._code, 5.0f);
+        }
+        public void AddForce()
+        {
+            base.rb.AddForce(transform.forward * throwPower, ForceMode.Impulse);
+        }
+        public void PoolAggro()
+        {
+            try
+            {
+                aggroObj.SetActive(true);
+                StartCoroutine(aggro.Disposer());
+            }
+            catch (System.NullReferenceException)
+            {
+                SetAggro();
+                aggroObj.SetActive(true);
+                StartCoroutine(aggro.Disposer());
+            }
+        }
+        public IEnumerator Disposer()
+        {
+            yield return new WaitForSeconds(timeValue);
+            lockAggro = false;
+            gameObject.SetActive(false);
+
+            yield break;
+        }
+
+        public void DisposeImmediately()
+        {
+            lockAggro = false;
+            gameObject.SetActive(false);
         }
     }
 }

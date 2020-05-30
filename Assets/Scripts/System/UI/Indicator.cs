@@ -4,15 +4,12 @@ namespace Com.MyCompany.MyGame.UI
 {
     public class Indicator : UI
     {
-        [HideInInspector]   public Transform target;
+        public Transform target = null;
+        private Vector3 pos { get { return (target == null ? Vector3.zero : target.position); } }
 
-        void Awake()
-        {
-            if (target == null) this.enabled = false;
-        }
         void Update()
         {
-            if (target != null) base.Move(target.position);
+            base.Move(pos);
         }
     }
 }

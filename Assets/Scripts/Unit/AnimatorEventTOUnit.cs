@@ -32,10 +32,19 @@ namespace Com.MyCompany.MyGame
             unit.swManager.attackCountDelay.Restart();
             unit.curUnitPose = UnitPose.MOD_RUN;
 
-            unit.transform.GetComponent<Unit>().curLookDir = LookDirState.IDLE;
+            unit.curLookDir = LookDirState.IDLE;
 
             unit.animator.SetBool("IsAttack", false);
             unit.animator.SetBool("IsHit", false);
+        }
+        public void DisableHitReaction()
+        {
+            unit.curUnitPose = UnitPose.MOD_RUN;
+
+            unit.curLookDir = LookDirState.IDLE;
+
+            unit.animator.SetBool("IsHit", false);
+            unit.lockControl = false;
         }
 
         public void Dead()

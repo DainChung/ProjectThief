@@ -38,13 +38,11 @@ namespace Com.MyCompany.MyGame
                 lineRenderer.enabled = false;
             }
 
-            //탄도방정식을 이용하여 궤적을 그릴 수 있도록 Vector3 값을 반환한다.
             //theta : 발사각도
             //t : 시간
             //eulerAngleY : 캐릭터가 바라보는 방향
             private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
             {
-                //시간 t로 x, y, z 값을 구한다.
                 float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
                 float y = (0.95f * throwPower * MyMath.Sin(theta) - 0.545f * gravity * t) * t;
                 float z = MyMath.Cos(theta) * MyMath.Cos(eulerAngleY) * throwPower * t;
@@ -53,7 +51,7 @@ namespace Com.MyCompany.MyGame
             }
 
             //theta : 발사각도
-            //t : 시간
+            //throwPos : 발사 위치
             //eulerAngleY : 캐릭터가 바라보는 방향
             public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
             {
@@ -162,6 +160,7 @@ namespace Com.MyCompany.MyGame
             {
                 return sw[index].IsRunning;
             }
+
             public void SWDelayManager()
             {
                 for (int i = 0; i < sw.Count; i++)
@@ -187,6 +186,19 @@ namespace Com.MyCompany.MyGame
                     return sw[0].ElapsedMilliseconds >= swDelays[0];
                 else
                     return sw[0].ElapsedMilliseconds >= swDelays[4];
+            }
+
+            public int GetSWCount()
+            {
+                return sw.Count;
+            }
+            public float GetTime(WeaponCode code)
+            {
+                float result = (float)sw[(int)(code)].ElapsedMilliseconds / (float)swDelays[(int)(code)];
+
+                if (result > 1) result = 1;
+
+                return result;
             }
             public bool AttackCountDelayDone()
             {
@@ -288,6 +300,11 @@ namespace Com.MyCompany.MyGame
         public bool doubleThrowLock { get { return _doubleThrowLock; } }
         public AnimatorStateInfo standingLayerAnimInfo  { get { return animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing); }}
         public bool lockControl { get { return _lockControl; } set { _lockControl = value; } }
+
+        public ObjectPooler objPooler;
+
+        //Debug
+        public UnitState debugState;
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -322,13 +339,15 @@ namespace Com.MyCompany.MyGame
 
         void Update()
         {
+            //AlertManager();
             if (health > 0)
             {
+                swManager.SWDelayManager();
                 if (IsOnFloor())
                 {
                     try
                     {
-                        CheckExeption();
+                        CheckException();
                         switch (curUnitPose)
                         {
                             case UnitPose.MOD_FALL:
@@ -439,10 +458,10 @@ namespace Com.MyCompany.MyGame
             curUnitPose = UnitPose.MOD_RUN;
             curLookDir = LookDirState.IDLE;
         }
-        private void CheckExeption()
+        private void CheckException()
         {
             ValidateException.ValidateFreezingAttackException(_lockControl, unitAnimController.currentAnimStateInfo, unitAnimController.currentAnimLayer);
-            ValidateException.ValidateFreezingUnitException(animator.GetBool("IsAttack"), unitAnimController.currentAnimStateInfo, "HitReaction");
+            ValidateException.ValidateFreezingUnitException(_lockControl, unitAnimController.currentAnimStateInfo, "Idle 0-0", unitAnimController.currentAnimLayer);
         }
         #endregion
 
@@ -458,12 +477,11 @@ namespace Com.MyCompany.MyGame
             }
             catch (System.Exception) { }
 
-            if (transform.CompareTag("Player")) SendMessage("ShowDeadWindow");
+            if (transform.CompareTag("Player"))
+                SendMessage("ShowDeadWindow");
             else if (transform.gameObject.layer == PhysicsLayers.Enemy)
             {
                 SendMessage("OffIndicator", "AssassinateIndicator");
-                try { DestroyImmediate(transform.GetComponent<EnemyController>().rightArm.Find("WeaponCHEESE").gameObject); }
-                catch (System.Exception) { }
             }
 
             Destroy(gameObject, ValueCollections.deadBodyRemainTime);
@@ -517,15 +535,15 @@ namespace Com.MyCompany.MyGame
                 swManager.ResetSW(0);
                 int attackCount = animator.GetInteger("AttackCount");
 
-                if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName("Attack " + attackCount.ToString()))
+                if (!animator.GetCurrentAnimatorStateInfo(AnimationLayers.Standing).IsName(string.Format("Attack {0}", attackCount)))
                 {
                     //애니메이션 제어
                     unitAnimController.TurnOffAllLayers();
 
-                    if (attackCount > 0) attackCount = 0;
+                    if (attackCount != 0) attackCount = 0;
                     else attackCount++;
 
-                    animator.Play("Attack " + attackCount.ToString(), AnimationLayers.Standing);
+                    animator.Play(string.Format("Attack {0}", attackCount), AnimationLayers.Standing);
                     animator.SetInteger("AttackCount", attackCount);
                     animator.SetBool("IsAttack", true);
                     curUnitPose = UnitPose.MOD_ATTACK;
@@ -533,10 +551,6 @@ namespace Com.MyCompany.MyGame
                     //조작 제어
                     attackCollider.InitAttackCollider(1);
                     EnableAttackCollider(true);
-
-                    ////위치 제어
-                    //try { rb.AddForce(transform.forward * 2, ForceMode.Impulse); }
-                    //catch (System.Exception) { GetComponent<CharacterController>().Move(transform.forward * Time.deltaTime); }
                 }
                 //attackSW[0]가 영구적으로 중지되는 경우 방지
                 else if (!swManager.IsRunningSW(0))
@@ -684,16 +698,24 @@ namespace Com.MyCompany.MyGame
 
         public void InstantiateWeapon(WeaponCode weapon, Vector3 pos, Quaternion rot)
         {
-            GameObject obj = Instantiate(Resources.Load(FilePaths.weaponPath + weapon.ToString()) as GameObject, pos, rot) as GameObject;
-
-            if (weapon != WeaponCode.max)
+            GameObject obj = null;
+            switch (weapon)
             {
-                if (weapon != WeaponCode.SMOKE)
-                    obj.GetComponent<WeaponThrow>().SetCode(weapon);
-                else
+                case WeaponCode.SMOKE:
+                    obj = Instantiate(Resources.Load(FilePaths.weaponPath + weapon.ToString()) as GameObject, pos, rot) as GameObject;
                     obj.GetComponent<WeaponSmoke>().SetCode(weapon);
+                    break;
+                case WeaponCode.CAN:
+                    objPooler.PoolObj(pos, rot, "WeaponCAN");
+                    break;
+                case WeaponCode.CHEESE:
+                    objPooler.PoolObj(pos, rot, "WeaponCHEESE");
+                    break;
+                default:
+                    break;
             }
-            swManager.RestartSW((int)weapon);
+
+            swManager.RestartSW((int)weapon);    
         }
 
             #endregion
@@ -797,7 +819,7 @@ namespace Com.MyCompany.MyGame
                 curUnitState = UnitState.COMBAT;
             }
 
-            curUnitState = UnitState.IDLE;
+            //curUnitState = debugState;
         }
 
         #endregion

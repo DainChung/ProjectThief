@@ -2646,6 +2646,10 @@ MonoBehaviour:
     mMethodName: OffParent
     mParameters: []
     oneShot: 0
+  - mTarget: {fileID: 1849783380}
+    mMethodName: SetSoundIcon
+    mParameters: []
+    oneShot: 0
 --- !u!114 &1213642634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3970,7 +3974,7 @@ MonoBehaviour:
     relative: 1
     absolute: 0
   updateAnchors: 1
-  mColor: {r: 1, g: 1, b: 1, a: 1}
+  mColor: {r: 1, g: 0, b: 0, a: 1}
   mPivot: 4
   mWidth: 2700
   mHeight: 2700
@@ -4751,7 +4755,8 @@ AudioSource:
   m_GameObject: {fileID: 1849783376}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 9d8ecad3e87429f4ba924bb6b362bae4,
+    type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1

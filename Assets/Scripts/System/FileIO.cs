@@ -261,7 +261,8 @@ namespace Com.MyCompany.MyGame.FileIO
         {
             string filePath = FilePaths.DataPath + "/" + file;
             //파일이 없다면 만든다
-            if (!File.Exists(filePath)) Write(file);
+            if (!File.Exists(filePath))
+                Write(file);
 
             string[] allData = File.ReadAllLines(filePath);
             GameResult result;
@@ -291,7 +292,8 @@ namespace Com.MyCompany.MyGame.FileIO
         {
             string filePath = FilePaths.DataPath + "/" + file;
             //파일이 없다면 만든다
-            if (!File.Exists(filePath)) Write(file);
+            if (!File.Exists(filePath))
+                Write(file);
 
             string[] allData = File.ReadAllLines(filePath);
             string result;
@@ -305,7 +307,8 @@ namespace Com.MyCompany.MyGame.FileIO
         {
             string filePath = FilePaths.DataPath + "/" + file;
             //파일이 없다면 만든다
-            if (!File.Exists(filePath)) Write(file);
+            if (!File.Exists(filePath))
+                Write(file);
 
             return File.ReadAllLines(filePath);
         }

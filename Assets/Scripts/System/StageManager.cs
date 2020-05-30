@@ -67,6 +67,10 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         private System.Diagnostics.Stopwatch gameTimer;
         private UIManager uiManager;
+
+        //Debug
+        List<Light> lights = new List<Light>();
+        GameObject[] g;
         #endregion
 
         #region Public Fields
@@ -105,8 +109,24 @@ namespace Com.MyCompany.MyGame.GameSystem
 
                 gameTimer = new System.Diagnostics.Stopwatch();
                 gameTimer.Start();
+                
+                g = GameObject.FindGameObjectsWithTag("Debug");
+                for (int i = 0; i < g.Length; i++)
+                    lights.Add(g[i].GetComponent<Light>());
             }
             catch (System.Exception){}
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                for (int i = 0; i < lights.Count; i++)
+                {
+                    lights[i].intensity = 10;
+                    lights[i].range = 10;
+                }
+            }
         }
         #endregion
 
@@ -130,12 +150,42 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             UIController windowLoading = uiManager.GetUIController("Window_Loading");
             windowLoading.OnOffAll(true);
-            AsyncOperation loading = SceneManager.LoadSceneAsync(scene);
-
-            while (!loading.isDone)
+            windowLoading.OnOffChildren(false, "PressAnyKey");
+            try
             {
-                windowLoading.SetFillAmount(loading.progress, "LoadingForeground");
-                windowLoading.SetText(string.Format("{0}%", loading.progress * 100), "Value");
+                uiManager.OnOffUIWindow(false, "Window_Stage");
+                uiManager.OnOffUIWindow(false, "Window_MiniMap");
+            }
+            catch (System.Exception)
+            {
+
+            }
+
+            AsyncOperation loading = SceneManager.LoadSceneAsync(scene);
+            loading.allowSceneActivation = false;
+            int progress;
+
+            while (loading.progress <= 0.9f)
+            {
+                progress = (int)((loading.progress + 0.1f) * 100);
+
+                windowLoading.SetFillAmount(loading.progress + 0.1f, "LoadingForeground");
+                windowLoading.SetText(string.Format("{0}%", progress), "Value");
+
+                if (loading.progress >= 0.9f)
+                    break;
+                yield return null;
+            }
+            while (true)
+            {
+                windowLoading.OnOffChildren(true, "PressAnyKey");
+                windowLoading.OnOffChildren(false, "Value");
+                if (Input.anyKeyDown)
+                {
+                    loading.allowSceneActivation = true;
+                    break;
+                }
+
                 yield return null;
             }
 

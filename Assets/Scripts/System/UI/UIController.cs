@@ -43,11 +43,13 @@ namespace Com.MyCompany.MyGame.UI
             {
                 base.OnOffUI(enable);
                 OnOffChildren(enable);
+
                 if (enable) OnOffIcon();
+
                 try { transform.GetComponent<Indicator>().enabled = enable; }
                 catch (System.NullReferenceException) { }
             }
-            catch (System.Exception) { }
+            catch (System.Exception){}
         }
 
         public void OnOffChildren(bool enable)
@@ -61,6 +63,11 @@ namespace Com.MyCompany.MyGame.UI
                 }
                 catch (System.Exception) { }
             }
+        }
+        public void OnOffChildren(bool enable, string name)
+        {
+            try { transform.Find(name).GetComponent<UIController>().OnOffUI(enable); }
+            catch (System.Exception) { }
         }
 
         public void OnOffUIButtonAll(bool enable)
@@ -198,6 +205,26 @@ namespace Com.MyCompany.MyGame.UI
             try { GetComponent<UISlider>().value = enable ? 1 : 0; }
             catch (System.Exception) { Debug.Log(transform.name+"에 UISlider가 없습니다."); }
         }
+        public void SetColor(Color color, string uiName)
+        {
+            try
+            {
+                if (transform.name != uiName) transform.Find(uiName).GetComponent<UIController>().SetColor(color, uiName);
+                else
+                {
+                    base.SetColor(color);
+                }
+            }
+            catch (System.NullReferenceException)
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    try { transform.GetChild(i).GetComponent<UIController>().SetColor(color, uiName); }
+                    catch (System.NullReferenceException) { }
+                }
+            }
+        }
+
         #endregion
 
         #region Private Methods

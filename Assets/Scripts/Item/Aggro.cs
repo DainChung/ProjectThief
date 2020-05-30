@@ -15,15 +15,17 @@ namespace Com.MyCompany.MyGame
             code = weaponCode;
         }
 
-        void Start()
+        public IEnumerator Disposer()
         {
-            //지속시간 짧음
-            Destroy(gameObject, 2.0f);
+            yield return new WaitForSeconds(2.0f);
+            gameObject.SetActive(false);
+
+            yield break;
         }
 
         void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            if (other.gameObject.layer == PhysicsLayers.Enemy)
                 other.transform.GetComponent<EnemyController>().Detect(code, transform, transform.position);
         }
     }

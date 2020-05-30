@@ -532,7 +532,13 @@ namespace Com.MyCompany.MyGame
             }
             public static void ValidateFreezingUnitException(bool boolVal, AnimatorStateInfo animInfo, string animName)
             {
-                if (animInfo.IsName(animName) && boolVal) throw new FreezingUnitException();
+                if (animInfo.IsName(animName) && boolVal)
+                    throw new FreezingUnitException();
+            }
+            public static void ValidateFreezingUnitException(bool boolVal, AnimatorStateInfo animInfo, string animName, int currentAnimLayer)
+            {
+                if (animInfo.IsName(animName) && boolVal && currentAnimLayer != Collections.AnimationLayers.Assassinate)
+                    throw new FreezingUnitException();
             }
             public static void ValidateFreezingAttackException(bool isLocked, AnimatorStateInfo animInfo, int currentAnimLayer)
             {

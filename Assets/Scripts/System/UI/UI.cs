@@ -35,8 +35,10 @@ namespace Com.MyCompany.MyGame.UI
         /// <param name="enable">true = 활성화, false = 비활성화</param>
         public virtual void OnOffUI(bool enable)
         {
-            UIRect[] uiRects = transform.GetComponents<UIRect>();
-            UIWidgetContainer[] uiWidgetConts = transform.GetComponents<UIWidgetContainer>();
+            UIRect[] uiRects = GetComponents<UIRect>();
+            UIWidgetContainer[] uiWidgetConts = GetComponents<UIWidgetContainer>();
+            UnityEngine.UI.RawImage rawImage;
+            TryGetComponent<UnityEngine.UI.RawImage>(out rawImage);
 
             try { GetComponent<BoxCollider>().enabled = enable; }
             catch (System.Exception) { }
@@ -49,6 +51,9 @@ namespace Com.MyCompany.MyGame.UI
                 try { OnOffUIButton(enable);}
                 catch (System.Exception) { }
             }
+
+            try { rawImage.enabled = enable; }
+            catch (System.Exception) { }
         }
         public virtual void OnOffUIButton(bool enable)
         {
@@ -116,6 +121,11 @@ namespace Com.MyCompany.MyGame.UI
         public virtual string GetText()
         {
             return transform.GetComponent<UILabel>().text;
+        }
+
+        public virtual void SetColor(Color color)
+        {
+            transform.GetComponent<UI2DSprite>().color = color;
         }
 
         public bool IsUIOn()

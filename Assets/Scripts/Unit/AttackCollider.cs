@@ -13,7 +13,12 @@ namespace Com.MyCompany.MyGame
 
         public bool enableCollider { get { return collider.enabled; } set { collider.enabled = value; } }
         public int damage { get { return _damage; } }
-        
+
+        void Start()
+        {
+            collider = GetComponent<SphereCollider>();
+        }
+
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == PhysicsLayers.Enemy
@@ -29,8 +34,15 @@ namespace Com.MyCompany.MyGame
         public void InitAttackCollider(int damage)
         {
             _damage = damage;
-            collider = GetComponent<SphereCollider>();
-            collider.enabled = false;
+            try
+            {
+                collider.enabled = false;
+            }
+            catch (System.NullReferenceException)
+            {
+                collider = GetComponent<SphereCollider>();
+                collider.enabled = false;
+            }
         }
     }
 }

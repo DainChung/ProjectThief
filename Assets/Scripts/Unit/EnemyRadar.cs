@@ -12,9 +12,12 @@ namespace Com.MyCompany.MyGame
         private Vector3 height = new Vector3(0, 0.1f, 0);
         private bool exitCoroutine = false;
         private Unit unit;
+        private EnemyController enemyController;
+        
 
         public float radarValue;
         [HideInInspector] public Stopwatch delays = new Stopwatch();
+        [HideInInspector] public MeshCollider collider;
 
         public Transform eyes;
         public EnemyCheckStructure checkStructure;
@@ -22,6 +25,8 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             unit = transform.parent.parent.GetComponent<Unit>();
+            enemyController = transform.parent.parent.GetComponent<EnemyController>();
+            collider = GetComponent<MeshCollider>();
         }
 
         void FixedUpdate()
@@ -85,8 +90,8 @@ namespace Com.MyCompany.MyGame
                             float distVal = Mathf.Clamp(Vector3.Distance(otherPos, unit.transform.position), 0.1f, 7);
                             unit.AddToAlertValue(otherTR.GetComponent<PlayerController>().aggroVal * radarValue / distVal);
 
-                            if (unit.curUnitState == UnitState.ALERT) unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
-                            else if (unit.curUnitState == UnitState.COMBAT) unit.transform.GetComponent<EnemyController>().Detect(WeaponCode.PLAYER, otherTR, otherPos);
+                            if (unit.curUnitState == UnitState.ALERT) enemyController.Detect(WeaponCode.PLAYERTRACK, otherTR, otherPos);
+                            else if (unit.curUnitState == UnitState.COMBAT) enemyController.Detect(WeaponCode.PLAYER, otherTR, otherPos);
                         }
                     }
                     catch (System.Exception) { }
@@ -115,6 +120,7 @@ namespace Com.MyCompany.MyGame
 
                 unit.SetAlertValue(AggroCollections.combatMin - 0.1f);
                 unit.curLookDir = LookDirState.IDLE;
+                enemyController.EnemyAlertManager();
                 yield break;
             }
             //비전투 상태면
@@ -144,6 +150,7 @@ namespace Com.MyCompany.MyGame
 
                 unit.curUnitState = UnitState.IDLE;
                 unit.curLookDir = LookDirState.IDLE;
+                enemyController.EnemyAlertManager();
             }
 
             yield break;

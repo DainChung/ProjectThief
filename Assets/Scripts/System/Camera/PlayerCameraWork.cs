@@ -8,8 +8,6 @@ namespace Com.MyCompany.MyGame
 {
     public class PlayerCameraWork : CameraWork
     {
-        private float _maxDist;
-
         // Start is called before the first frame update
         new void Start()
         {
