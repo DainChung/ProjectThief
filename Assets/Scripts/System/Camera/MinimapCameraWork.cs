@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+
+using UnityEngine;
 
 using Com.MyCompany.MyGame.Collections;
 using Com.MyCompany.MyGame.GameSystem;
@@ -24,9 +26,18 @@ namespace Com.MyCompany.MyGame
 
             destiPos = cameraPos;
             windowMiniMap = uiManager.GetUIController("Window_MiniMap");
-            ChangeFloor(1);
-            //transform.GetComponent<Camera>().cullingMask = (1 << LayerMask.NameToLayer("Default"));
+            StartCoroutine(LateStart());
         }
+
+        IEnumerator LateStart()
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            ChangeFloor(1);
+
+            yield break;
+        }
+        
 
         // Update is called once per frame
         void FixedUpdate()

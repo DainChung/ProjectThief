@@ -139,6 +139,11 @@ namespace Com.MyCompany.MyGame
                 attackCountDelay.Start();
             }
 
+            public void StartSW(int index)
+            {
+                sw[index].Start();
+                SWDelayManager();
+            }
             public void RestartSW(int index)
             {
                 sw[index].Restart();
@@ -182,7 +187,7 @@ namespace Com.MyCompany.MyGame
             }
             public bool SWDelayDone(bool isPlayer)
             {
-                if(isPlayer)
+                if (isPlayer)
                     return sw[0].ElapsedMilliseconds >= swDelays[0];
                 else
                     return sw[0].ElapsedMilliseconds >= swDelays[4];
@@ -259,6 +264,8 @@ namespace Com.MyCompany.MyGame
         private CapsuleCollider collider;
         private CharacterController charController;
         private StageManager stageManager;
+
+        private bool isPlayer   { get { return CompareTag("Player"); } }
 
         #endregion
 
@@ -339,10 +346,8 @@ namespace Com.MyCompany.MyGame
 
         void Update()
         {
-            //AlertManager();
             if (health > 0)
             {
-                swManager.SWDelayManager();
                 if (IsOnFloor())
                 {
                     try
@@ -453,7 +458,8 @@ namespace Com.MyCompany.MyGame
             lockControl = false;
             animator.SetBool("IsAttack", false);
             animator.Play("Idle 0-0", AnimationLayers.Standing);
-            swManager.RestartSW((int)WeaponCode.HAND);
+            if(!swManager.IsRunningSW((int)WeaponCode.HAND))
+                swManager.StartSW((int)WeaponCode.HAND);
             swManager.attackCountDelay.Restart();
             curUnitPose = UnitPose.MOD_RUN;
             curLookDir = LookDirState.IDLE;

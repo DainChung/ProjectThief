@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Com.MyCompany.MyGame.UI
 {
@@ -8,6 +9,33 @@ namespace Com.MyCompany.MyGame.UI
     {
         float maxW = 38424;
         float maxH = 18490;
+
+        UIRect[] uiRects;
+        UIWidgetContainer[] uiWidgetConts;
+        RawImage rawImage;
+        BoxCollider boxCollider;
+        UIButton uiButton;
+        UIBasicSprite uiBasicSprite;
+        UILabel uiLabel;
+        UI2DSprite ui2DSprite;
+
+        protected void InitMaxWMaxH(Vector3 pos)
+        {
+            maxW = pos.x / 4;
+            maxH = pos.y / 4;
+        }
+
+        protected void InitComponents()
+        {
+            uiRects = GetComponents<UIRect>();
+            uiWidgetConts = GetComponents<UIWidgetContainer>();
+            TryGetComponent<RawImage>(out rawImage);
+            TryGetComponent<BoxCollider>(out boxCollider);
+            TryGetComponent<UIButton>(out uiButton);
+            TryGetComponent<UIBasicSprite>(out uiBasicSprite);
+            TryGetComponent<UILabel>(out uiLabel);
+            TryGetComponent<UI2DSprite>(out ui2DSprite);
+        }
 
         /// <summary>
         /// destiPos 위치로 UI를 이동
@@ -35,51 +63,73 @@ namespace Com.MyCompany.MyGame.UI
         /// <param name="enable">true = 활성화, false = 비활성화</param>
         public virtual void OnOffUI(bool enable)
         {
-            UIRect[] uiRects = GetComponents<UIRect>();
-            UIWidgetContainer[] uiWidgetConts = GetComponents<UIWidgetContainer>();
-            UnityEngine.UI.RawImage rawImage;
-            TryGetComponent<UnityEngine.UI.RawImage>(out rawImage);
-
-            try { GetComponent<BoxCollider>().enabled = enable; }
+            try { boxCollider.enabled = enable; }
+            catch (System.Exception) { }
+            try { rawImage.enabled = enable; }
             catch (System.Exception) { }
 
-            for (int i = 0; i < uiRects.Length; i++) uiRects[i].enabled = enable;
+            for (int i = 0; i < uiRects.Length; i++)
+                uiRects[i].enabled = enable;
 
             for (int j = 0; j < uiWidgetConts.Length; j++)
             {
                 uiWidgetConts[j].enabled = enable;
-                try { OnOffUIButton(enable);}
+                try { OnOffUIButton(enable); }
                 catch (System.Exception) { }
             }
-
-            try { rawImage.enabled = enable; }
-            catch (System.Exception) { }
         }
         public virtual void OnOffUIButton(bool enable)
         {
             try
             {
+                uiButton.isEnabled = enable;
+                boxCollider.enabled = enable;
+            }
+            catch (System.NullReferenceException)
+            {
                 GetComponent<UIButton>().isEnabled = enable;
                 GetComponent<BoxCollider>().enabled = enable;
             }
-            catch (System.Exception) { }
+            catch (System.Exception e)
+            {
+                Debug.Log(transform.name + "." + this.name + ".OnOffUIButton() Exception : " + e);
+            }
         }
         public virtual void OnOffUIButtonAuto()
         {
             try
             {
-                if (GetComponent<UIButton>().isEnabled)
+                if (uiButton.isEnabled)
                 {
-                    GetComponent<UIButton>().isEnabled = false;
-                    GetComponent<BoxCollider>().enabled = false;
+                    uiButton.isEnabled = false;
+                    boxCollider.enabled = false;
                 }
                 else
                 {
-                    GetComponent<UIButton>().isEnabled = true;
-                    GetComponent<BoxCollider>().enabled = true;
+                    uiButton.isEnabled = true;
+                    boxCollider.enabled = true;
                 }
             }
-            catch (System.Exception) { }
+            catch (System.NullReferenceException)
+            {
+                UIButton uiB = GetComponent<UIButton>();
+                BoxCollider boxC = GetComponent<BoxCollider>();
+
+                if (uiB.isEnabled)
+                {
+                    uiB.isEnabled = false;
+                    boxC.enabled = false;
+                }
+                else
+                {
+                    uiB.isEnabled = true;
+                    boxC.enabled = true;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log(transform.name + "." + this.name + ".OnOffUIButtonAuto() Exception : " + e);
+            }
         }
         /// <summary>
         /// transform이 NGUI Texture 또는 NGUI Unity2DSprite를 갖고 있어야 작동,
@@ -88,7 +138,11 @@ namespace Com.MyCompany.MyGame.UI
         /// <param name="amount">fillAmount에 더할 값</param>
         public virtual void FillAmount(float amount)
         {
-            transform.GetComponent<UIBasicSprite>().fillAmount += amount;
+            try { uiBasicSprite.fillAmount += amount; }
+            catch (System.NullReferenceException)
+            {
+                GetComponent<UIBasicSprite>().fillAmount += amount;
+            }
         }
         /// <summary>
         /// transform이 UITexture 또는 UI2DSprite를 갖고 있어야 작동,
@@ -97,7 +151,11 @@ namespace Com.MyCompany.MyGame.UI
         /// <param name="setValue">fillAmount값 설정</param>
         public virtual void SetFillAmount(float setValue)
         {
-            transform.GetComponent<UIBasicSprite>().fillAmount = setValue;
+            try { uiBasicSprite.fillAmount = setValue; }
+            catch (System.NullReferenceException)
+            {
+                GetComponent<UIBasicSprite>().fillAmount = setValue;
+            }
         }
         /// <summary>
         /// transform이 UITexture 또는 UI2DSprite를 갖고 있어야 작동,
@@ -106,26 +164,51 @@ namespace Com.MyCompany.MyGame.UI
         /// <returns></returns>
         public virtual float GetFillAmount()
         {
-            return transform.GetComponent<UIBasicSprite>().fillAmount;
+            try { return uiBasicSprite.fillAmount; }
+            catch (System.NullReferenceException)
+            {
+                return GetComponent<UIBasicSprite>().fillAmount;
+            }
         }
 
         public virtual void SetText(string text)
         {
-            transform.GetComponent<UILabel>().text = text;
+            try { uiLabel.text = text; }
+            catch (System.NullReferenceException)
+            {
+                GetComponent<UILabel>().text = text;
+            }
         }
         public virtual void SetText(string text, int size)
         {
-            transform.GetComponent<UILabel>().fontSize = size;
-            transform.GetComponent<UILabel>().text = text;
+            try
+            {
+                uiLabel.fontSize = size;
+                uiLabel.text = text;
+            }
+            catch (System.NullReferenceException)
+            {
+                UILabel uiL = GetComponent<UILabel>();
+                uiL.fontSize = size;
+                uiL.text = text;
+            }
         }
         public virtual string GetText()
         {
-            return transform.GetComponent<UILabel>().text;
+            try { return uiLabel.text; }
+            catch (System.NullReferenceException)
+            {
+                return GetComponent<UILabel>().text;
+            }
         }
 
         public virtual void SetColor(Color color)
         {
-            transform.GetComponent<UI2DSprite>().color = color;
+            try   { ui2DSprite.color = color; }
+            catch (System.NullReferenceException)
+            {
+                GetComponent<UI2DSprite>().color = color;
+            }
         }
 
         public bool IsUIOn()
@@ -134,11 +217,11 @@ namespace Com.MyCompany.MyGame.UI
 
             try
             {
-                result = (transform.GetComponent<UIRect>().enabled) ? 1 : 0;
+                result = (uiRects[0].enabled) ? 1 : 0;
             }
             catch (System.Exception)
             {
-                result = (transform.GetComponent<UIWidgetContainer>().enabled) ? 1 : 0;
+                result = (uiWidgetConts[0].enabled) ? 1 : 0;
             }
 
             if (result == -1) Debug.Log("There is no UIRect OR UIWidgetContainer");

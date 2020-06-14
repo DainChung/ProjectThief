@@ -28,10 +28,7 @@ namespace Com.MyCompany.MyGame
                 for (int i = 0; i < poolAmount[objIndex]; i++)
                 {
                     GameObject o = Instantiate(obj[objIndex]) as GameObject;
-                    try
-                    {
-                        o.GetComponent<WeaponThrow>().Init();
-                    }
+                    try{ o.GetComponent<WeaponThrow>().Init();}
                     catch (System.Exception e) { Debug.Log(transform.name + "("+this.name+")"+ " : " + e); }
                     o.SetActive(false);
                     objList.Add(o);

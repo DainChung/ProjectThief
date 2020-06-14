@@ -8,21 +8,52 @@ namespace Com.MyCompany.MyGame.UI
     public class UIController : UI
     {
         private AudioManager audioManager;
+        private UIManager uiManager;
+        private ConcreteSubject<bool> getUIHovered;
 
         void Start()
         {
+            base.InitComponents();
+
             if (transform.name.Contains("Button"))
             {
                 audioManager = GameObject.FindWithTag("Manager").GetComponent<AudioManager>();
-                StartCoroutine(GetButtonState());
+                uiManager = audioManager.GetComponent<UIManager>();
+                StartCoroutine(SetObserver());
             }
         }
 
+        public IEnumerator SetObserver()
+        {
+            yield return new WaitForFixedUpdate();
+
+            try
+            {
+                getUIHovered = new ConcreteSubject<bool>();
+                ConcreteObserver<bool> playerObserver = audioManager.GetComponent<StageManager>().playerController.GetUIHovered;
+                getUIHovered.Add(playerObserver);
+            }
+            catch (System.Exception) { }
+
+            StartCoroutine(GetButtonState());
+
+            yield break;
+        }
+
+        //coroutine이 중첩실행될 가능성이 있으므로 이런 방식은 지양할 것
         public IEnumerator GetButtonState()
         {
             while (GetComponent<UIButton>().state != UIButtonColor.State.Hover) yield return null;
             audioManager.PlayAudio("Hover");
+            getUIHovered.value = true;
+            try { getUIHovered.Notify(); }
+            catch (System.Exception) { }
+
             while (GetComponent<UIButton>().state == UIButtonColor.State.Hover) yield return null;
+            getUIHovered.value = false;
+            try { getUIHovered.Notify(); }
+            catch (System.Exception) { }
+
             StartCoroutine(GetButtonState());
             yield break;
         }
@@ -49,7 +80,7 @@ namespace Com.MyCompany.MyGame.UI
                 try { transform.GetComponent<Indicator>().enabled = enable; }
                 catch (System.NullReferenceException) { }
             }
-            catch (System.Exception){}
+            catch (System.Exception) { }
         }
 
         public void OnOffChildren(bool enable)
@@ -77,7 +108,7 @@ namespace Com.MyCompany.MyGame.UI
                 if (audioManager.GetComponent<UIManager>().buttonNameToString[transform.name] == "NULL") base.OnOffUIButton(false);
                 else base.OnOffUIButton(enable);
             }
-            catch (System.Exception){}
+            catch (System.Exception) { }
             finally
             {
                 for (int i = 0; i < transform.childCount; i++)
@@ -105,7 +136,7 @@ namespace Com.MyCompany.MyGame.UI
             }
             catch (System.NullReferenceException)
             {
-                for(int i = 0; i < transform.childCount; i++)
+                for (int i = 0; i < transform.childCount; i++)
                     transform.GetChild(i).GetComponent<UIController>().FillAmount(amount, uiName);
             }
         }
@@ -158,7 +189,7 @@ namespace Com.MyCompany.MyGame.UI
             {
                 for (int i = 0; i < transform.childCount; i++)
                 {
-                    try{ transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName);}
+                    try { transform.GetChild(i).GetComponent<UIController>().SetText(text, uiName); }
                     catch (System.NullReferenceException) { }
                 }
             }
@@ -198,12 +229,12 @@ namespace Com.MyCompany.MyGame.UI
                 transform.Find("Icon_On").GetComponent<UIController>().OnOffUI(_enable);
                 transform.Find("Icon_Off").GetComponent<UIController>().OnOffUI(!_enable);
             }
-            catch (System.Exception) { Debug.Log(transform.name+ "의 Child에 이름이 Icon_On, Icon_Off인 물체가 필요합니다. 두 물체에 UIController가 필요합니다."); }
+            catch (System.Exception) { Debug.Log(transform.name + "의 Child에 이름이 Icon_On, Icon_Off인 물체가 필요합니다. 두 물체에 UIController가 필요합니다."); }
         }
         public void ControlSliderByButton(bool enable)
         {
             try { GetComponent<UISlider>().value = enable ? 1 : 0; }
-            catch (System.Exception) { Debug.Log(transform.name+"에 UISlider가 없습니다."); }
+            catch (System.Exception) { Debug.Log(transform.name + "에 UISlider가 없습니다."); }
         }
         public void SetColor(Color color, string uiName)
         {
@@ -244,7 +275,7 @@ namespace Com.MyCompany.MyGame.UI
                 iconOn.GetComponent<UIController>().OnOffUI(_enable);
                 iconOff.GetComponent<UIController>().OnOffUI(!_enable);
             }
-            catch (System.Exception){}
+            catch (System.Exception) { }
         }
         #endregion
     }

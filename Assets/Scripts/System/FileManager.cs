@@ -31,7 +31,7 @@ namespace Com.MyCompany.MyGame.GameSystem
             float.TryParse(FileIO.DataIO.Read("SoundSetting.data", 0), out _audioVolume);
             audioSettings.SetFloat("AllVolume", _audioVolume);
             uiManager = GetComponent<UIManager>();
-            uiManager.SetUISliderValue("Window_Setting", "Sound Slider", (_audioVolume + 80)/100);
+            uiManager.SetUISliderValue("Window_Setting", "Sound Slider", (_audioVolume + 80) / 100);
             settingUIIcon = uiManager.GetUIController("Window_Setting", "Button_Sound");
         }
 

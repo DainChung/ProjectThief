@@ -12,6 +12,8 @@ namespace Com.MyCompany.MyGame.GameSystem
     {
         #region Private Values
         private List<UI2DSprite> gameResultStars = new List<UI2DSprite>();
+        private List<UIController> uiWindows = new List<UIController>();
+        private Dictionary<string, int> uiWindowsDic = new Dictionary<string, int>();
 
         private GameObject player;
         #endregion
@@ -39,9 +41,9 @@ namespace Com.MyCompany.MyGame.GameSystem
         // Start is called before the first frame update
         void Start()
         {
-            if (SceneManager.GetActiveScene().name.Contains("Stage")) player = GameObject.Find("Player");
-
-            InitUI();
+            if (SceneManager.GetActiveScene().name.Contains("Stage"))
+                player = GameObject.Find("Player");
+            StartCoroutine(InitUI());
         }
 
         // Update is called once per frame
@@ -52,10 +54,17 @@ namespace Com.MyCompany.MyGame.GameSystem
         #endregion
 
         #region Private Methods
-        private void InitUI()
+        IEnumerator InitUI()
         {
             string curScene = SceneManager.GetActiveScene().name;
 
+            for (int i = 0; i < uiCam.childCount; i++)
+            {
+                uiWindows.Add(uiCam.GetChild(i).GetComponent<UIController>());
+                uiWindowsDic.Add(uiWindows[i].name, i);
+            }
+
+            yield return null;
             #region 게임 스테이지
             if (curScene.Contains("Stage"))
             {
@@ -91,7 +100,16 @@ namespace Com.MyCompany.MyGame.GameSystem
         }
         private void OnOffUI(bool onoff, Transform uiTR)
         {
-            uiTR.GetComponent<UIController>().OnOffAll(onoff);
+            if (uiTR == uiCam)
+            {
+                for (int i = 0; i < uiWindows.Count; i++)
+                    uiWindows[i].OnOffAll(onoff);
+            }
+            else
+            {
+                try {  uiWindows[uiWindowsDic[uiTR.name]].OnOffAll(onoff);  }
+                catch (System.Exception) { }
+            }
         }
 
         private IEnumerator ShowGameResult(GameResult gameResult, bool isBestRecord)
@@ -195,8 +213,8 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             string windowName = buttonNameToString[buttonName];
 
-            uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);
-            try { OnOffButton(!enable, buttonName); }
+            OnOffUIWindow(enable, windowName);
+            try {  OnOffButton(!enable, buttonName);  }
             catch (System.Exception) { }
             if (windowName == "Window_Menu" || windowName == "Window_Inventory")
             {
@@ -212,19 +230,19 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public void OnOffUIWindow(bool enable, string windowName)
         {
-            try{uiCam.Find(windowName).GetComponent<UIController>().OnOffAll(enable);}
+            try {  uiWindows[uiWindowsDic[windowName]].OnOffAll(enable); }
             catch (System.Exception) { }
         }
 
         public void SetUILabelText(string uiName, string text)
         {
-            uiCam.Find(uiName).GetComponent<UIController>().SetText(text);
+            uiWindows[uiWindowsDic[uiName]].SetText(text);
         }
         public void SetUILabelText(string windowName, string text, string uiName)
         {
             try
             {
-                uiCam.Find(windowName).GetComponent<UIController>().SetText(text, uiName);
+                uiWindows[uiWindowsDic[windowName]].SetText(text, uiName);
             }
             catch (System.NullReferenceException)
             {
@@ -327,7 +345,7 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public void OnOffButton(bool onoff, string uiName)
         {
-            uiCam.Find(uiName).GetComponent<UIController>().OnOffUIButton(onoff);
+            uiWindows[uiWindowsDic[uiName]].OnOffUIButton(onoff);
         }
 
         public void OnOffButton(bool onoff, string windowName, string uiName)
@@ -339,27 +357,6 @@ namespace Com.MyCompany.MyGame.GameSystem
         {
             uiCam.Find(windowName).GetComponent<UIController>().OnOffUIButtonAll(onoff);
         }
-        ///// <summary>
-        ///// uiName에 소속된 buttonName 버튼을 활성화 / 비활성화
-        ///// </summary>
-        ///// <param name="onoff">true = 활성화, false = 비활성화<</param>
-        ///// <param name="uiName">활성화 / 비활성화 할 버튼의 parent 이름 </param>
-        ///// <param name="buttonName">활성화 / 비활성화 할 버튼 이름 </param>
-        //public void OnOffButton(bool onoff, string uiName, string buttonName)
-        //{
-        //    try
-        //    {
-        //        for (int i = 0; i < ui[uiDic[uiName]].childCount; i++)
-        //        {
-        //            if (ui[uiDic[uiName]].GetChild(i).name == buttonName)
-        //            {
-        //                ui[uiDic[uiName]].GetChild(i).GetComponent<UIButton>().isEnabled = onoff;
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    catch (System.Exception) { }
-        //}
 
         /// <summary>
         /// HP바를 연속적으로 줄임
@@ -374,38 +371,72 @@ namespace Com.MyCompany.MyGame.GameSystem
             fill -= amount;
             if (fill <= ratio) fill = ratio;
 
-            uiCam.Find("Bar_HP").GetComponent<UIController>().SetFillAmount(fill, name);
+            try
+            {
+                uiWindows[uiWindowsDic["Bar_HP"]].SetFillAmount(fill, name);
+            }
+            catch (KeyNotFoundException)
+            {
+                uiCam.Find("Bar_HP").GetComponent<UIController>().SetFillAmount(fill, name);
+            }
         }
         public float GetHPBarFillAmount(int index)
         {
             string name = ((index == 0) ? "Fill_HP" : "Fill_HP Deco");
-            return uiCam.Find("Bar_HP").GetComponent<UIController>().GetFillAmount(name);
+            try
+            {
+                return uiWindows[uiWindowsDic["Bar_HP"]].GetFillAmount(name);
+            }
+            catch (KeyNotFoundException)
+            {
+                return uiCam.Find("Bar_HP").GetComponent<UIController>().GetFillAmount(name);
+            }
         }
 
         public void SetFillAmountUIName(string uiName, float setValue)
         {
-            uiCam.Find(uiName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
+            try
+            {
+                uiWindows[uiWindowsDic[uiName]].SetFillAmount(setValue, uiName);
+            }
+            catch (KeyNotFoundException)
+            {
+                uiCam.Find(uiName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
+            }
         }
         public void FillAmountUIName(string uiName, float amount)
         {
-            uiCam.Find(uiName).GetComponent<UIController>().FillAmount(amount, uiName);
+            try
+            {
+                uiWindows[uiWindowsDic[uiName]].FillAmount(amount, uiName);
+            }
+            catch (KeyNotFoundException)
+            {
+                uiCam.Find(uiName).GetComponent<UIController>().FillAmount(amount, uiName);
+            }
         }
         public bool IsFullUIBasicSprite(string uiName)
         {
-            return (uiCam.Find(uiName).GetComponent<UIController>().GetFillAmount() >= 1);
+            try
+            {
+                return (uiWindows[uiWindowsDic[uiName]].GetFillAmount() >= 1);
+            }
+            catch (KeyNotFoundException)
+            {
+                return (uiCam.Find(uiName).GetComponent<UIController>().GetFillAmount() >= 1);
+            }
         }
 
-        public void SetFillAmountUIName(string windowName, float setValue, string uiName)
-        {
-            uiCam.Find(windowName).GetComponent<UIController>().SetFillAmount(setValue, uiName);
-        }
         public void SetFillAmountUIName(string windowName, float setValue, WeaponCode weaponCode)
         {
-            uiCam.Find(windowName).Find(weaponCode.ToString()).GetComponent<UIController>().SetFillAmount(setValue);
-        }
-        public void FillAmountUIName(string windowName, float amount, string uiName)
-        {
-            uiCam.Find(windowName).GetComponent<UIController>().FillAmount(amount, uiName);
+            try
+            {
+                uiWindows[uiWindowsDic[windowName]].SetFillAmount(setValue, weaponCode.ToString());
+            }
+            catch (KeyNotFoundException)
+            {
+                uiCam.Find(windowName).Find(weaponCode.ToString()).GetComponent<UIController>().SetFillAmount(setValue);
+            }
         }
         public bool IsFullUIBasicSprite(string windowName, string uiName)
         {
@@ -419,7 +450,7 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public void SetIndicator(string uiName, Transform target)
         {
-            Indicator indicator = uiCam.Find(uiName).GetComponent<Indicator>();
+            Indicator indicator = uiWindows[uiWindowsDic[uiName]].GetComponent<Indicator>();
             OnOffUI((target != null), indicator.transform);
 
             try
@@ -436,7 +467,14 @@ namespace Com.MyCompany.MyGame.GameSystem
 
         public UIController GetUIController(string windowName)
         {
-            return uiCam.Find(windowName).GetComponent<UIController>();
+            try
+            {
+                return uiWindows[uiWindowsDic[windowName]];
+            }
+            catch (KeyNotFoundException)
+            {
+                return uiCam.Find(windowName).GetComponent<UIController>();
+            }
         }
         public UIController GetUIController(string windowName, string uiName)
         {

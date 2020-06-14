@@ -79,6 +79,8 @@ namespace Com.MyCompany.MyGame.GameSystem
         public Transform[] end;
 
         public GameResult gameResult { get { return _gameResult; } }
+
+        [HideInInspector]public PlayerController playerController;
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -96,8 +98,10 @@ namespace Com.MyCompany.MyGame.GameSystem
 
             try
             {
+                Transform player = GameObject.FindGameObjectWithTag("Player").transform;
                 //플레이어 캐릭터를 시작 지점으로 옮김
-                GameObject.FindGameObjectWithTag("Player").transform.position = start.position;
+                player.position = start.position;
+                playerController = player.GetComponent<PlayerController>();
                 //탈출 지점을 숨김
                 foreach (Transform endArea in end)
                 {

@@ -19,11 +19,6 @@ namespace Com.MyCompany.MyGame.GameSystem
             uiManager.SetIndicator(uiName, null);
         }
 
-        public void OffAllIndicator()
-        {
-
-        }
-
         public void UpdateHPBar(float ratio)
         {
             StartCoroutine(uiManager.UpdateHPBar(ratio, 0));

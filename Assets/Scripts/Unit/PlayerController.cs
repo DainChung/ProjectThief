@@ -106,7 +106,27 @@ namespace Com.MyCompany.MyGame
                         break;
                     case WeaponCode.HAND:
                     default:
-                        result =  true;
+                        result = true;
+                        break;
+                }
+
+                return result;
+            }
+            public bool CheckWeaponFull(ItemCode item)
+            {
+                WeaponCode weapon = EnumCollections.ConvertItemToWeapon(item);
+                bool result = false;
+
+                switch (weapon)
+                {
+                    case WeaponCode.CAN:
+                    case WeaponCode.CHEESE:
+                    case WeaponCode.SMOKE:
+                        result = _items[(int)(item) - 1] >= maxAmount[(int)(item) - 1];
+                        break;
+                    case WeaponCode.HAND:
+                    default:
+                        result = true;
                         break;
                 }
 
@@ -263,6 +283,7 @@ namespace Com.MyCompany.MyGame
 
         public float aggroVal { get { return aggroValue; } }
 
+        public ConcreteObserver<bool> GetUIHovered;
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -270,12 +291,15 @@ namespace Com.MyCompany.MyGame
         void Awake()
         {
             aggroValue = AggroCollections.aggroRun;
+            GetUIHovered = new ConcreteObserver<bool>(false);
         }
 
         void Start()
         {
+            if (gameObject.layer == PhysicsLayers.Enemy)
+                MyDebug.Log(transform.name);
             nearestItem = new NearestItem(transform);
-            unit = GetComponent<Unit>();
+            unit = transform.GetComponent<Unit>();
 
             playerAnimController = GetComponent<PlayerAnimationController>();
             GameObject m = GameObject.FindWithTag("Manager");
@@ -290,7 +314,6 @@ namespace Com.MyCompany.MyGame
 
             playerSpeed = unit.speed;
 
-            //인벤토리 초기화
             pInventory = new Inventory(uiManager);
             pInventory.Add(ItemCode.CAN, 5);
             pInventory.Add(ItemCode.CHEESE, 3);
@@ -436,38 +459,41 @@ namespace Com.MyCompany.MyGame
         {
             unit.swManager.SWDelayManager();
 
-            switch (curWeapon)
+            if (!GetUIHovered.value)
             {
-                //비무장, 아무것도 할 수 없음
-                case WeaponCode.HAND:
-                    AttackDefault();
-                    AttackAssassinate();
-                    break;
-                case WeaponCode.CAN:
-                    AttackAssassinate();
-                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
-                        AttackThrow();
-                    break;
-                case WeaponCode.CHEESE:
-                    AttackAssassinate();
-                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
-                        AttackThrow();
-                    break;
-                //플레이어 위치에서 사용
-                case WeaponCode.SMOKE:
-                    AttackAssassinate();
-                    if (unit.curUnitPose != UnitPose.MOD_CROUCH)
-                    {
-                        if (Input.GetButtonDown("Fire1") && unit.swManager.SWDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
+                switch (curWeapon)
+                {
+                    //비무장, 아무것도 할 수 없음
+                    case WeaponCode.HAND:
+                        AttackDefault();
+                        AttackAssassinate();
+                        break;
+                    case WeaponCode.CAN:
+                        AttackAssassinate();
+                        if (unit.curUnitPose != UnitPose.MOD_CROUCH)
+                            AttackThrow();
+                        break;
+                    case WeaponCode.CHEESE:
+                        AttackAssassinate();
+                        if (unit.curUnitPose != UnitPose.MOD_CROUCH)
+                            AttackThrow();
+                        break;
+                    //플레이어 위치에서 사용
+                    case WeaponCode.SMOKE:
+                        AttackAssassinate();
+                        if (unit.curUnitPose != UnitPose.MOD_CROUCH)
                         {
-                            unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
-                            pInventory.Remove((int)curWeapon);
-                            uiManager.ControlEquippedWeaponCoolTime(curWeapon);
+                            if (Input.GetButtonDown("Fire1") && unit.swManager.SWDelayDone(curWeapon) && pInventory.CheckWeapon(curWeapon))
+                            {
+                                unit.InstantiateWeapon(curWeapon, transform.position + ValueCollections.weaponSmokeVec, ValueCollections.weaponSmokeQuat);
+                                pInventory.Remove((int)curWeapon);
+                                uiManager.ControlEquippedWeaponCoolTime(curWeapon);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         private void AttackDefault()
@@ -624,7 +650,7 @@ namespace Com.MyCompany.MyGame
 
                     if (nearestItem.GetItem().code == ItemCode.STRUCTURE)
                         nearestItem.GetStructure().UseStructure();
-                    else
+                    else if(!pInventory.CheckWeaponFull(nearestItem.GetItem().code))
                         pInventory.Add(nearestItem.GetItemCode());
 
                     nearestItem.Init();

@@ -207,6 +207,17 @@ namespace Com.MyCompany.MyGame
 
                 return result;
             }
+
+            public static WeaponCode ConvertItemToWeapon(ItemCode itemCode)
+            {
+                WeaponCode result = WeaponCode.max;
+                int index = (int)itemCode;
+
+                if (index < (int)WeaponCode.PLAYER)
+                    result = (WeaponCode)index;
+
+                return result;
+            }
         }
 
         public static class ValueCollections

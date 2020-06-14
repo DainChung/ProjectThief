@@ -273,7 +273,7 @@ namespace Com.MyCompany.MyGame
 
         void Start()
         {
-            unit = GetComponent<Unit>();
+            unit = transform.GetComponent<Unit>();
             unit.curUnitState = UnitState.IDLE;
             unit.curLookDir = LookDirState.IDLE;
             enemySpeed = unit.speed;
@@ -295,13 +295,6 @@ namespace Com.MyCompany.MyGame
         {
             if (!unit.lockControl)
             {
-                //if (unit.curUnitState == UnitState.COMBAT)
-                //{
-                //    isMovingNow = false;
-                //    unit.AttackDefault(false);
-                //}
-                //else
-                //    isMovingNow = true;
                 if (unit.health > 0)
                     AI();
             }
@@ -436,7 +429,7 @@ namespace Com.MyCompany.MyGame
                 default:
                     break;
             }
-            //EnemyAlertManager();
+            EnemyAlertManager();
         }
 
         //curUnitState == UnitState.IDLE
