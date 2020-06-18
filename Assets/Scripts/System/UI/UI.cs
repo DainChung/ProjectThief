@@ -68,14 +68,38 @@ namespace Com.MyCompany.MyGame.UI
             try { rawImage.enabled = enable; }
             catch (System.Exception) { }
 
-            for (int i = 0; i < uiRects.Length; i++)
-                uiRects[i].enabled = enable;
-
-            for (int j = 0; j < uiWidgetConts.Length; j++)
+            try
             {
-                uiWidgetConts[j].enabled = enable;
-                try { OnOffUIButton(enable); }
-                catch (System.Exception) { }
+                for (int i = 0; i < uiRects.Length; i++)
+                    uiRects[i].enabled = enable;
+            }
+            catch (System.NullReferenceException)
+            {
+                UIRect[] uiR = GetComponents<UIRect>();
+
+                for (int i = 0; i < uiR.Length; i++)
+                    uiR[i].enabled = enable;
+            }
+
+            try
+            {
+                for (int j = 0; j < uiWidgetConts.Length; j++)
+                {
+                    uiWidgetConts[j].enabled = enable;
+                    try { OnOffUIButton(enable); }
+                    catch (System.Exception) { }
+                }
+            }
+            catch (System.NullReferenceException)
+            {
+                UIWidgetContainer[] uiW = GetComponents<UIWidgetContainer>();
+
+                for (int i = 0; i < uiW.Length; i++)
+                {
+                    uiW[i].enabled = enable;
+                    try { OnOffUIButton(enable); }
+                    catch (System.Exception) { }
+                }
             }
         }
         public virtual void OnOffUIButton(bool enable)

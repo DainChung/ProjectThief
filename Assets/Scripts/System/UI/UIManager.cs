@@ -451,12 +451,12 @@ namespace Com.MyCompany.MyGame.GameSystem
         public void SetIndicator(string uiName, Transform target)
         {
             Indicator indicator = uiWindows[uiWindowsDic[uiName]].GetComponent<Indicator>();
-            OnOffUI((target != null), indicator.transform);
+            OnOffUI((target != null && target.gameObject.activeInHierarchy), indicator.transform);
 
             try
             {
                 indicator.target = target;
-                if (target == null)
+                if (target == null || !target.gameObject.activeInHierarchy)
                 {
                     indicator.target = null;
                     SetFillAmountUIName(uiName, 0);

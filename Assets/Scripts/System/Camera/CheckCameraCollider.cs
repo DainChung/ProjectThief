@@ -28,9 +28,9 @@ namespace Com.MyCompany.MyGame
 
         #region Public Fields
 
-        public bool canAssassinate { get { return (_assassinateTarget == null ? false : _canAssassinate); } }
+        public bool canAssassinate              { get { return (_assassinateTarget == null ? false : _canAssassinate); } }
         public EnemyController assassinateEnemy { get { return ((_assassinateTarget == null) ? null : _assassinateEnemy); } }
-        public Vector3 assassinateTargetPos { get { return ((_assassinateTarget == null) ? ValueCollections.initPos : _assassinateTarget.position); } }
+        public Vector3 assassinateTargetPos     { get { return ((_assassinateTarget == null) ? ValueCollections.initPos : _assassinateTarget.position); } }
 
         #endregion
 
@@ -104,7 +104,8 @@ namespace Com.MyCompany.MyGame
                     Debug.DrawRay(rayOrigin, rayDesti, Color.red);
                     if (Physics.Raycast(rayOrigin, rayDesti, out hit) && hit.transform.gameObject.layer == PhysicsLayers.Structure)
                     {
-                        if (obj.transform.GetComponent<EnemyController>().canAssassinate) playerController.SetIndicator("AssassinateIndicator", null);
+                        if (obj.transform.GetComponent<EnemyController>().canAssassinate)
+                            playerController.SetIndicator("AssassinateIndicator", null);
                         _canAssassinate = false;
                         InitAssassinateTargetPos();
                         continue;
@@ -112,7 +113,8 @@ namespace Com.MyCompany.MyGame
 
                     if (obj.transform.GetComponent<EnemyController>().canAssassinate)
                     {
-                        if (obj.transform.GetComponent<Unit>().health > 0 && unit.health > 0) playerController.SetIndicator("AssassinateIndicator", obj.transform);
+                        if (obj.transform.GetComponent<Unit>().health > 0 && unit.health > 0)
+                            playerController.SetIndicator("AssassinateIndicator", obj.transform);
                         _canAssassinate = true;
                         _assassinateTarget = obj.transform;
                         _assassinateEnemy = _assassinateTarget.GetComponent<EnemyController>();

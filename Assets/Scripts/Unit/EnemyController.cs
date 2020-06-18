@@ -252,7 +252,7 @@ namespace Com.MyCompany.MyGame
         public MeshCollider enemyRadar;
         public MeshCollider enemyEye;
         //assassinateTargetted가 true면 무조건 false 반환
-        public bool canAssassinate { get { return (assassinateTargetted ? false : _canAssassinate); } set { _canAssassinate = value; } }
+        public bool canAssassinate { get { return (assassinateTargetted || (unit.curUnitState == UnitState.COMBAT) ? false : _canAssassinate); } set { _canAssassinate = value; } }
 
         public EnemyCheckStructure checkStructure;
         public Transform[] patrolSpots = new Transform[6];

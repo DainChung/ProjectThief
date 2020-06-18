@@ -14,6 +14,7 @@ namespace Com.MyCompany.MyGame
         private class Inventory
         {
             private UIManager uiManager;
+            private StageManager stageManager;
             private bool _takeGold = false;
             private int[] _items = new int[(int)ItemCode.max - 1];
             private int[] maxAmount = new int[(int)ItemCode.max - 1];
@@ -24,6 +25,7 @@ namespace Com.MyCompany.MyGame
             public Inventory(UIManager UIManager)
             {
                 uiManager = UIManager;
+                stageManager = UIManager.transform.GetComponent<StageManager>();
                 for (int i = 0; i < _items.Length; i++)
                 {
                     _items[i] = 0;
@@ -72,7 +74,7 @@ namespace Com.MyCompany.MyGame
                         break;
                     case ItemCode.GOLD:
                         _takeGold = true;
-                        GameObject.FindWithTag("Manager").GetComponent<StageManager>().ShowEndArea();
+                        stageManager.ShowEndArea();
                         break;
                     default:
                         break;
@@ -125,6 +127,8 @@ namespace Com.MyCompany.MyGame
                         result = _items[(int)(item) - 1] >= maxAmount[(int)(item) - 1];
                         break;
                     case WeaponCode.HAND:
+                        result = false;
+                        break;
                     default:
                         result = true;
                         break;
@@ -221,7 +225,7 @@ namespace Com.MyCompany.MyGame
                     Init();
 
                 }
-                catch (System.Exception e){ MyDebug.Log(this.ToString() + " : " + e); }
+                catch (System.Exception e){ MyDebug.Log(this.ToString() + ", " + _item.name + " : " + e); }
                 return result;
             }
             public Item GetItem()
@@ -644,7 +648,6 @@ namespace Com.MyCompany.MyGame
             {
                 if (uiManager.IsFullUIBasicSprite("NearestItemIndicator"))
                 {
-                    SetIndicator("NearestItemIndicator", null);
                     if (nearestItem.GetItem().code == ItemCode.GOLD)
                         SetIndicator("DestiIndicator", null);
 
@@ -653,6 +656,7 @@ namespace Com.MyCompany.MyGame
                     else if(!pInventory.CheckWeaponFull(nearestItem.GetItem().code))
                         pInventory.Add(nearestItem.GetItemCode());
 
+                    SetIndicator("NearestItemIndicator", null);
                     nearestItem.Init();
                     SendMessage("PlayAudio", "GetItem");
                 }
