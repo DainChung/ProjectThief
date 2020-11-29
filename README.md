@@ -191,48 +191,48 @@ NGUI를 사용하여 만들었습니다.
   > > Collections.cs의 MyMath 클래스
   <pre>
   <code>
-    public static class MyMath
-    {
-        //sin 근사값 모음
-	      private static Dictionary<int, float> sinDB = FileIO.DataIO.Read("Sin.data");
+    	public static class MyMath
+    	{
+        	//sin 근사값 모음
+		private static Dictionary<int, float> sinDB = FileIO.DataIO.Read("Sin.data");
 
-	      public static float Sin(float deg)
-	      {
-		        int index = (int)(deg + 0.5f);
+		public static float Sin(float deg)
+		{
+			int index = (int)(deg + 0.5f);
 
-		        if(index < 0) 	index += 360;
-		        else if(index > 360)  index -= 360;		
+			if(index < 0) 	index += 360;
+			else if(index > 360)  index -= 360;		
 
-            try
-            {
-                return sinDB[index];
-            }
-            catch (System.Exception)
-            {
-                //sin.data에서 근사값들을 읽기
-                sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
-                return sinDB[index];
-            }
-	      }
+			try
+			{
+				return sinDB[index];
+			}
+			catch (System.Exception)
+			{
+				//sin.data에서 근사값들을 읽기
+				sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
+				return sinDB[index];
+			}
+		}
         
-	      public static float Cos(float deg)
-	      {
+		public static float Cos(float deg)
+		{
 		        int index = (int)(deg + 0.5f);
 		
 		        if(index < -90) 	index += 360;
 		        else if(index >= 270)  index -= 360;	
 
-            try
-            {
-                return sinDB[index + 90];
-            }
-            catch (System.Exception)
-            {
-                sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
-                return sinDB[index + 90];
-            }
-	      }
-    }
+            		try
+            		{
+                		return sinDB[index + 90];
+            		}
+            		catch (System.Exception)
+            		{
+                		sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
+                		return sinDB[index + 90];
+            		}
+		}
+	}
   </code>
   </pre>
   
