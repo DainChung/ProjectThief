@@ -15,7 +15,14 @@
 
 ### 3.1. 파일 시스템
 
+![캡처](https://user-images.githubusercontent.com/11573611/100544631-8012cc00-329a-11eb-9298-14924cceb6a9.PNG)
 
+   - FileIO.cs에서 .db, .data 파일을 읽고 씁니다.
+   - (사용자 이름)\AppData\LocalLow\DefaultCompany\ProjectThief 위치에 필요한 파일이 없으면 초기화된 데이터를 입력하고 파일에 저장합니다.
+   - BestRecord.data에는 스테이지별 최고 점수가 저장됩니다.
+   - sin.data에는 Sin값이 저장됩니다.
+   - SoundSetting.data에는 음량 크기가 저장욉니다.
+   - UnitStatDB.db에는 캐릭터의 스탯이 저장됩니다.
 
 ### 3.2. UI
 
