@@ -9,3 +9,17 @@
 [![Video Label](http://img.youtube.com/vi/KWLyVQ_91eM/0.jpg)](https://youtu.be/KWLyVQ_91eM?t=0s)
 
 ## 3. 주요 기능
+
+### 3.1. 파일 시스템
+
+
+
+### 3.2. UI
+
+#### 3.2.1. 메인 화면
+
+#### 3.2.2. 게임 화면
+
+#### 3.2.3. 현재 목표
+
+#### 3.2.4. 투척 궤도
