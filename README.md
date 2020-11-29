@@ -5,6 +5,13 @@
 쥐를 피해 반지를 훔치고 탈출하는 Unity 잠입 게임입니다.
 
 
+ - 이름 : ProjectThief
+ - 장르 : 잠입 게임
+ - 기간 : 2020-01-12 ~ 2020-06-14
+ - 인원 : 개인 프로젝트
+ - 사용 프로그램 : Unity 2019.2.17f1
+
+
 ## 2. 플레이 영상
 
 [![Video Label](http://img.youtube.com/vi/KWLyVQ_91eM/0.jpg)](https://youtu.be/KWLyVQ_91eM?t=0s)
