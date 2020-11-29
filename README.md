@@ -170,7 +170,7 @@ NGUI를 사용하여 만들었습니다.
   
   > > Unit.cs의 ThrowLineRenderer.GetThrowLinePoint
   
-  - 발사각도, 시간, 방향을 이용하여 궤적을 계산합니다.
+  - 탄도방정식에 발사각도, 시간, 방향을 대입하여 궤적을 계산합니다.
   
   <pre>
   <code>
