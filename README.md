@@ -8,10 +8,8 @@
 ## 2. 플레이 영상
 
 [![Video Label](http://img.youtube.com/vi/KWLyVQ_91eM/0.jpg)](https://youtu.be/KWLyVQ_91eM?t=0s)
+
 [유튜브 링크](https://youtu.be/KWLyVQ_91eM)
-
-클릭하시면 유튜브 페이지로 이동합니다.
-
 
 ## 3. 주요 기능
 
@@ -27,13 +25,13 @@ NGUI를 사용하여 만들었습니다.
 #### 3.2.1. 메인 화면
 
 *시작 화면
-![시작화면 (1)](https://user-images.githubusercontent.com/11573611/100540835-3a96d480-3283-11eb-9883-f41c1a12c447.jpg)
+![시작화면 (1)](https://user-images.githubusercontent.com/11573611/100541461-76cc3400-3287-11eb-949f-396ad4a71036.jpg)
 
 *스테이지 선택 화면
-
+![시작화면 스테이지 (2)](https://user-images.githubusercontent.com/11573611/100541469-83508c80-3287-11eb-81d5-79f30df29333.jpg)
 
 *설정
-![시작화면 작은거 (1)](https://user-images.githubusercontent.com/11573611/100540847-4bdfe100-3283-11eb-97c0-5436e885b382.jpg)
+![시작화면 설정](https://user-images.githubusercontent.com/11573611/100541475-89df0400-3287-11eb-829e-4e51f50e25f0.jpg)
 
 
 
