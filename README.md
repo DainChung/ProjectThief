@@ -7,6 +7,7 @@
 ## 2. 플레이 영상
 
 [![Video Label](http://img.youtube.com/vi/KWLyVQ_91eM/0.jpg)](https://youtu.be/KWLyVQ_91eM?t=0s)
+
 클릭하시면 유튜브 페이지로 이동합니다.
 
 ## 3. 주요 기능
