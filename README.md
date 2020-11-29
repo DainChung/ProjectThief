@@ -25,12 +25,15 @@ NGUI를 사용하여 만들었습니다.
 #### 3.2.1. 메인 화면
 
 *시작 화면
+
 ![시작화면 (1)](https://user-images.githubusercontent.com/11573611/100541461-76cc3400-3287-11eb-949f-396ad4a71036.jpg)
 
 *스테이지 선택 화면
+
 ![시작화면 스테이지 (2)](https://user-images.githubusercontent.com/11573611/100541469-83508c80-3287-11eb-81d5-79f30df29333.jpg)
 
 *설정
+
 ![시작화면 설정](https://user-images.githubusercontent.com/11573611/100541475-89df0400-3287-11eb-829e-4e51f50e25f0.jpg)
 
 
