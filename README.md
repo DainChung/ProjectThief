@@ -75,32 +75,32 @@ NGUI를 사용하여 만들었습니다.
   > > Incator.cs
 <pre>
 <code>
-    public class Indicator : UI
-    {
-        public Transform target = null;
-        private Vector3 pos
-        {
-          get { return (target == null ? Collections.ValueCollections.initPos : target.position); }
-        }
+	public class Indicator : UI
+	{
+        	public Transform target = null;
+        	private Vector3 pos
+        	{
+          		get { return (target == null ? Collections.ValueCollections.initPos : target.position); }
+        	}
 
-        private UIController uiController;
+        	private UIController uiController;
 
-        void Start()
-        {
-            Transform canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
-            Transform uiCam = GameObject.Find("UICamera").transform;
-            uiController = GetComponent<UIController>();
-            base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
-        }
+        	void Start()
+        	{
+          	  Transform canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
+          	  Transform uiCam = GameObject.Find("UICamera").transform;
+           	 uiController = GetComponent<UIController>();
+           	 base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
+        	}
 
-        void Update()
-        {
-            if (pos != Collections.ValueCollections.initPos)
-                base.Move(pos);
-            else
-                uiController.OnOffAll(false);
-        }
-    }
+       	 	void Update()
+	 	{
+            		if (pos != Collections.ValueCollections.initPos)
+                		base.Move(pos);
+            		else
+                		uiController.OnOffAll(false);
+        	}
+	}
 </code>
 </pre>
 
@@ -108,21 +108,21 @@ NGUI를 사용하여 만들었습니다.
   
   <pre>
   <code>
-    protected virtual void Move(Vector3 destiPos)
-    {
-        destiPos = Camera.main.WorldToViewportPoint(destiPos);
+	protected virtual void Move(Vector3 destiPos)
+	{
+        	destiPos = Camera.main.WorldToViewportPoint(destiPos);
 
-        //화면을 넘어가지 않도록 함
-        moveX = 2 * (Mathf.Clamp(destiPos.x, 0.10f, 0.80f) - 0.5f);
-        moveY = 2 * (Mathf.Clamp(destiPos.y, 0.15f, 0.85f) - 0.5f);
+        	//화면을 넘어가지 않도록 함
+        	moveX = 2 * (Mathf.Clamp(destiPos.x, 0.10f, 0.80f) - 0.5f);
+        	moveY = 2 * (Mathf.Clamp(destiPos.y, 0.15f, 0.85f) - 0.5f);
 
-        //방향 오류 수정
-        if (destiPos.z < 0)
-            moveY = -0.7f;
+        	//방향 오류 수정
+        	if (destiPos.z < 0)
+			moveY = -0.7f;
 
-        destiPos.Set(moveX * maxW, moveY * maxH, 0);
-        transform.localPosition = destiPos;
-    }
+        	destiPos.Set(moveX * maxW, moveY * maxH, 0);
+        	transform.localPosition = destiPos;
+	}
   </code>
   </pre>
   
@@ -140,30 +140,30 @@ NGUI를 사용하여 만들었습니다.
   
   <pre>
   <code>
-    public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
-    {
-        //조준할 때만 LineRenderer를 활성화합니다.
-        if (!lineRenderer.enabled) 
-        {
-            lineRenderer.enabled = true;
-            //착탄지점을 보여줍니다.
-            throwDestiPos.GetComponent<MeshRenderer>().enabled = true; 
-        }
+	public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
+	{
+		//조준할 때만 LineRenderer를 활성화합니다.
+		if (!lineRenderer.enabled) 
+		{
+		    lineRenderer.enabled = true;
+		    //착탄지점을 보여줍니다.
+		    throwDestiPos.GetComponent<MeshRenderer>().enabled = true; 
+		}
 
-        theta *= (-1); //발사각도
+		theta *= (-1); //발사각도
 
-        float t = 0.08f; //탄도방정식에 넣을 변수 t
+		float t = 0.08f; //탄도방정식에 넣을 변수 t
 
-        for (int index = 0; index < lineRenderer.positionCount; index++)
-        {
-            lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, eulerAngleY) + throwPos);
+		for (int index = 0; index < lineRenderer.positionCount; index++)
+		{
+		    lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, eulerAngleY) + throwPos);
 
-            //구조물과 닿는 지점부터 계산을 생략합니다.
-            if (index != 0 && CheckObject(index)) break;
+		    //구조물과 닿는 지점부터 계산을 생략합니다.
+		    if (index != 0 && CheckObject(index)) break;
 
-            t += 0.1f;
-        }
-    }
+		    t += 0.1f;
+		}
+	}
 
   </code>
   </pre>
@@ -174,17 +174,17 @@ NGUI를 사용하여 만들었습니다.
   
   <pre>
   <code>
-    //theta : 발사각도
-    //t : 시간
-    //eulerAngleY : 캐릭터가 바라보는 방향
-    private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
-    {
-        float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
-        float y = (0.95f * throwPower * MyMath.Sin(theta) - 0.545f * gravity * t) * t;
-        float z = MyMath.Cos(theta) * MyMath.Cos(eulerAngleY) * throwPower * t;
+	//theta : 발사각도
+	//t : 시간
+	//eulerAngleY : 캐릭터가 바라보는 방향
+	private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
+	{
+        	float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
+        	float y = (0.95f * throwPower * MyMath.Sin(theta) - 0.545f * gravity * t) * t;
+        	float z = MyMath.Cos(theta) * MyMath.Cos(eulerAngleY) * throwPower * t;
 
-        return new Vector3(x, y, z);
-    }
+        	return new Vector3(x, y, z);
+	}
   </code>
   </pre>
   
