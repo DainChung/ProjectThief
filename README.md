@@ -35,7 +35,7 @@ NGUI를 사용하여 만들었습니다.
   ![시작화면 스테이지 (2)](https://user-images.githubusercontent.com/11573611/100541469-83508c80-3287-11eb-81d5-79f30df29333.jpg)
 
     - 스테이지를 클리어 한 경우 클리어 시간과 점수가 표시됩니다.
-    - 스테이지 별 최고 점수는 BestRecord.data에 저장됩니다.
+    - 스테이지별 최고 점수는 BestRecord.data에 저장됩니다.
     - 스테이지 1을 클리어하면 스테이지 2가 열립니다.
 
        
@@ -66,17 +66,58 @@ NGUI를 사용하여 만들었습니다.
   ![게임 메뉴](https://user-images.githubusercontent.com/11573611/100541128-1b994200-3285-11eb-85c4-e809e167a55c.jpg)
 
 -------------------------------------------------------------------------------------------
-  #### 3.2.3. 현재 목표
+  > 목표(Indicator)
+  
+  - 현재 목표가 어디에 있는지 화면에 표시됩니다.
+  - 반지를 습득한 경우 탈출 지점을 표시합니다.
+  
+  '''
+  {
+    public class Indicator : UI
+    {
+        public Transform target = null;
+        private Vector3 pos { get { return (target == null ? Collections.ValueCollections.initPos : target.position); } }
 
+        private UIController uiController;
+
+        void Start()
+        {
+            Transform canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
+            Transform uiCam = GameObject.Find("UICamera").transform;
+            uiController = GetComponent<UIController>();
+            base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
+        }
+
+        void Update()
+        {
+            if (pos != Collections.ValueCollections.initPos)
+                base.Move(pos);
+            else
+                uiController.OnOffAll(false);
+        }
+    }
+  }
+  '''
 -------------------------------------------------------------------------------------------
-  #### 3.2.4. 투척 궤도
+  > 투척 궤도
+  
   
 -------------------------------------------------------------------------------------------
-  #### 3.2.5. 결과 화면
+  
+  > HP바
+  
+  
+-------------------------------------------------------------------------------------------
+  #### 3.2.3. 결과 화면
   
   > 성공
   
   ![게임 결과창-클리어-최고기록 - 복사본](https://user-images.githubusercontent.com/11573611/100541991-dc6def80-328a-11eb-875d-a46c64d0f04b.PNG)
+  
+  - 반지를 갖고 탈출지점으로 가면 출력됩니다.
+  - 클리어 시간과 점수가 표시됩니다.
+  - 최고 점수를 달성하면 BestRecord.data에 저장하고 추가 효과를 출력합니다.
+  - 최고 점수가 아닌 경우 기록만 출력합니다.
   
   > 실패
   
