@@ -68,7 +68,7 @@ NGUI를 사용하여 만들었습니다.
 -------------------------------------------------------------------------------------------
   > 목표(Indicator)
   
-  - 현재 목표가 어디에 있는지 화면에 표시됩니다.
+  - 현재 목표가 어디에 있는지 노란 점으로 표시됩니다.
   - 반지를 습득한 경우 탈출 지점을 표시합니다.
   
   
@@ -127,8 +127,116 @@ NGUI를 사용하여 만들었습니다.
   </pre>
   
 -------------------------------------------------------------------------------------------
-  > 투척 궤도
+  > 투척 궤적
   
+  ![궤적 (2)](https://user-images.githubusercontent.com/11573611/100542989-e266cf00-3290-11eb-8529-c8887c7cd966.jpg)
+  
+  - LineRenderer로 투척 궤적을 보여줍니다.
+  - 미리 계산한 sin값을 sin.data에 저장하고 이를 이용하여 빠르게 궤적을 계산합니다.
+  
+  > > Unit.cs의 ThrowLineRenderer.Draw
+  
+  - 계산한 궤적을 LineRenderer로 전송하여 화면상에 표시합니다.
+  
+  <pre>
+  <code>
+    public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
+    {
+        //조준할 때만 LineRenderer를 활성화합니다.
+        if (!lineRenderer.enabled) 
+        {
+            lineRenderer.enabled = true;
+            //착탄지점을 보여줍니다.
+            throwDestiPos.GetComponent<MeshRenderer>().enabled = true; 
+        }
+
+        theta *= (-1); //발사각도
+
+        float t = 0.08f; //탄도방정식에 넣을 변수 t
+
+        for (int index = 0; index < lineRenderer.positionCount; index++)
+        {
+            lineRenderer.SetPosition(index, GetThrowLinePoint(theta, t, eulerAngleY) + throwPos);
+
+            //구조물과 닿는 지점부터 계산을 생략합니다.
+            if (index != 0 && CheckObject(index)) break;
+
+            t += 0.1f;
+        }
+    }
+
+  </code>
+  </pre>
+  
+  > > Unit.cs의 ThrowLineRenderer.GetThrowLinePoint
+  
+  - 발사각도, 시간, 방향을 이용하여 궤적을 계산합니다.
+  
+  <pre>
+  <code>
+    //theta : 발사각도
+    //t : 시간
+    //eulerAngleY : 캐릭터가 바라보는 방향
+    private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
+    {
+        float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
+        float y = (0.95f * throwPower * MyMath.Sin(theta) - 0.545f * gravity * t) * t;
+        float z = MyMath.Cos(theta) * MyMath.Cos(eulerAngleY) * throwPower * t;
+
+        return new Vector3(x, y, z);
+    }
+  </code>
+  </pre>
+  
+  > > Collections.cs의 MyMath 클래스
+  <pre>
+  <code>
+    public static class MyMath
+    {
+        //sin 근사값 모음
+	      private static Dictionary<int, float> sinDB = FileIO.DataIO.Read("Sin.data");
+
+	      public static float Sin(float deg)
+	      {
+		        int index = (int)(deg + 0.5f);
+
+		        if(index < 0) 	index += 360;
+		        else if(index > 360)  index -= 360;		
+
+            try
+            {
+                return sinDB[index];
+            }
+            catch (System.Exception)
+            {
+                //sin.data에서 근사값들을 읽기
+                sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
+                return sinDB[index];
+            }
+	      }
+        
+	      public static float Cos(float deg)
+	      {
+		        int index = (int)(deg + 0.5f);
+		
+		        if(index < -90) 	index += 360;
+		        else if(index >= 270)  index -= 360;	
+
+            try
+            {
+                return sinDB[index + 90];
+            }
+            catch (System.Exception)
+            {
+                sinDB = ParseData.String2Dic(DataIO.ReadAll("sin.data"));
+                return sinDB[index + 90];
+            }
+	      }
+    }
+  </code>
+  </pre>
+  
+  > >
   
 -------------------------------------------------------------------------------------------
   
