@@ -76,7 +76,10 @@ NGUI를 사용하여 만들었습니다.
     public class Indicator : UI
     {
         public Transform target = null;
-        private Vector3 pos { get { return (target == null ? Collections.ValueCollections.initPos : target.position); } }
+        private Vector3 pos
+        {
+          get { return (target == null ? Collections.ValueCollections.initPos : target.position); }
+        }
 
         private UIController uiController;
 
