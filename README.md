@@ -71,6 +71,8 @@ NGUI를 사용하여 만들었습니다.
   - 현재 목표가 어디에 있는지 화면에 표시됩니다.
   - 반지를 습득한 경우 탈출 지점을 표시합니다.
   
+  
+  > > Incator.cs
 <pre>
 <code>
     public class Indicator : UI
@@ -101,6 +103,28 @@ NGUI를 사용하여 만들었습니다.
     }
 </code>
 </pre>
+
+  > > UI.cs의 Move함수
+  
+  <pre>
+  <code>
+    protected virtual void Move(Vector3 destiPos)
+    {
+        destiPos = Camera.main.WorldToViewportPoint(destiPos);
+
+        //화면을 넘어가지 않도록 함
+        moveX = 2 * (Mathf.Clamp(destiPos.x, 0.10f, 0.80f) - 0.5f);
+        moveY = 2 * (Mathf.Clamp(destiPos.y, 0.15f, 0.85f) - 0.5f);
+
+        //방향 오류 수정
+        if (destiPos.z < 0)
+            moveY = -0.7f;
+
+        destiPos.Set(moveX * maxW, moveY * maxH, 0);
+        transform.localPosition = destiPos;
+    }
+  </code>
+  </pre>
   
 -------------------------------------------------------------------------------------------
   > 투척 궤도
