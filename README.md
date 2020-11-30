@@ -11,9 +11,6 @@
  - 인원 : 개인 프로젝트
  - 사용 프로그램 : Unity 2019.2.17f1
 
- - 스테이지 오브젝트 출처 : [유니티 에셋 스토어](https://assetstore.unity.com/packages/3d/environments/snaps-prototype-office-137490)
- - 캐릭터 모델 및 애니메이션 출처 : [Mixamo](https://www.mixamo.com/#/)
-
 ## 2. 플레이 영상
 
 [![Video Label](http://img.youtube.com/vi/KWLyVQ_91eM/0.jpg)](https://youtu.be/KWLyVQ_91eM?t=0s)
@@ -35,9 +32,7 @@
 
 ### 3.2. UI
 
-- NGUI를 사용하여 만들었습니다.
-- UI 디자인 출처 : https://www.kenney.nl/
-
+- NGUI와 LineRenderer를 사용하여 만들었습니다.
 
   #### 3.2.1. 메인 화면
 
@@ -279,3 +274,10 @@
   
   
 -------------------------------------------------------------------------------------------
+
+## 출처
+
+ - UI 디자인 출처 : [Kenny](https://www.kenney.nl/)
+ - 스테이지 오브젝트 출처 : [유니티 에셋 스토어](https://assetstore.unity.com/packages/3d/environments/snaps-prototype-office-137490)
+ - 캐릭터 모델 및 애니메이션 출처 : [Mixamo](https://www.mixamo.com/#/)
+
