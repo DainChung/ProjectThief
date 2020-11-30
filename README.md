@@ -203,7 +203,7 @@
 	0.95 : 힘 가중치		0.545 : 중력가중치
   
  	x = cos Θ * sin Φ * F * t
-	y = (0.95f * F * sin Φ - 0.545f * G * t) * t
+	y = (0.95 * F * sin Φ - 0.545 * G * t) * t
 	z = cos Θ * cos Φ * F * t
   </code>
   </pre>
