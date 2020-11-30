@@ -147,9 +147,9 @@
   ### 3.2.3. 투척 궤적
   
   > 인게임
-  
 
-![궤적 (2)_Small](https://user-images.githubusercontent.com/11573611/100572964-1b975180-331a-11eb-95b1-653bce599ad7.png)
+![궤적 (2)_Small](https://user-images.githubusercontent.com/11573611/100573040-45507880-331a-11eb-907a-1a64a75604e0.png)
+
   
   > 개발 화면
   
