@@ -148,7 +148,8 @@
   
   > 인게임
   
-![궤적 (2)_Small](https://user-images.githubusercontent.com/11573611/100572896-f1459400-3319-11eb-9614-849a98c0438f.png)
+
+![궤적 (2)_Small](https://user-images.githubusercontent.com/11573611/100572964-1b975180-331a-11eb-95b1-653bce599ad7.png)
   
   > 개발 화면
   
