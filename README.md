@@ -170,7 +170,7 @@
 
 		theta *= (-1); //발사각도
 
-		float t = 0.08f; //탄도방정식에 넣을 변수 t
+		float t = 0.08f; //탄도방정식에 넣을 시간 변수
 
 		for (int index = 0; index < lineRenderer.positionCount; index++)
 		{
