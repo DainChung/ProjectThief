@@ -183,32 +183,18 @@ NGUI를 사용하여 만들었습니다.
   
   > GetThrowLinePoint로 계산하는 궤적
   
-  - 탄도방정식에 발사각도, 시간, 방향을 대입하여 궤적을 계산합니다.
+  - 탄도방정식에 발사각도, 방향, 시간을 대입하여 궤적을 계산합니다.
+  - 삼각함수 값은 MyMath 클래스에서 근사값을 이용하여 계산했습니다.
   
-  > 탄도방정식
   <pre>
   <code>
-  	Θ : 발사각도
-	
+  	θ : 발사각도	t : 시간
+	Φ : 방향		  F : 힘
+	G : 중력
   
- 	x = cos Θ * sin(eulerAngleY) * 힘 * 시간
-	y = {힘가중치 * 힘 * sin(eulerAngleY) - 중력가중치 * 중력 * 시간} * 시간
-	z = cos Θ * cos() * 힘 * 시간
-  </code>
-  </pre>
-	
-  > > 코드
-  <pre>
-  <code>
-  	
-	private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
-	{
-        	float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
-        	float y = (0.95f * throwPower * MyMath.Sin(theta) - 0.545f * gravity * t) * t;
-        	float z = MyMath.Cos(theta) * MyMath.Cos(eulerAngleY) * throwPower * t;
-
-        	return new Vector3(x, y, z);
-	}
+ 	x = cos Θ × sin Φ × F × t
+	y = (F × sin Φ - G × t) × t
+	z = cos Θ × cos Φ × F × t
   </code>
   </pre>
   
