@@ -149,6 +149,8 @@
   
   ![궤적 (2)](https://user-images.githubusercontent.com/11573611/100542989-e266cf00-3290-11eb-8529-c8887c7cd966.jpg)
   
+  ![UI-포물선-최소각도](https://user-images.githubusercontent.com/11573611/100572533-0c63d400-3319-11eb-9853-a2b93d801af8.png)
+  
   - LineRenderer로 투척 궤적을 보여줍니다.
   - 미리 계산한 sin값을 sin.data에 저장하고 이를 이용하여 빠르게 궤적을 계산합니다.
   
