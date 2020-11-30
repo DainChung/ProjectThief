@@ -26,7 +26,7 @@
 
    - FileIO.cs에서 파일을 읽고 씁니다. .db파일의 경우 SQLite를 이용하여 관리했습니다.
    - (사용자 이름)\AppData\LocalLow\DefaultCompany\ProjectThief 위치에 필요한 파일이 없으면 초기화된 데이터를 입력하고 파일에 저장합니다.
-   - BestRecord.data에는 스테이지별 최고 점수가 저장됩니다. -> [3.2.3. 결과 화면](https://github.com/DainChung/ProjectThief#324-%EA%B2%B0%EA%B3%BC-%ED%99%94%EB%A9%B4)
+   - BestRecord.data에는 스테이지별 최고 점수가 저장됩니다. -> [3.2.4. 결과 화면](https://github.com/DainChung/ProjectThief#324-%EA%B2%B0%EA%B3%BC-%ED%99%94%EB%A9%B4)
    - sin.data에는 Sin값이 저장됩니다. -> [3.2.3. 투척 궤적](https://github.com/DainChung/ProjectThief#323-%ED%88%AC%EC%B2%99-%EA%B6%A4%EC%A0%81)
    - SoundSetting.data에는 음량 크기가 저장됩니다. -> [3.2.1.3. 설정](https://github.com/DainChung/ProjectThief#3213-%EC%84%A4%EC%A0%95)
    - UnitStatDB.db에는 캐릭터의 스탯이 저장됩니다.
