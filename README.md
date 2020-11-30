@@ -90,7 +90,7 @@
   - 반지를 습득한 경우 탈출 지점을 표시합니다.
   
   
-  > Incator.cs
+  > Indicator.cs
 <pre>
 <code>
 	public class Indicator : UI
@@ -122,8 +122,7 @@
 </code>
 </pre>
 
-  > UI.cs의 Move함수
-  
+  > UI.cs의 Move함수  
   <pre>
   <code>
 	protected virtual void Move(Vector3 destiPos)
@@ -158,10 +157,8 @@
   - LineRenderer로 투척 궤적을 보여줍니다.
   - 미리 계산한 sin값을 sin.data에 저장하고 이를 이용하여 빠르게 궤적을 계산합니다.
   
-  > Unit.cs의 ThrowLineRenderer.Draw
-  
-  - 계산한 궤적을 LineRenderer로 전송하여 화면상에 표시합니다.
-  
+  > Unit.cs의 ThrowLineRenderer.Draw  
+  - 계산한 궤적을 LineRenderer로 전송하여 화면상에 표시합니다. 
   <pre>
   <code>
 	public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
@@ -193,7 +190,6 @@
   </pre>
   
   > GetThrowLinePoint로 계산하는 궤적
-  
   - 탄도방정식에 발사각도, 방향, 시간을 대입하여 궤적을 계산합니다.
   - 삼각함수 값은 MyMath 클래스에서 근사값을 이용하여 계산했습니다.
   
