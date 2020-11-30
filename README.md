@@ -277,7 +277,7 @@
 
 ## 출처
 
- - UI 디자인 출처 : [Kenny](https://www.kenney.nl/)
- - 스테이지 오브젝트 출처 : [유니티 에셋 스토어](https://assetstore.unity.com/packages/3d/environments/snaps-prototype-office-137490)
- - 캐릭터 모델 및 애니메이션 출처 : [Mixamo](https://www.mixamo.com/#/)
+ - UI 디자인 : [Kenny](https://www.kenney.nl/)
+ - 스테이지 오브젝트 및 배경화면 : [유니티 에셋 스토어](https://assetstore.unity.com/packages/3d/environments/snaps-prototype-office-137490)
+ - 캐릭터 모델 및 애니메이션 : [Mixamo](https://www.mixamo.com/#/)
 
