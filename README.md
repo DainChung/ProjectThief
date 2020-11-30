@@ -197,9 +197,9 @@
 	Φ : 방향	F : 힘
 	G : 중력
   
- 	x = cos Θ × sin Φ × F × t
-	y = (F × sin Φ - G × t) × t
-	z = cos Θ × cos Φ × F × t
+ 	x = cos Θ * sin Φ * F * t
+	y = (F * sin Φ - G * t) * t
+	z = cos Θ * cos Φ * F * t
   </code>
   </pre>
   
