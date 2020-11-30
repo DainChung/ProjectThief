@@ -1,12 +1,12 @@
-//*****	[Character Models with Materials and Textures]	*****
+[Character Models with Materials and Textures]
 [0] All Animation and Character Model Files (with Materials & Textures) in Assets\Models are from
 https://www.mixamo.com/
 
 [1] UI Textures from
 https://www.kenney.nl/
-*************************	end	*************************//
+------------------------------------------------------------------------------
 
-//*****	[Models with Materials and Textures]		*****
+[Models with Materials and Textures]
 [0] Can.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
 https://www.cgtrader.com/free-3d-models/food/miscellaneous/coca-cola-can-60b7e50c-5679-4f5f-a9eb-ff6c26fe5744
 
@@ -21,9 +21,9 @@ https://sketchfab.com/3d-models/cheese-ecda1dabea2b4c349a8aa76b6d1a083c
 
 [3] Ring.fbx file (with Materials & Textures) in Assets\Models\UsableObjects from
 https://www.cgtrader.com/items/707754/download-page
-*************************	end	*************************//
+------------------------------------------------------------------------------
 
-//
+[Sound]
 [0] Smoke Grenade.mp3 from
 https://www.youtube.com/watch?v=CsDIM0pLEt0
 
