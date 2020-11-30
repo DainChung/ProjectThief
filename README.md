@@ -85,13 +85,13 @@
   
   - 해당 스테이지를 재도전, 사운드 설정 변경을 하거나 메인메뉴로 나갈 수 있습니다.
 
-  ##### 3.2.2.4. 목표(Indicator)
+  ##### 3.2.2.4. 목표(Indicator) 
   
   - 현재 목표가 어디에 있는지 노란 점으로 표시됩니다.
-  - 반지를 습득한 경우 탈출 지점을 표시합니다.
-  
+  - 반지를 습득한 경우 탈출 지점을 표시합니다. 
   
   > Indicator.cs
+  
 <pre>
 <code>
 	public class Indicator : UI
@@ -106,10 +106,10 @@
 
         	void Start()
         	{
-          	  Transform canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
-          	  Transform uiCam = GameObject.Find("UICamera").transform;
-           	  uiController = GetComponent<UIController>();
-           	  base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
+          		Transform canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
+          		Transform uiCam = GameObject.Find("UICamera").transform;
+           		uiController = GetComponent<UIController>();
+           		base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
         	}
 
        	 	void Update()
@@ -123,7 +123,8 @@
 </code>
 </pre>
 
-  > UI.cs의 Move함수  
+  > UI.cs의 Move함수 
+  
   <pre>
   <code>
 	protected virtual void Move(Vector3 destiPos)
@@ -160,7 +161,9 @@
   - 미리 계산한 sin값을 sin.data에 저장하고 이를 이용하여 빠르게 궤적을 계산합니다.
   
   > Unit.cs의 ThrowLineRenderer.Draw  
-  - 계산한 궤적을 LineRenderer로 전송하여 화면상에 표시합니다. 
+  
+  계산한 궤적을 LineRenderer로 전송하여 화면상에 표시합니다. 
+  
   <pre>
   <code>
 	public void Draw(float theta, Vector3 throwPos, float eulerAngleY)
@@ -192,9 +195,10 @@
   </pre>
   
   > GetThrowLinePoint로 계산하는 궤적
+  
   - 탄도방정식에 발사각도, 방향, 시간을 대입하여 궤적을 계산합니다.
   - 실제 궤적과 비슷하게 되도록 가중치를 추가했습니다.
-  - 삼각함수 값은 MyMath 클래스에서 근사값을 이용하여 계산했습니다.
+  - 삼각함수 값은 MyMath 클래스의 근사값을 이용하여 계산했습니다.
   
   <pre>
   <code>
