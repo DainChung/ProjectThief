@@ -11,6 +11,8 @@
  - 인원 : 개인 프로젝트
  - 사용 프로그램 : Unity 2019.2.17f1
 
+ - 스테이지 오브젝트 출처 : https://assetstore.unity.com/packages/3d/environments/snaps-prototype-office-137490
+ - 캐릭터 모델 및 애니메이션 출처 : https://www.mixamo.com/#/
 
 ## 2. 플레이 영상
 
