@@ -277,7 +277,8 @@
 
 ## 출처
 
- - UI 디자인 : [Kenny](https://www.kenney.nl/)
+ - UI 디자인, 폰트, UI효과음 : [Kenny](https://www.kenney.nl/)
  - 스테이지 오브젝트 및 배경화면 : [유니티 에셋 스토어](https://assetstore.unity.com/packages/3d/environments/snaps-prototype-office-137490)
  - 캐릭터 모델 및 애니메이션 : [Mixamo](https://www.mixamo.com/#/)
+ - 그 외 출처는 ReadIt.txt에 기록되어있습니다.
 
