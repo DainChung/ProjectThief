@@ -66,7 +66,8 @@
 
   ##### 3.2.2.1. 게임 UI
 
-  ![그림1](https://user-images.githubusercontent.com/11573611/100541166-4be0e080-3285-11eb-858f-1b9ac6e330b4.png)
+![전체 게임 화면](https://user-images.githubusercontent.com/11573611/100573166-88125080-331a-11eb-9644-66632790a24c.png)
+
 
   ##### 3.2.2.2. 인벤토리
 
@@ -148,7 +149,7 @@
   
   > 인게임
 
-![궤적 (2)_Small](https://user-images.githubusercontent.com/11573611/100573040-45507880-331a-11eb-907a-1a64a75604e0.png)
+![궤적 (2)_Small](https://user-images.githubusercontent.com/11573611/100573210-9ceee400-331a-11eb-9a99-5ae3b7d8ec4e.png)
 
   
   > 개발 화면
