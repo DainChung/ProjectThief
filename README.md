@@ -102,8 +102,8 @@ NGUI를 사용하여 만들었습니다.
         	{
           	  Transform canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
           	  Transform uiCam = GameObject.Find("UICamera").transform;
-           	 uiController = GetComponent<UIController>();
-           	 base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
+           	  uiController = GetComponent<UIController>();
+           	  base.InitMaxWMaxH(canvas.TransformVector(transform.position) / uiCam.localScale.x);
         	}
 
        	 	void Update()
@@ -181,15 +181,26 @@ NGUI를 사용하여 만들었습니다.
   </code>
   </pre>
   
-  > Unit.cs의 ThrowLineRenderer.GetThrowLinePoint
+  > GetThrowLinePoint로 계산하는 궤적
   
   - 탄도방정식에 발사각도, 시간, 방향을 대입하여 궤적을 계산합니다.
   
+  > 탄도방정식
   <pre>
   <code>
-	//theta : 발사각도
-	//t : 시간
-	//eulerAngleY : 캐릭터가 바라보는 방향
+  	Θ : 발사각도
+	
+  
+ 	x = cos Θ * sin(eulerAngleY) * 힘 * 시간
+	y = {힘가중치 * 힘 * sin(eulerAngleY) - 중력가중치 * 중력 * 시간} * 시간
+	z = cos Θ * cos() * 힘 * 시간
+  </code>
+  </pre>
+	
+  > > 코드
+  <pre>
+  <code>
+  	
 	private Vector3 GetThrowLinePoint(float theta, float t, float eulerAngleY)
 	{
         	float x = MyMath.Cos(theta) * MyMath.Sin(eulerAngleY) * throwPower * t;
