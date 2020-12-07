@@ -243,7 +243,7 @@
 		{
 		        int index = (int)(deg + 0.5f);
 		
-		        if(index < -90) 	index += 360;
+		        if(index < -90)  index += 360;
 		        else if(index >= 270)  index -= 360;	
 
             		try
